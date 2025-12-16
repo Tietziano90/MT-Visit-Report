@@ -20,7 +20,27 @@ MT Voice Assistant is a comprehensive Salesforce solution that transforms voice 
 
 ## 🚀 Quick Deployment
 
-### 🌟 Option 1: Git-Based Deployment (Recommended!)
+### 🌟 Option 1: Direct Download (Easiest - No Git Login!)
+
+**No authentication required! Just download and run:**
+
+**Mac/Linux:**
+```bash
+curl -L https://git.soma.salesforce.com/mtietze/MT-Visit-Report/-/archive/main/MT-Visit-Report-main.tar.gz | tar xz
+cd MT-Visit-Report-main
+./deploy.sh
+```
+
+**Windows:**
+1. Download: [MT-Visit-Report-main.zip](https://git.soma.salesforce.com/mtietze/MT-Visit-Report/-/archive/main/MT-Visit-Report-main.zip)
+2. Extract the ZIP
+3. Double-click `deploy.bat`
+
+📖 **See:** [SIMPLE_DEPLOY_INSTRUCTIONS.md](SIMPLE_DEPLOY_INSTRUCTIONS.md) for details
+
+---
+
+### Option 2: Git-Based Deployment (Always Latest)
 
 **Automatically pull and deploy the latest code:**
 
@@ -42,22 +62,6 @@ deploy-from-git.bat
 - ✅ One command deployment
 
 📖 **See:** [GIT_DEPLOYMENT_GUIDE.md](GIT_DEPLOYMENT_GUIDE.md) for details
-
----
-
-### Option 2: Local Deployment Scripts
-
-**Mac/Linux:** Double-click `deploy.sh` or `Deploy MT Voice Assistant.command`  
-**Windows:** Double-click `deploy.bat`
-
-The script will:
-- ✅ Check prerequisites automatically
-- ✅ Open browser to connect to your org
-- ✅ Deploy all components in correct order
-- ✅ Assign permission sets
-- ✅ Show post-deployment steps
-
-**Perfect for:** Deploying from a local copy of the code.
 
 ---
 
