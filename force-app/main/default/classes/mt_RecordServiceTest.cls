@@ -103,14 +103,14 @@ private class mt_RecordServiceTest {
             'Phone' => '555-9999'
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.createRecord(
             'Contact',
             fieldValues,
             null,
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.success, 'Should succeed: ' + result.message);
         System.assertNotEquals(null, result.recordId, 'Should have record ID');
@@ -132,14 +132,14 @@ private class mt_RecordServiceTest {
             'NextStep' => 'Send proposal'
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.createRecord(
             'Opportunity',
             fieldValues,
             null,
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.success, 'Should succeed: ' + result.message);
     }
@@ -159,14 +159,14 @@ private class mt_RecordServiceTest {
             'Description' => 'Call to discuss proposal'
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.createRecord(
             'Task',
             fieldValues,
             null,
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.success, 'Should succeed: ' + result.message);
     }
@@ -183,14 +183,14 @@ private class mt_RecordServiceTest {
             'Description' => 'Strategy meeting'
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.createRecord(
             'Event',
             fieldValues,
             null,
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.success, 'Should succeed: ' + result.message);
     }
@@ -205,14 +205,14 @@ private class mt_RecordServiceTest {
             'Status' => 'Open - Not Contacted'
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.createRecord(
             'Lead',
             fieldValues,
             null,
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.success, 'Should succeed: ' + result.message);
     }
@@ -226,14 +226,14 @@ private class mt_RecordServiceTest {
             'Website' => 'https://test.com'
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.createRecord(
             'Account',
             fieldValues,
             null,
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.success, 'Should succeed: ' + result.message);
     }
@@ -244,14 +244,14 @@ private class mt_RecordServiceTest {
             'FirstName' => 'Test'
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.createRecord(
             'Contact',
             fieldValues,
             null,
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, result.success, 'Should fail for missing required field');
         System.assertNotEquals(null, result.message, 'Should have error message');
@@ -263,42 +263,42 @@ private class mt_RecordServiceTest {
             'Name' => 'Test'
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.createRecord(
             'InvalidObject__xyz',
             fieldValues,
             null,
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, result.success, 'Should fail for invalid object');
     }
 
     @isTest
     static void testCreateRecord_EmptyFields() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.createRecord(
             'Contact',
             new Map<String, Object>(),
             null,
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, result.success, 'Should fail with empty fields');
     }
 
     @isTest
     static void testCreateRecord_NullFields() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.createRecord(
             'Contact',
             null,
             null,
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, result.success, 'Should fail with null fields');
     }
@@ -311,14 +311,14 @@ private class mt_RecordServiceTest {
             'Email' => 'nodupe@test.com'
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.createRecord(
             'Contact',
             fieldValues,
             null,
             false  // Don't allow duplicates
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         // Should succeed (first record) or fail if duplicate exists
         System.assertNotEquals(null, result, 'Should return result');
@@ -336,13 +336,13 @@ private class mt_RecordServiceTest {
             'Description' => 'Updated contact'
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.updateRecord(
             'Contact',
             con.Id,
             fieldValues
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.success, 'Should succeed: ' + result.message);
         System.assertEquals(false, result.isNew, 'Should not be new');
@@ -362,13 +362,13 @@ private class mt_RecordServiceTest {
             'Probability' => 30
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.updateRecord(
             'Opportunity',
             opp.Id,
             fieldValues
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.success, 'Should succeed: ' + result.message);
     }
@@ -382,13 +382,13 @@ private class mt_RecordServiceTest {
             'Industry' => 'Finance'
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.updateRecord(
             'Account',
             acc.Id,
             fieldValues
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.success, 'Should succeed: ' + result.message);
     }
@@ -399,13 +399,13 @@ private class mt_RecordServiceTest {
             'Name' => 'Test'
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.updateRecord(
             'Account',
             '001000000000000AAA',
             fieldValues
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, result.success, 'Should fail for invalid ID');
     }
@@ -416,13 +416,13 @@ private class mt_RecordServiceTest {
             'Name' => 'Test'
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.updateRecord(
             'Account',
             null,
             fieldValues
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, result.success, 'Should fail for null ID');
     }
@@ -431,13 +431,13 @@ private class mt_RecordServiceTest {
     static void testUpdateRecord_EmptyFields() {
         Account acc = [SELECT Id FROM Account WHERE Name = 'Test Account for Record Service' LIMIT 1];
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.updateRecord(
             'Account',
             acc.Id,
             new Map<String, Object>()
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         // Should handle gracefully
         System.assertNotEquals(null, result, 'Should return result');
@@ -456,14 +456,14 @@ private class mt_RecordServiceTest {
         };
         String fieldValuesJson = JSON.serialize(fieldValues);
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.saveRecordSimple(
             'Contact',
             null,
             fieldValuesJson,
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.success, 'Should succeed: ' + result.message);
     }
@@ -478,56 +478,56 @@ private class mt_RecordServiceTest {
         };
         String fieldValuesJson = JSON.serialize(fieldValues);
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.saveRecordSimple(
             'Opportunity',
             opp.Id,
             fieldValuesJson,
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.success, 'Should succeed: ' + result.message);
     }
 
     @isTest
     static void testSaveRecordSimple_InvalidJson() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.saveRecordSimple(
             'Contact',
             null,
             'invalid json {',
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, result.success, 'Should fail for invalid JSON');
     }
 
     @isTest
     static void testSaveRecordSimple_NullJson() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.saveRecordSimple(
             'Contact',
             null,
             null,
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, result.success, 'Should fail for null JSON');
     }
 
     @isTest
     static void testSaveRecordSimple_EmptyJson() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.saveRecordSimple(
             'Contact',
             null,
             '{}',
             true
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, result.success, 'Should fail for empty JSON');
     }
@@ -547,9 +547,9 @@ private class mt_RecordServiceTest {
             'AccountId' => acc.Id
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.saveRecord(request);
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.success, 'Should succeed: ' + result.message);
     }
@@ -565,18 +565,18 @@ private class mt_RecordServiceTest {
             'Title' => 'Updated via Request'
         };
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.saveRecord(request);
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.success, 'Should succeed: ' + result.message);
     }
 
     @isTest
     static void testSaveRecord_NullRequest() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.saveRecord(null);
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, result.success, 'Should fail for null request');
     }
@@ -599,13 +599,13 @@ private class mt_RecordServiceTest {
             'AccountId' => acc.Id
         });
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DmlResult> results = mt_RecordService.createRecords(
             'Contact',
             recordsFieldValues,
             null
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(2, results.size(), 'Should return 2 results');
         System.assertEquals(true, results[0].success, 'First should succeed');
@@ -614,26 +614,26 @@ private class mt_RecordServiceTest {
 
     @isTest
     static void testCreateRecords_EmptyList() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DmlResult> results = mt_RecordService.createRecords(
             'Contact',
             new List<Map<String, Object>>(),
             null
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(0, results.size(), 'Should return empty list');
     }
 
     @isTest
     static void testCreateRecords_NullList() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DmlResult> results = mt_RecordService.createRecords(
             'Contact',
             null,
             null
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, results, 'Should return list');
     }
@@ -646,9 +646,9 @@ private class mt_RecordServiceTest {
         Account acc = new Account(Name = 'Account To Delete');
         insert acc;
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.deleteRecord(acc.Id);
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.success, 'Should succeed: ' + result.message);
         
@@ -659,27 +659,27 @@ private class mt_RecordServiceTest {
 
     @isTest
     static void testDeleteRecord_InvalidId() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.deleteRecord('001000000000000AAA');
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, result.success, 'Should fail for invalid ID');
     }
 
     @isTest
     static void testDeleteRecord_NullId() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.deleteRecord(null);
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, result.success, 'Should fail for null ID');
     }
 
     @isTest
     static void testDeleteRecord_EmptyId() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         mt_RecordService.DmlResult result = mt_RecordService.deleteRecord('');
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, result.success, 'Should fail for empty ID');
     }
@@ -690,14 +690,14 @@ private class mt_RecordServiceTest {
     static void testGetRelatedRecords_Contacts() {
         Account acc = [SELECT Id FROM Account WHERE Name = 'Test Account for Record Service' LIMIT 1];
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DuplicateRecordInfo> records = mt_RecordService.getRelatedRecords(
             'Contact',
             acc.Id,
             null,
             10
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, records, 'Should return records');
         System.assert(records.size() > 0, 'Should have contacts');
@@ -707,14 +707,14 @@ private class mt_RecordServiceTest {
     static void testGetRelatedRecords_Opportunities() {
         Account acc = [SELECT Id FROM Account WHERE Name = 'Test Account for Record Service' LIMIT 1];
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DuplicateRecordInfo> records = mt_RecordService.getRelatedRecords(
             'Opportunity',
             acc.Id,
             null,
             10
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, records, 'Should return records');
     }
@@ -723,14 +723,14 @@ private class mt_RecordServiceTest {
     static void testGetRelatedRecords_WithSearch() {
         Account acc = [SELECT Id FROM Account WHERE Name = 'Test Account for Record Service' LIMIT 1];
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DuplicateRecordInfo> records = mt_RecordService.getRelatedRecords(
             'Contact',
             acc.Id,
             'Test',
             10
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, records, 'Should return records');
     }
@@ -739,14 +739,14 @@ private class mt_RecordServiceTest {
     static void testGetRelatedRecords_Tasks() {
         Account acc = [SELECT Id FROM Account WHERE Name = 'Test Account for Record Service' LIMIT 1];
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DuplicateRecordInfo> records = mt_RecordService.getRelatedRecords(
             'Task',
             acc.Id,
             null,
             10
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, records, 'Should return records');
     }
@@ -755,14 +755,14 @@ private class mt_RecordServiceTest {
     static void testGetRelatedRecords_InvalidObject() {
         Account acc = [SELECT Id FROM Account WHERE Name = 'Test Account for Record Service' LIMIT 1];
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DuplicateRecordInfo> records = mt_RecordService.getRelatedRecords(
             'InvalidObject__xyz',
             acc.Id,
             null,
             10
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, records, 'Should return empty list');
     }
@@ -771,28 +771,28 @@ private class mt_RecordServiceTest {
     static void testGetRelatedRecords_NullObject() {
         Account acc = [SELECT Id FROM Account WHERE Name = 'Test Account for Record Service' LIMIT 1];
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DuplicateRecordInfo> records = mt_RecordService.getRelatedRecords(
             null,
             acc.Id,
             null,
             10
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, records, 'Should return empty list');
     }
 
     @isTest
     static void testGetRelatedRecords_NullAccountId() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DuplicateRecordInfo> records = mt_RecordService.getRelatedRecords(
             'Contact',
             null,
             null,
             10
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, records, 'Should return empty list');
     }
@@ -807,12 +807,12 @@ private class mt_RecordServiceTest {
             recordIds.add(c.Id);
         }
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DuplicateRecordInfo> records = mt_RecordService.getDuplicateRecords(
             'Contact',
             recordIds
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, records, 'Should return records');
         System.assertEquals(2, records.size(), 'Should have 2 records');
@@ -826,48 +826,48 @@ private class mt_RecordServiceTest {
             recordIds.add(a.Id);
         }
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DuplicateRecordInfo> records = mt_RecordService.getDuplicateRecords(
             'Account',
             recordIds
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, records, 'Should return records');
     }
 
     @isTest
     static void testGetDuplicateRecords_EmptyIds() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DuplicateRecordInfo> records = mt_RecordService.getDuplicateRecords(
             'Contact',
             new List<String>()
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(0, records.size(), 'Should return empty list');
     }
 
     @isTest
     static void testGetDuplicateRecords_NullIds() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DuplicateRecordInfo> records = mt_RecordService.getDuplicateRecords(
             'Contact',
             null
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, records, 'Should return empty list');
     }
 
     @isTest
     static void testGetDuplicateRecords_InvalidObject() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         List<mt_RecordService.DuplicateRecordInfo> records = mt_RecordService.getDuplicateRecords(
             'InvalidObject__xyz',
             new List<String>{ 'abc123' }
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, records, 'Should return empty list');
     }
@@ -878,12 +878,12 @@ private class mt_RecordServiceTest {
     static void testGetRecordFields_Contact() {
         Contact con = [SELECT Id FROM Contact LIMIT 1];
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         Map<String, Object> fields = mt_RecordService.getRecordFields(
             con.Id,
             new List<String>{ 'FirstName', 'LastName', 'Email' }
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, fields, 'Should return fields');
         System.assertEquals(true, fields.containsKey('FirstName'), 'Should have FirstName');
@@ -893,12 +893,12 @@ private class mt_RecordServiceTest {
     static void testGetRecordFields_Account() {
         Account acc = [SELECT Id FROM Account WHERE Name = 'Test Account for Record Service' LIMIT 1];
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         Map<String, Object> fields = mt_RecordService.getRecordFields(
             acc.Id,
             new List<String>{ 'Name', 'Industry', 'Phone' }
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, fields, 'Should return fields');
         System.assertEquals('Test Account for Record Service', fields.get('Name'));
@@ -908,24 +908,24 @@ private class mt_RecordServiceTest {
     static void testGetRecordFields_Opportunity() {
         Opportunity opp = [SELECT Id FROM Opportunity LIMIT 1];
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         Map<String, Object> fields = mt_RecordService.getRecordFields(
             opp.Id,
             new List<String>{ 'Name', 'Amount', 'StageName' }
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, fields, 'Should return fields');
     }
 
     @isTest
     static void testGetRecordFields_InvalidId() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         Map<String, Object> fields = mt_RecordService.getRecordFields(
             '001000000000000AAA',
             new List<String>{ 'Name' }
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         // Should handle gracefully
         System.assertNotEquals(null, fields, 'Should return map');
@@ -933,12 +933,12 @@ private class mt_RecordServiceTest {
 
     @isTest
     static void testGetRecordFields_NullId() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         Map<String, Object> fields = mt_RecordService.getRecordFields(
             null,
             new List<String>{ 'Name' }
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, fields, 'Should return empty map');
     }
@@ -947,12 +947,12 @@ private class mt_RecordServiceTest {
     static void testGetRecordFields_EmptyFields() {
         Account acc = [SELECT Id FROM Account WHERE Name = 'Test Account for Record Service' LIMIT 1];
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         Map<String, Object> fields = mt_RecordService.getRecordFields(
             acc.Id,
             new List<String>()
         );
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, fields, 'Should return map');
     }
@@ -967,9 +967,9 @@ private class mt_RecordServiceTest {
             lookupIds.put(acc.Id, acc.Id);
         }
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         Map<String, String> names = mt_RecordService.resolveLookupNames(lookupIds);
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, names, 'Should return names');
         System.assertEquals(accounts.size(), names.size(), 'Should have same count');
@@ -983,9 +983,9 @@ private class mt_RecordServiceTest {
             lookupIds.put(con.Id, con.Id);
         }
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         Map<String, String> names = mt_RecordService.resolveLookupNames(lookupIds);
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, names, 'Should return names');
     }
@@ -999,27 +999,27 @@ private class mt_RecordServiceTest {
         lookupIds.put(acc.Id, acc.Id);
         lookupIds.put(con.Id, con.Id);
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         Map<String, String> names = mt_RecordService.resolveLookupNames(lookupIds);
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, names, 'Should return names');
     }
 
     @isTest
     static void testResolveLookupNames_EmptyMap() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         Map<String, String> names = mt_RecordService.resolveLookupNames(new Map<String, String>());
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(0, names.size(), 'Should return empty map');
     }
 
     @isTest
     static void testResolveLookupNames_NullMap() {
-        System.System.Test.startTest();
+        System.Test.startTest();
         Map<String, String> names = mt_RecordService.resolveLookupNames(null);
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, names, 'Should return empty map');
     }
@@ -1030,9 +1030,9 @@ private class mt_RecordServiceTest {
         lookupIds.put('invalid1', 'invalid1');
         lookupIds.put('invalid2', 'invalid2');
         
-        System.System.Test.startTest();
+        System.Test.startTest();
         Map<String, String> names = mt_RecordService.resolveLookupNames(lookupIds);
-        System.System.Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, names, 'Should handle gracefully');
     }

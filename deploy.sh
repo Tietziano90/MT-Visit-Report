@@ -186,29 +186,16 @@ show_existing_orgs() {
     echo ""
     print_header "📋 EXISTING SALESFORCE ORGS"
     
-    echo -e "${CYAN}Connected Orgs:${NC}"
+    echo -e "${CYAN}Fetching connected orgs...${NC}"
     echo ""
     
-    sf org list --json > /tmp/org-list-$$.json 2>&1
+    # Use simple text output instead of JSON for speed
+    sf org list 2>/dev/null
     
-    if [ -f /tmp/org-list-$$.json ]; then
-        # Parse and display orgs nicely
-        echo -e "${WHITE}Alias${NC}                ${WHITE}Username${NC}                           ${WHITE}Org ID${NC}"
-        echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-        
-        # Show non-scratch orgs
-        grep -o '"alias":"[^"]*"' /tmp/org-list-$$.json | cut -d'"' -f4 | while read -r alias; do
-            username=$(grep -A 2 "\"alias\":\"$alias\"" /tmp/org-list-$$.json | grep -o '"username":"[^"]*"' | cut -d'"' -f4 | head -1)
-            orgid=$(grep -A 2 "\"alias\":\"$alias\"" /tmp/org-list-$$.json | grep -o '"orgId":"[^"]*"' | cut -d'"' -f4 | head -1)
-            printf "%-20s %-35s %-15s\n" "$alias" "$username" "$orgid"
-        done
-        
-        echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-        
-        rm -f /tmp/org-list-$$.json
-    else
-        # Fallback to simple list
-        sf org list
+    if [ $? -ne 0 ]; then
+        print_error "Failed to retrieve org list"
+        echo ""
+        echo -e "${YELLOW}Try running: ${WHITE}sf org list${NC}"
     fi
     
     echo ""
