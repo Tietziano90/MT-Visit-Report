@@ -182,17 +182,240 @@ get_deployment_status() {
     fi
 }
 
+show_existing_orgs() {
+    echo ""
+    print_header "📋 EXISTING SALESFORCE ORGS"
+    
+    echo -e "${CYAN}Connected Orgs:${NC}"
+    echo ""
+    
+    sf org list --json > /tmp/org-list-$$.json 2>&1
+    
+    if [ -f /tmp/org-list-$$.json ]; then
+        # Parse and display orgs nicely
+        echo -e "${WHITE}Alias${NC}                ${WHITE}Username${NC}                           ${WHITE}Org ID${NC}"
+        echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        
+        # Show non-scratch orgs
+        grep -o '"alias":"[^"]*"' /tmp/org-list-$$.json | cut -d'"' -f4 | while read -r alias; do
+            username=$(grep -A 2 "\"alias\":\"$alias\"" /tmp/org-list-$$.json | grep -o '"username":"[^"]*"' | cut -d'"' -f4 | head -1)
+            orgid=$(grep -A 2 "\"alias\":\"$alias\"" /tmp/org-list-$$.json | grep -o '"orgId":"[^"]*"' | cut -d'"' -f4 | head -1)
+            printf "%-20s %-35s %-15s\n" "$alias" "$username" "$orgid"
+        done
+        
+        echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        
+        rm -f /tmp/org-list-$$.json
+    else
+        # Fallback to simple list
+        sf org list
+    fi
+    
+    echo ""
+}
+
+manual_component_deployment() {
+    local org_alias=$1
+    
+    print_header "🔧 MANUAL COMPONENT DEPLOYMENT"
+    
+    echo -e "${CYAN}Select component to deploy:${NC}"
+    echo ""
+    echo -e "${WHITE} 1)${NC}  Custom Metadata Types & Objects"
+    echo -e "${WHITE} 2)${NC}  Custom Permissions"
+    echo -e "${WHITE} 3)${NC}  Apex Classes"
+    echo -e "${WHITE} 4)${NC}  Lightning Web Components (All)"
+    echo -e "${WHITE} 5)${NC}  mtDateInput (LWC)"
+    echo -e "${WHITE} 6)${NC}  mtRecordSuggestion (LWC)"
+    echo -e "${WHITE} 7)${NC}  mtEinsteinTranscribe (LWC)"
+    echo -e "${WHITE} 8)${NC}  mtVoiceAssistantAdmin (LWC)"
+    echo -e "${WHITE} 9)${NC}  Page Layouts"
+    echo -e "${WHITE}10)${NC}  Custom Metadata Records"
+    echo -e "${WHITE}11)${NC}  External Credentials"
+    echo -e "${WHITE}12)${NC}  Named Credentials"
+    echo -e "${WHITE}13)${NC}  CSP Trusted Sites"
+    echo -e "${WHITE}14)${NC}  Connected App"
+    echo -e "${WHITE}15)${NC}  GenAI Prompt Templates"
+    echo -e "${WHITE}16)${NC}  Custom Tab"
+    echo -e "${WHITE}17)${NC}  Flows"
+    echo -e "${WHITE}18)${NC}  Permission Sets"
+    echo -e "${WHITE} 0)${NC}  Back to main menu"
+    echo ""
+    
+    if [ -t 0 ]; then
+        read -p "Enter choice (0-18): " COMPONENT_CHOICE
+    else
+        read -p "Enter choice (0-18): " COMPONENT_CHOICE </dev/tty
+    fi
+    
+    case $COMPONENT_CHOICE in
+        1) deploy_component "Custom Metadata Types & Objects" "force-app/main/default/objects" ;;
+        2) deploy_component "Custom Permissions" "force-app/main/default/customPermissions" ;;
+        3) deploy_component "Apex Classes" "force-app/main/default/classes" ;;
+        4) deploy_component "All Lightning Web Components" "force-app/main/default/lwc" ;;
+        5) deploy_component "mtDateInput" "force-app/main/default/lwc/mtDateInput" ;;
+        6) deploy_component "mtRecordSuggestion" "force-app/main/default/lwc/mtRecordSuggestion" ;;
+        7) deploy_component "mtEinsteinTranscribe" "force-app/main/default/lwc/mtEinsteinTranscribe" ;;
+        8) deploy_component "mtVoiceAssistantAdmin" "force-app/main/default/lwc/mtVoiceAssistantAdmin" ;;
+        9) deploy_component "Page Layouts" "force-app/main/default/layouts" ;;
+        10) deploy_component "Custom Metadata Records" "force-app/main/default/customMetadata" ;;
+        11) deploy_component "External Credentials" "force-app/main/default/externalCredentials" ;;
+        12) deploy_component "Named Credentials" "force-app/main/default/namedCredentials" ;;
+        13) deploy_component "CSP Trusted Sites" "force-app/main/default/cspTrustedSites" ;;
+        14) deploy_component "Connected App" "force-app/main/default/connectedApps" ;;
+        15) deploy_component "GenAI Prompt Templates" "force-app/main/default/genAiPromptTemplates" ;;
+        16) deploy_component "Custom Tab" "force-app/main/default/tabs" ;;
+        17) deploy_component "Flows" "force-app/main/default/flows" ;;
+        18) deploy_component "Permission Sets" "force-app/main/default/permissionsets" ;;
+        0) return ;;
+        *) print_error "Invalid choice" ;;
+    esac
+    
+    echo ""
+    if [ -t 0 ]; then
+        read -p "Press Enter to continue..."
+    else
+        read -p "Press Enter to continue..." </dev/tty
+    fi
+}
+
 ################################################################################
 # MAIN DEPLOYMENT SCRIPT
 ################################################################################
 
+# Check prerequisites first
+check_salesforce_cli
+
+# Main menu loop
+while true; do
+    clear
+    
+    print_header "${ROCKET} MT VOICE ASSISTANT - DEPLOYMENT WIZARD ${ROCKET}"
+    
+    echo -e "${PURPLE}This script will deploy the complete MT Voice Assistant solution${NC}"
+    echo -e "${PURPLE}to your Salesforce org with all dependencies in the correct order.${NC}"
+    echo ""
+    
+    echo -e "${CYAN}What would you like to do?${NC}"
+    echo ""
+    echo -e "${WHITE}1)${NC} 🚀 Full Deployment (Deploy all components)"
+    echo -e "${WHITE}2)${NC} 📋 View Existing Orgs"
+    echo -e "${WHITE}3)${NC} 🔧 Manual Component Deployment"
+    echo -e "${WHITE}4)${NC} 🔄 Re-run Failed Components"
+    echo -e "${WHITE}5)${NC} 📊 Check Deployment Status"
+    echo -e "${WHITE}6)${NC} ❌ Exit"
+    echo ""
+    
+    if [ -t 0 ]; then
+        read -p "Enter choice (1-6): " MENU_CHOICE
+    else
+        read -p "Enter choice (1-6): " MENU_CHOICE </dev/tty
+    fi
+    
+    case $MENU_CHOICE in
+        1)
+            # Full deployment - continue with existing script
+            break
+            ;;
+        2)
+            # View existing orgs
+            show_existing_orgs
+            if [ -t 0 ]; then
+                read -p "Press Enter to continue..."
+            else
+                read -p "Press Enter to continue..." </dev/tty
+            fi
+            ;;
+        3)
+            # Manual component deployment
+            echo ""
+            print_info "Enter org alias for deployment:"
+            if [ -t 0 ]; then
+                read -p "Org Alias: " MANUAL_ORG_ALIAS
+            else
+                read -p "Org Alias: " MANUAL_ORG_ALIAS </dev/tty
+            fi
+            
+            if [ ! -z "$MANUAL_ORG_ALIAS" ]; then
+                ORG_ALIAS="$MANUAL_ORG_ALIAS"
+                manual_component_deployment "$ORG_ALIAS"
+            else
+                print_error "No org alias provided"
+                sleep 2
+            fi
+            ;;
+        4)
+            # Re-run failed components
+            echo ""
+            print_info "Enter org alias:"
+            if [ -t 0 ]; then
+                read -p "Org Alias: " RERUN_ORG_ALIAS
+            else
+                read -p "Org Alias: " RERUN_ORG_ALIAS </dev/tty
+            fi
+            
+            if [ ! -z "$RERUN_ORG_ALIAS" ]; then
+                ORG_ALIAS="$RERUN_ORG_ALIAS"
+                print_info "This will re-run the full deployment sequence."
+                if [ -t 0 ]; then
+                    read -p "Continue? (yes/no): " RERUN_CONFIRM
+                else
+                    read -p "Continue? (yes/no): " RERUN_CONFIRM </dev/tty
+                fi
+                
+                RERUN_CONFIRM=$(echo "$RERUN_CONFIRM" | tr '[:upper:]' '[:lower:]' | xargs)
+                if [ "$RERUN_CONFIRM" = "yes" ] || [ "$RERUN_CONFIRM" = "y" ]; then
+                    break
+                fi
+            else
+                print_error "No org alias provided"
+                sleep 2
+            fi
+            ;;
+        5)
+            # Check deployment status
+            echo ""
+            print_info "Enter org alias:"
+            if [ -t 0 ]; then
+                read -p "Org Alias: " STATUS_ORG_ALIAS
+            else
+                read -p "Org Alias: " STATUS_ORG_ALIAS </dev/tty
+            fi
+            
+            if [ ! -z "$STATUS_ORG_ALIAS" ]; then
+                ORG_ALIAS="$STATUS_ORG_ALIAS"
+                get_deployment_status "Recent Deployment"
+            else
+                print_error "No org alias provided"
+            fi
+            
+            if [ -t 0 ]; then
+                read -p "Press Enter to continue..."
+            else
+                read -p "Press Enter to continue..." </dev/tty
+            fi
+            ;;
+        6)
+            # Exit
+            echo ""
+            print_info "Goodbye!"
+            echo ""
+            exit 0
+            ;;
+        *)
+            print_error "Invalid choice"
+            sleep 2
+            ;;
+    esac
+done
+
+################################################################################
+# FULL DEPLOYMENT MODE
+################################################################################
+
 clear
 
-print_header "${ROCKET} MT VOICE ASSISTANT - DEPLOYMENT WIZARD ${ROCKET}"
-
-echo -e "${PURPLE}This script will deploy the complete MT Voice Assistant solution${NC}"
-echo -e "${PURPLE}to your Salesforce org with all dependencies in the correct order.${NC}"
-echo ""
+print_header "${ROCKET} FULL DEPLOYMENT MODE ${ROCKET}"
 
 ################################################################################
 # OPTIONAL: Deployment Password Protection
@@ -223,15 +446,17 @@ echo ""
 
 # Check prerequisites
 print_header "${GEAR} CHECKING PREREQUISITES"
-check_salesforce_cli
+print_success "Salesforce CLI detected"
 
-# Get org alias
-echo ""
-print_info "Enter your Salesforce org alias (or press Enter to create a new connection):"
-if [ -t 0 ]; then
-    read -p "Org Alias: " ORG_ALIAS
-else
-    read -p "Org Alias: " ORG_ALIAS </dev/tty
+# Get org alias (if not already set from menu)
+if [ -z "$ORG_ALIAS" ]; then
+    echo ""
+    print_info "Enter your Salesforce org alias (or press Enter to create a new connection):"
+    if [ -t 0 ]; then
+        read -p "Org Alias: " ORG_ALIAS
+    else
+        read -p "Org Alias: " ORG_ALIAS </dev/tty
+    fi
 fi
 
 if [ -z "$ORG_ALIAS" ]; then
