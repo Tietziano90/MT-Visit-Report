@@ -34,7 +34,7 @@ ERROR="❌"
 INFO="ℹ️"
 
 # Git repository URL
-GIT_REPO="https://soma.git.soma.salesforce.com/mtietze/voice-assistant-visit-report.git"
+GIT_REPO="https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git"
 TEMP_DIR="/tmp/voice-assistant-deploy-$$"
 
 ################################################################################

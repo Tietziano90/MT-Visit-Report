@@ -390,4 +390,4 @@ deploy.bat
 **Last Updated:** December 16, 2025  
 **Status:** Production Ready ✅  
 **Code Coverage:** 88% Average (All classes >75%)  
-**Repository:** https://soma.git.soma.salesforce.com/mtietze/voice-assistant-visit-report
+**Repository:** https://git.soma.salesforce.com/mtietze/MT-Visit-Report

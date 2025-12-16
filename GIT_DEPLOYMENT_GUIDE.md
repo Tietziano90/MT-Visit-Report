@@ -101,7 +101,7 @@ Before running the Git deployment script, ensure you have:
 ## 🌐 Git Repository
 
 ### Repository Information
-- **URL:** https://soma.git.soma.salesforce.com/mtietze/voice-assistant-visit-report
+- **URL:** https://git.soma.salesforce.com/mtietze/MT-Visit-Report
 - **Access:** Public read (no authentication required)
 - **Branch:** main
 - **Latest Version:** Always deployed
@@ -155,7 +155,7 @@ This script will:
 📦 PULLING LATEST CODE FROM GIT
 ═══════════════════════════════════════════════════════════════════
 
-→ Repository: https://soma.git.soma.salesforce.com/mtietze/voice-assistant-visit-report.git
+→ Repository: https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git
 → Cloning to temporary directory...
 ✓ Successfully pulled latest code from Git
 ℹ️ Latest commit: f8d0b3c - Initial commit: MT Voice Assistant v1.0 (2 minutes ago)
@@ -202,7 +202,7 @@ Source: Git (latest commit)
 
 **Solution:**
 1. Ensure you're on Salesforce VPN or network
-2. Verify repository exists: https://soma.git.soma.salesforce.com/mtietze/voice-assistant-visit-report
+2. Verify repository exists: https://git.soma.salesforce.com/mtietze/MT-Visit-Report
 3. If repository doesn't exist, create it first (see Repository Setup below)
 
 ### Issue: "Authentication required"
