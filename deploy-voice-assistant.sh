@@ -153,9 +153,9 @@ if ! command -v sf &> /dev/null; then
         echo -e "${GREEN}✓ npm detected!${NC}"
         echo ""
         if [ -t 0 ]; then
-            read -p "Install Salesforce CLI via npm now? (yes/no): " INSTALL_CLI
+            read -p "Install Salesforce CLI via npm now? (may require sudo) (yes/no): " INSTALL_CLI
         else
-            read -p "Install Salesforce CLI via npm now? (yes/no): " INSTALL_CLI </dev/tty
+            read -p "Install Salesforce CLI via npm now? (may require sudo) (yes/no): " INSTALL_CLI </dev/tty
         fi
         
         INSTALL_CLI=$(echo "$INSTALL_CLI" | tr '[:upper:]' '[:lower:]' | xargs)
@@ -163,14 +163,23 @@ if ! command -v sf &> /dev/null; then
         if [ "$INSTALL_CLI" = "yes" ] || [ "$INSTALL_CLI" = "y" ]; then
             echo ""
             print_step "Installing Salesforce CLI..."
-            npm install -g @salesforce/cli
             
-            if command -v sf &> /dev/null; then
+            # Try without sudo first
+            if npm install -g @salesforce/cli 2>/dev/null; then
                 print_success "Salesforce CLI installed successfully!"
                 echo ""
             else
-                print_error "Installation failed. Please install manually."
-                exit 1
+                # Try with sudo if first attempt failed
+                print_step "Trying with sudo..."
+                sudo npm install -g @salesforce/cli
+                
+                if command -v sf &> /dev/null; then
+                    print_success "Salesforce CLI installed successfully!"
+                    echo ""
+                else
+                    print_error "Installation failed. Please install manually."
+                    exit 1
+                fi
             fi
         else
             echo ""
@@ -245,14 +254,62 @@ if ! command -v git &> /dev/null; then
         fi
     elif command -v apt-get &> /dev/null; then
         # Ubuntu/Debian
-        echo -e "${YELLOW}Run this command to install Git:${NC}"
-        echo "  sudo apt-get update && sudo apt-get install -y git"
-        exit 1
+        echo -e "${GREEN}✓ apt-get detected!${NC}"
+        echo ""
+        if [ -t 0 ]; then
+            read -p "Install Git via apt-get now? (requires sudo) (yes/no): " INSTALL_GIT
+        else
+            read -p "Install Git via apt-get now? (requires sudo) (yes/no): " INSTALL_GIT </dev/tty
+        fi
+        
+        INSTALL_GIT=$(echo "$INSTALL_GIT" | tr '[:upper:]' '[:lower:]' | xargs)
+        
+        if [ "$INSTALL_GIT" = "yes" ] || [ "$INSTALL_GIT" = "y" ]; then
+            echo ""
+            print_step "Installing Git..."
+            sudo apt-get update && sudo apt-get install -y git
+            
+            if command -v git &> /dev/null; then
+                print_success "Git installed successfully!"
+                echo ""
+            else
+                print_error "Installation failed. Please install manually."
+                exit 1
+            fi
+        else
+            echo ""
+            echo "Please install Git and run this script again."
+            exit 1
+        fi
     elif command -v yum &> /dev/null; then
         # CentOS/RHEL
-        echo -e "${YELLOW}Run this command to install Git:${NC}"
-        echo "  sudo yum install -y git"
-        exit 1
+        echo -e "${GREEN}✓ yum detected!${NC}"
+        echo ""
+        if [ -t 0 ]; then
+            read -p "Install Git via yum now? (requires sudo) (yes/no): " INSTALL_GIT
+        else
+            read -p "Install Git via yum now? (requires sudo) (yes/no): " INSTALL_GIT </dev/tty
+        fi
+        
+        INSTALL_GIT=$(echo "$INSTALL_GIT" | tr '[:upper:]' '[:lower:]' | xargs)
+        
+        if [ "$INSTALL_GIT" = "yes" ] || [ "$INSTALL_GIT" = "y" ]; then
+            echo ""
+            print_step "Installing Git..."
+            sudo yum install -y git
+            
+            if command -v git &> /dev/null; then
+                print_success "Git installed successfully!"
+                echo ""
+            else
+                print_error "Installation failed. Please install manually."
+                exit 1
+            fi
+        else
+            echo ""
+            echo "Please install Git and run this script again."
+            exit 1
+        fi
     else
         echo ""
         echo "Please install Git manually and run this script again."
