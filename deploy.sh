@@ -189,10 +189,15 @@ show_existing_orgs() {
     echo -e "${CYAN}Fetching connected orgs...${NC}"
     echo ""
     
-    # Use simple text output instead of JSON for speed
-    sf org list 2>/dev/null
+    # Use simple text output with timeout
+    timeout 5 sf org list 2>/dev/null
     
-    if [ $? -ne 0 ]; then
+    local exit_code=$?
+    if [ $exit_code -eq 124 ]; then
+        print_warning "Command timed out after 5 seconds"
+        echo ""
+        echo -e "${YELLOW}Try running manually: ${WHITE}sf org list${NC}"
+    elif [ $exit_code -ne 0 ]; then
         print_error "Failed to retrieve org list"
         echo ""
         echo -e "${YELLOW}Try running: ${WHITE}sf org list${NC}"
@@ -301,8 +306,8 @@ while true; do
     
     case $MENU_CHOICE in
         1)
-            # Full deployment - continue with existing script
-            break
+            # Full deployment - run deployment then return to menu
+            RUN_FULL_DEPLOYMENT=true
             ;;
         2)
             # View existing orgs
@@ -316,11 +321,23 @@ while true; do
         3)
             # Manual component deployment
             echo ""
-            print_info "Enter org alias for deployment:"
+            
+            # Use last deployed org as default if available
+            if [ ! -z "$LAST_DEPLOYED_ORG" ]; then
+                print_info "Enter org alias (press Enter to use ${CYAN}$LAST_DEPLOYED_ORG${NC}):"
+            else
+                print_info "Enter org alias for deployment:"
+            fi
+            
             if [ -t 0 ]; then
                 read -p "Org Alias: " MANUAL_ORG_ALIAS
             else
                 read -p "Org Alias: " MANUAL_ORG_ALIAS </dev/tty
+            fi
+            
+            # Use last deployed org if no input
+            if [ -z "$MANUAL_ORG_ALIAS" ] && [ ! -z "$LAST_DEPLOYED_ORG" ]; then
+                MANUAL_ORG_ALIAS="$LAST_DEPLOYED_ORG"
             fi
             
             if [ ! -z "$MANUAL_ORG_ALIAS" ]; then
@@ -334,11 +351,23 @@ while true; do
         4)
             # Re-run failed components
             echo ""
-            print_info "Enter org alias:"
+            
+            # Use last deployed org as default if available
+            if [ ! -z "$LAST_DEPLOYED_ORG" ]; then
+                print_info "Enter org alias (press Enter to use ${CYAN}$LAST_DEPLOYED_ORG${NC}):"
+            else
+                print_info "Enter org alias:"
+            fi
+            
             if [ -t 0 ]; then
                 read -p "Org Alias: " RERUN_ORG_ALIAS
             else
                 read -p "Org Alias: " RERUN_ORG_ALIAS </dev/tty
+            fi
+            
+            # Use last deployed org if no input
+            if [ -z "$RERUN_ORG_ALIAS" ] && [ ! -z "$LAST_DEPLOYED_ORG" ]; then
+                RERUN_ORG_ALIAS="$LAST_DEPLOYED_ORG"
             fi
             
             if [ ! -z "$RERUN_ORG_ALIAS" ]; then
@@ -352,7 +381,7 @@ while true; do
                 
                 RERUN_CONFIRM=$(echo "$RERUN_CONFIRM" | tr '[:upper:]' '[:lower:]' | xargs)
                 if [ "$RERUN_CONFIRM" = "yes" ] || [ "$RERUN_CONFIRM" = "y" ]; then
-                    break
+                    RUN_FULL_DEPLOYMENT=true
                 fi
             else
                 print_error "No org alias provided"
@@ -362,11 +391,23 @@ while true; do
         5)
             # Check deployment status
             echo ""
-            print_info "Enter org alias:"
+            
+            # Use last deployed org as default if available
+            if [ ! -z "$LAST_DEPLOYED_ORG" ]; then
+                print_info "Enter org alias (press Enter to use ${CYAN}$LAST_DEPLOYED_ORG${NC}):"
+            else
+                print_info "Enter org alias:"
+            fi
+            
             if [ -t 0 ]; then
                 read -p "Org Alias: " STATUS_ORG_ALIAS
             else
                 read -p "Org Alias: " STATUS_ORG_ALIAS </dev/tty
+            fi
+            
+            # Use last deployed org if no input
+            if [ -z "$STATUS_ORG_ALIAS" ] && [ ! -z "$LAST_DEPLOYED_ORG" ]; then
+                STATUS_ORG_ALIAS="$LAST_DEPLOYED_ORG"
             fi
             
             if [ ! -z "$STATUS_ORG_ALIAS" ]; then
@@ -394,15 +435,18 @@ while true; do
             sleep 2
             ;;
     esac
-done
-
-################################################################################
-# FULL DEPLOYMENT MODE
-################################################################################
-
-clear
-
-print_header "${ROCKET} FULL DEPLOYMENT MODE ${ROCKET}"
+    
+    # Check if we should run full deployment
+    if [ "$RUN_FULL_DEPLOYMENT" = "true" ]; then
+        RUN_FULL_DEPLOYMENT=false  # Reset flag
+        
+        ################################################################################
+        # FULL DEPLOYMENT MODE
+        ################################################################################
+        
+        clear
+        
+        print_header "${ROCKET} FULL DEPLOYMENT MODE ${ROCKET}"
 
 ################################################################################
 # OPTIONAL: Deployment Password Protection
@@ -906,4 +950,33 @@ print_header "${ROCKET} DEPLOYMENT WIZARD COMPLETE"
 echo -e "${GREEN}Thank you for using MT Voice Assistant!${NC}"
 echo -e "${CYAN}For support, contact: mtietze@salesforce.com${NC}"
 echo ""
+
+# Store the org for future operations in this session
+        LAST_DEPLOYED_ORG="$ORG_ALIAS"
+        
+        # Ask if user wants to return to menu
+        echo ""
+        print_info "What would you like to do next?"
+        echo ""
+        echo -e "${WHITE}1)${NC} Return to main menu (using ${CYAN}$ORG_ALIAS${NC} as default)"
+        echo -e "${WHITE}2)${NC} Exit"
+        echo ""
+        
+        if [ -t 0 ]; then
+            read -p "Enter choice (1-2): " NEXT_CHOICE
+        else
+            read -p "Enter choice (1-2): " NEXT_CHOICE </dev/tty
+        fi
+        
+        if [ "$NEXT_CHOICE" != "1" ]; then
+            # Exit
+            echo ""
+            print_info "Goodbye!"
+            echo ""
+            exit 0
+        fi
+        # If choice is 1, loop continues back to menu
+        
+    fi  # End of RUN_FULL_DEPLOYMENT check
+done  # End of main menu while loop
 
