@@ -12,7 +12,7 @@ Since the repository is public, you can clone it without any login:
 
 ```bash
 # Clone the repository (no authentication needed!)
-git clone https://github.com/mtietze/MT-Visit-Report.git
+git clone https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git
 
 # Navigate to directory
 cd MT-Visit-Report
@@ -23,14 +23,14 @@ cd MT-Visit-Report
 
 **Or as one command:**
 ```bash
-git clone https://github.com/mtietze/MT-Visit-Report.git && cd MT-Visit-Report && ./deploy.sh
+git clone https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git && cd MT-Visit-Report && ./deploy.sh
 ```
 
 ### **Windows:**
 
 ```cmd
 # Clone the repository (no authentication needed!)
-git clone https://github.com/mtietze/MT-Visit-Report.git
+git clone https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git
 
 # Navigate to directory
 cd MT-Visit-Report
@@ -45,7 +45,7 @@ deploy.bat
 
 If you don't have Git installed:
 
-1. **Go to:** https://github.com/mtietze/MT-Visit-Report
+1. **Go to:** https://git.soma.salesforce.com/mtietze/MT-Visit-Report
 2. **Click:** The blue "Code" button
 3. **Select:** "Download ZIP"
 4. **Extract** the ZIP file
@@ -148,14 +148,14 @@ Or use the ZIP download method above
 **Copy and paste this:**
 
 ```bash
-git clone https://github.com/mtietze/MT-Visit-Report.git && cd MT-Visit-Report && ./deploy.sh
+git clone https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git && cd MT-Visit-Report && ./deploy.sh
 ```
 
 **That's it!** The script handles everything else automatically! 🚀
 
 ---
 
-**Repository:** https://github.com/mtietze/MT-Visit-Report  
+**Repository:** https://git.soma.salesforce.com/mtietze/MT-Visit-Report  
 **Version:** 1.0  
 **Last Updated:** December 16, 2025
 

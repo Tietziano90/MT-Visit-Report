@@ -9,10 +9,10 @@
 ### Mac/Linux
 
 1. **Download the deployment script:**
-   - Right-click and "Save As": [deploy-from-git.sh](https://github.com/mtietze/MT-Visit-Report/-/raw/main/deploy-from-git.sh)
+   - Right-click and "Save As": [deploy-from-git.sh](https://git.soma.salesforce.com/mtietze/MT-Visit-Report/-/raw/main/deploy-from-git.sh)
    - Or use Terminal:
      ```bash
-     curl -O https://github.com/mtietze/MT-Visit-Report/-/raw/main/deploy-from-git.sh
+     curl -O https://git.soma.salesforce.com/mtietze/MT-Visit-Report/-/raw/main/deploy-from-git.sh
      ```
 
 2. **Run it:**
@@ -26,7 +26,7 @@
 ### Windows
 
 1. **Download the deployment script:**
-   - Right-click and "Save As": [deploy-from-git.bat](https://github.com/mtietze/MT-Visit-Report/-/raw/main/deploy-from-git.bat)
+   - Right-click and "Save As": [deploy-from-git.bat](https://git.soma.salesforce.com/mtietze/MT-Visit-Report/-/raw/main/deploy-from-git.bat)
 
 2. **Double-click** `deploy-from-git.bat`
 
@@ -38,7 +38,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/mtietze/MT-Visit-Report.git
+git clone https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git
 
 # Navigate to directory
 cd MT-Visit-Report
@@ -156,7 +156,7 @@ Make sure you're on Salesforce VPN or network
 ## 📞 Need Help?
 
 - **Email:** mtietze@salesforce.com
-- **Repository:** https://github.com/mtietze/MT-Visit-Report
+- **Repository:** https://git.soma.salesforce.com/mtietze/MT-Visit-Report
 - **Full Documentation:** See `README.md` in the repository
 
 ---
@@ -165,7 +165,7 @@ Make sure you're on Salesforce VPN or network
 
 Just download one file and run it. The script handles everything else automatically!
 
-**Repository:** https://github.com/mtietze/MT-Visit-Report
+**Repository:** https://git.soma.salesforce.com/mtietze/MT-Visit-Report
 
 ---
 
