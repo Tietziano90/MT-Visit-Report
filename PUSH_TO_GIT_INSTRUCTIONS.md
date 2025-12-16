@@ -72,7 +72,7 @@ To git.soma.salesforce.com:mtietze/MT-Visit-Report.git
 
 Your repository will be available at:
 ```
-https://git.soma.salesforce.com/mtietze/MT-Visit-Report
+https://github.com/Tietziano90/MT-Visit-Report
 ```
 
 Then I'll update all the deployment scripts with the correct URL!
@@ -86,7 +86,7 @@ Then I'll update all the deployment scripts with the correct URL!
 - Wait 1-2 minutes after adding the key, then try again
 
 ### "Could not read from remote repository"
-- Check that the repository exists: https://git.soma.salesforce.com/mtietze/MT-Visit-Report
+- Check that the repository exists: https://github.com/Tietziano90/MT-Visit-Report
 - Make sure you have access to it
 
 ### Need Help?
@@ -102,7 +102,7 @@ If SSH is too complicated, you can use HTTPS:
 cd "/Users/mtietze/Documents/Voice Assistant/Voice Assistant Visit Report"
 
 # Use HTTPS instead
-git remote set-url origin https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git
+git remote set-url origin https://github.com/Tietziano90/MT-Visit-Report.git
 
 # Push (will ask for username and password)
 git push -u origin main

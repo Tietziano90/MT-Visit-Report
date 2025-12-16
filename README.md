@@ -26,13 +26,13 @@ MT Voice Assistant is a comprehensive Salesforce solution that transforms voice 
 
 **Mac/Linux:**
 ```bash
-curl -L https://git.soma.salesforce.com/mtietze/MT-Visit-Report/-/archive/main/MT-Visit-Report-main.tar.gz | tar xz
+curl -L https://github.com/Tietziano90/MT-Visit-Report/-/archive/main/MT-Visit-Report-main.tar.gz | tar xz
 cd MT-Visit-Report-main
 ./deploy.sh
 ```
 
 **Windows:**
-1. Download: [MT-Visit-Report-main.zip](https://git.soma.salesforce.com/mtietze/MT-Visit-Report/-/archive/main/MT-Visit-Report-main.zip)
+1. Download: [MT-Visit-Report-main.zip](https://github.com/Tietziano90/MT-Visit-Report/-/archive/main/MT-Visit-Report-main.zip)
 2. Extract the ZIP
 3. Double-click `deploy.bat`
 
@@ -394,4 +394,4 @@ deploy.bat
 **Last Updated:** December 16, 2025  
 **Status:** Production Ready ✅  
 **Code Coverage:** 88% Average (All classes >75%)  
-**Repository:** https://git.soma.salesforce.com/mtietze/MT-Visit-Report
+**Repository:** https://github.com/Tietziano90/MT-Visit-Report

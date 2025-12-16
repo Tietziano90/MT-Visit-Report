@@ -23,7 +23,7 @@
 ### 3. ✅ Git Repository Initialized
 - [x] Local Git repository created
 - [x] All files committed
-- [x] Remote configured: `https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git`
+- [x] Remote configured: `https://github.com/Tietziano90/MT-Visit-Report.git`
 - [x] .gitignore configured
 - [x] Ready to push
 
@@ -71,7 +71,7 @@ Delta compression using up to 8 threads
 Compressing objects: 100% (150/150), done.
 Writing objects: 100% (174/174), 1.23 MiB | 2.45 MiB/s, done.
 Total 174 (delta 45), reused 0 (delta 0)
-To https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git
+To https://github.com/Tietziano90/MT-Visit-Report.git
  * [new branch]      main -> main
 Branch 'main' set up to track remote branch 'main' from 'origin'.
 ```
@@ -202,7 +202,7 @@ Users will have access to:
 
 ### For Users
 - **Email:** mtietze@salesforce.com
-- **Repository:** https://git.soma.salesforce.com/mtietze/MT-Visit-Report
+- **Repository:** https://github.com/Tietziano90/MT-Visit-Report
 - **Documentation:** See README.md and guides
 
 ### For Issues

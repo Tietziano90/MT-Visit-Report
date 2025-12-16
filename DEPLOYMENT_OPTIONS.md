@@ -12,7 +12,7 @@
 
 ```bash
 # 1. Clone the repository (authenticate once)
-git clone https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git
+git clone https://github.com/Tietziano90/MT-Visit-Report.git
 
 # 2. Navigate to directory
 cd MT-Visit-Report
@@ -35,13 +35,13 @@ deploy.bat
 
 ### Mac/Linux:
 ```bash
-curl -O https://git.soma.salesforce.com/mtietze/MT-Visit-Report/-/raw/main/deploy-from-git.sh
+curl -O https://github.com/Tietziano90/MT-Visit-Report/-/raw/main/deploy-from-git.sh
 chmod +x deploy-from-git.sh
 ./deploy-from-git.sh
 ```
 
 ### Windows:
-Download and run: [deploy-from-git.bat](https://git.soma.salesforce.com/mtietze/MT-Visit-Report/-/raw/main/deploy-from-git.bat)
+Download and run: [deploy-from-git.bat](https://github.com/Tietziano90/MT-Visit-Report/-/raw/main/deploy-from-git.bat)
 
 ---
 
@@ -54,7 +54,7 @@ Download and run: [deploy-from-git.bat](https://git.soma.salesforce.com/mtietze/
    
 2. **Share this command:**
    ```bash
-   git clone https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git
+   git clone https://github.com/Tietziano90/MT-Visit-Report.git
    cd MT-Visit-Report
    ./deploy.sh
    ```
@@ -113,7 +113,7 @@ Download and run: [deploy-from-git.bat](https://git.soma.salesforce.com/mtietze/
 
 1. **Clone the repository:**
    ```bash
-   git clone https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git
+   git clone https://github.com/Tietziano90/MT-Visit-Report.git
    ```
    
    *You'll be prompted for your Salesforce Git username and password (one time)*
@@ -169,7 +169,7 @@ Download and run: [deploy-from-git.bat](https://git.soma.salesforce.com/mtietze/
 ## 📞 Support
 
 - **Email:** mtietze@salesforce.com
-- **Repository:** https://git.soma.salesforce.com/mtietze/MT-Visit-Report
+- **Repository:** https://github.com/Tietziano90/MT-Visit-Report
 - **Documentation:** See README.md in the repository
 
 ---
@@ -181,7 +181,7 @@ Download and run: [deploy-from-git.bat](https://git.soma.salesforce.com/mtietze/
 1. Set repository visibility to **"Internal"**
 2. Share this command with users:
    ```bash
-   git clone https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git && cd MT-Visit-Report && ./deploy.sh
+   git clone https://github.com/Tietziano90/MT-Visit-Report.git && cd MT-Visit-Report && ./deploy.sh
    ```
 3. Users authenticate once with Git, then deploy locally
 

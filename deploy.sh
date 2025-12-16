@@ -106,6 +106,33 @@ echo -e "${PURPLE}This script will deploy the complete MT Voice Assistant soluti
 echo -e "${PURPLE}to your Salesforce org with all dependencies in the correct order.${NC}"
 echo ""
 
+################################################################################
+# OPTIONAL: Deployment Password Protection
+# Uncomment the lines below to require a password for deployment
+################################################################################
+
+# DEPLOYMENT_PASSWORD="your-secret-password-here"
+# 
+# if [ ! -z "$DEPLOYMENT_PASSWORD" ]; then
+#     echo -e "${YELLOW}${WARNING} This deployment requires authorization${NC}"
+#     echo ""
+#     read -sp "Enter deployment password: " USER_PASSWORD
+#     echo ""
+#     
+#     if [ "$USER_PASSWORD" != "$DEPLOYMENT_PASSWORD" ]; then
+#         echo ""
+#         print_error "Invalid password. Deployment cancelled."
+#         echo ""
+#         echo "Contact mtietze@salesforce.com for access."
+#         exit 1
+#     fi
+#     
+#     print_success "Password verified"
+#     echo ""
+# fi
+
+################################################################################
+
 # Check prerequisites
 print_header "${GEAR} CHECKING PREREQUISITES"
 check_salesforce_cli
