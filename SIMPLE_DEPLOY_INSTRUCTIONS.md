@@ -10,7 +10,7 @@
 
 ```bash
 # Download and run deployment script
-curl -L https://git.soma.salesforce.com/mtietze/MT-Visit-Report/-/archive/main/MT-Visit-Report-main.tar.gz | tar xz
+curl -L https://github.com/mtietze/MT-Visit-Report/-/archive/main/MT-Visit-Report-main.tar.gz | tar xz
 cd MT-Visit-Report-main
 ./deploy.sh
 ```
@@ -18,7 +18,7 @@ cd MT-Visit-Report-main
 Or download the ZIP:
 ```bash
 # Download
-curl -L -O https://git.soma.salesforce.com/mtietze/MT-Visit-Report/-/archive/main/MT-Visit-Report-main.zip
+curl -L -O https://github.com/mtietze/MT-Visit-Report/-/archive/main/MT-Visit-Report-main.zip
 
 # Extract
 unzip MT-Visit-Report-main.zip
@@ -30,7 +30,7 @@ cd MT-Visit-Report-main
 
 ### Windows:
 
-1. **Download ZIP:** https://git.soma.salesforce.com/mtietze/MT-Visit-Report/-/archive/main/MT-Visit-Report-main.zip
+1. **Download ZIP:** https://github.com/mtietze/MT-Visit-Report/-/archive/main/MT-Visit-Report-main.zip
 2. **Extract** the ZIP file
 3. **Double-click:** `deploy.bat`
 
@@ -59,7 +59,7 @@ cd MT-Visit-Report-main
 ## 📞 Need Help?
 
 **Email:** mtietze@salesforce.com  
-**Repository:** https://git.soma.salesforce.com/mtietze/MT-Visit-Report
+**Repository:** https://github.com/mtietze/MT-Visit-Report
 
 ---
 

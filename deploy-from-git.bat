@@ -13,7 +13,7 @@ REM # to your Salesforce org. No manual download required!
 REM ################################################################################
 
 REM Git repository URL
-set GIT_REPO=https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git
+set GIT_REPO=https://github.com/mtietze/MT-Visit-Report.git
 set TEMP_DIR=%TEMP%\voice-assistant-deploy-%RANDOM%
 
 REM Unicode symbols

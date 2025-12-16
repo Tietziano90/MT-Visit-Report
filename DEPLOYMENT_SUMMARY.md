@@ -3,7 +3,7 @@
 **Version:** 1.0  
 **Date:** December 16, 2025  
 **Status:** ✅ Production Ready  
-**Repository:** https://git.soma.salesforce.com/mtietze/MT-Visit-Report
+**Repository:** https://github.com/mtietze/MT-Visit-Report
 
 ---
 
@@ -162,7 +162,7 @@ The automated deployment script deploys components in this dependency-aware orde
 
 ### Method 2: Git Clone + Deploy
 ```bash
-git clone https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git
+git clone https://github.com/mtietze/MT-Visit-Report.git
 cd voice-assistant-visit-report
 ./deploy.sh
 ```
@@ -232,7 +232,7 @@ sf org assign permset --name mt_VoiceAssistant_Admin --target-org YourOrg
 
 **Author:** Michael Tietze, Principal AI Architect  
 **Email:** mtietze@salesforce.com  
-**Repository:** https://git.soma.salesforce.com/mtietze/MT-Visit-Report
+**Repository:** https://github.com/mtietze/MT-Visit-Report
 
 ### Getting Help
 1. Check documentation files (README, DEPLOYMENT_GUIDE)

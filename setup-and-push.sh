@@ -62,7 +62,7 @@ if [ $? -eq 0 ]; then
     echo "=========================================="
     echo ""
     echo "Your code has been pushed to:"
-    echo "https://git.soma.salesforce.com/mtietze/MT-Visit-Report"
+    echo "https://github.com/mtietze/MT-Visit-Report"
     echo ""
     echo "Next steps:"
     echo "1. View your repository in the browser"

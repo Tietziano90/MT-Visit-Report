@@ -2,7 +2,7 @@
 
 echo "🚀 Pushing MT Voice Assistant to Git Repository"
 echo ""
-echo "Repository: https://git.soma.salesforce.com/mtietze/MT-Visit-Report.git"
+echo "Repository: https://github.com/mtietze/MT-Visit-Report.git"
 echo ""
 
 # Configure credential helper if not already set
@@ -18,14 +18,14 @@ if [ $? -eq 0 ]; then
     echo ""
     echo "✅ Successfully pushed to Git repository!"
     echo ""
-    echo "Repository URL: https://git.soma.salesforce.com/mtietze/MT-Visit-Report"
+    echo "Repository URL: https://github.com/mtietze/MT-Visit-Report"
     echo ""
 else
     echo ""
     echo "❌ Push failed. Please check:"
     echo "  1. Your Git credentials are correct"
     echo "  2. You have push access to the repository"
-    echo "  3. The repository exists: https://git.soma.salesforce.com/mtietze/MT-Visit-Report"
+    echo "  3. The repository exists: https://github.com/mtietze/MT-Visit-Report"
     echo ""
     echo "To create a personal access token:"
     echo "  1. Go to: https://git.soma.salesforce.com/-/profile/personal_access_tokens"
