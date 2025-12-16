@@ -20,9 +20,34 @@ MT Voice Assistant is a comprehensive Salesforce solution that transforms voice 
 
 ## 🚀 Quick Deployment
 
-### Option 1: Automated Scripts (Easiest!)
+### 🌟 Option 1: Git-Based Deployment (Recommended!)
 
-**Mac/Linux:** Double-click `deploy.sh`  
+**Automatically pull and deploy the latest code:**
+
+**Mac/Linux:**
+```bash
+./deploy-from-git.sh
+```
+Or double-click: `Deploy from Git.command`
+
+**Windows:**
+```cmd
+deploy-from-git.bat
+```
+
+**Benefits:**
+- ✅ Always deploys the latest version
+- ✅ No manual download needed
+- ✅ Automatic cleanup
+- ✅ One command deployment
+
+📖 **See:** [GIT_DEPLOYMENT_GUIDE.md](GIT_DEPLOYMENT_GUIDE.md) for details
+
+---
+
+### Option 2: Local Deployment Scripts
+
+**Mac/Linux:** Double-click `deploy.sh` or `Deploy MT Voice Assistant.command`  
 **Windows:** Double-click `deploy.bat`
 
 The script will:
@@ -32,11 +57,11 @@ The script will:
 - ✅ Assign permission sets
 - ✅ Show post-deployment steps
 
-**Perfect for:** Everyone! Just double-click and follow prompts.
+**Perfect for:** Deploying from a local copy of the code.
 
 ---
 
-### Option 2: Visual Guide (Optional)
+### Option 3: Visual Guide (Optional)
 
 **Double-click:** `deploy-wizard.html`
 
@@ -58,8 +83,10 @@ A beautiful web interface that:
 
 | Document | Description |
 |----------|-------------|
+| [GIT_DEPLOYMENT_GUIDE.md](GIT_DEPLOYMENT_GUIDE.md) | 🌟 **NEW!** Git-based deployment guide |
 | [QUICK_START.md](QUICK_START.md) | Fast track deployment (2 minutes) |
 | [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | Complete deployment documentation |
+| [DEPLOYMENT_SUMMARY.md](DEPLOYMENT_SUMMARY.md) | Deployment summary and metrics |
 | [DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md) | Component checklist and verification |
 
 ---
