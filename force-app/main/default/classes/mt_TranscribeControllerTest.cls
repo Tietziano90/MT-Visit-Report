@@ -73,7 +73,7 @@ private class mt_TranscribeControllerTest {
     static void testGetAccessTokenSuccess() {
         Map<String,Object> mockResponseMap = new Map<String,Object>{ 'access_token' => 'mockResponseToken' };
         String mockResponse = JSON.serialize(mockResponseMap);
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
+        System.Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
         
         System.Test.startTest();
         String accessToken = mt_TranscribeController.getAccessToken();
@@ -85,7 +85,7 @@ private class mt_TranscribeControllerTest {
     @isTest
     static void testGetAccessTokenNoToken() {
         String mockResponse = JSON.serialize(new Map<String,Object>{});
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
+        System.Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
         
         System.Test.startTest();
         String accessToken = mt_TranscribeController.getAccessToken();
@@ -100,7 +100,7 @@ private class mt_TranscribeControllerTest {
             'error' => 'invalid_request',
             'error_description' => 'Auth Failure'
         });
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponse(401, mockResponse));
+        System.Test.setMock(HttpCalloutMock.class, new MockHttpResponse(401, mockResponse));
         
         System.Test.startTest();
         String accessToken = mt_TranscribeController.getAccessToken();
@@ -112,7 +112,7 @@ private class mt_TranscribeControllerTest {
     @isTest
     static void testGetAccessTokenException() {
         String mockResponse = JSON.serialize(new Map<String,Object>{ 'access_token' => 1234 });
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
+        System.Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
         
         System.Test.startTest();
         String accessToken = mt_TranscribeController.getAccessToken();
@@ -411,7 +411,7 @@ private class mt_TranscribeControllerTest {
     @isTest
     static void testTestEinsteinConnection() {
         String mockResponse = JSON.serialize(new Map<String,Object>{ 'access_token' => 'mockToken' });
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
+        System.Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
         
         System.Test.startTest();
         mt_TranscribeController.ConnectionTestResult result = mt_TranscribeController.testEinsteinConnection();
@@ -423,7 +423,7 @@ private class mt_TranscribeControllerTest {
     @isTest
     static void testTestEinsteinConnection_Failure() {
         String mockResponse = JSON.serialize(new Map<String,Object>{ 'error' => 'failed' });
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponse(401, mockResponse));
+        System.Test.setMock(HttpCalloutMock.class, new MockHttpResponse(401, mockResponse));
         
         System.Test.startTest();
         mt_TranscribeController.ConnectionTestResult result = mt_TranscribeController.testEinsteinConnection();
@@ -465,7 +465,7 @@ private class mt_TranscribeControllerTest {
     @isTest
     static void testTranscribeWithWhisper() {
         String mockResponse = JSON.serialize(new Map<String,Object>{ 'text' => 'Test transcription' });
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
+        System.Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
         
         System.Test.startTest();
         mt_TranscribeController.TranscriptionResult result = 
@@ -478,7 +478,7 @@ private class mt_TranscribeControllerTest {
     @isTest
     static void testTranscribeWithWhisper_Failure() {
         String mockResponse = JSON.serialize(new Map<String,Object>{ 'error' => 'API Error' });
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponse(500, mockResponse));
+        System.Test.setMock(HttpCalloutMock.class, new MockHttpResponse(500, mockResponse));
         
         System.Test.startTest();
         mt_TranscribeController.TranscriptionResult result = 

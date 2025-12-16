@@ -248,7 +248,7 @@ private class mt_ConfigMetadataServiceTest {
     @isTest
     static void testCloneFlowAndPrompt() {
         System.Test.startTest();
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
+        System.Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         
         Map<String, Object> result = mt_ConfigMetadataService.cloneFlowAndPrompt(
             'MT_Visit_Report_MultiModal',
@@ -309,7 +309,7 @@ private class mt_ConfigMetadataServiceTest {
     @isTest
     static void testCheckDeploymentStatus_WithId() {
         System.Test.startTest();
-        Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
+        System.Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         
         Map<String, Object> result = mt_ConfigMetadataService.checkDeploymentStatus('0Af000000000000AAA');
         
