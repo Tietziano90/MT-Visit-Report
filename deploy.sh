@@ -540,10 +540,7 @@ if [ ! -z "$ORG_INSTANCE_URL" ]; then
     # Open the Lightning page for MT Voice Assistant Admin
     SETUP_PAGE_URL="${ORG_INSTANCE_URL}/lightning/n/MT_Voice_Assistant_Settings"
     
-    echo -e "${CYAN}Setup URL: ${SETUP_PAGE_URL}${NC}"
-    echo ""
-    
-    # Open in default browser (cross-platform)
+    # Try to open in default browser (cross-platform)
     BROWSER_OPENED=false
     if command -v open &> /dev/null; then
         # macOS
@@ -557,15 +554,31 @@ if [ ! -z "$ORG_INSTANCE_URL" ]; then
     fi
     
     if [ "$BROWSER_OPENED" = true ]; then
-        print_success "Setup page opened in your browser!"
+        print_success "✓ Setup page opened in your browser!"
+        echo ""
+        print_info "If the page didn't open, manually navigate to:"
+        echo -e "  ${WHITE}1. Open your Salesforce org${NC}"
+        echo -e "  ${WHITE}2. Go to App Launcher (waffle icon)${NC}"
+        echo -e "  ${WHITE}3. Search for: ${CYAN}Voice Assistant Setup${NC}"
+        echo -e "  ${WHITE}4. Follow the post-deployment setup instructions${NC}"
     else
-        print_warning "Could not auto-open browser. Please visit:"
-        echo -e "  ${CYAN}${SETUP_PAGE_URL}${NC}"
+        print_warning "⚠️  Could not automatically open browser"
+        echo ""
+        print_info "Please complete setup manually:"
+        echo -e "  ${WHITE}1. Open your Salesforce org${NC}"
+        echo -e "  ${WHITE}2. Go to App Launcher (waffle icon)${NC}"
+        echo -e "  ${WHITE}3. Search for: ${CYAN}Voice Assistant Setup${NC}"
+        echo -e "  ${WHITE}4. Follow the post-deployment setup instructions${NC}"
     fi
     echo ""
 else
-    print_warning "Could not detect org URL. Please access setup manually:"
-    echo -e "  ${CYAN}App Launcher → MT Voice Assistant Settings${NC}"
+    print_warning "⚠️  Could not detect org URL"
+    echo ""
+    print_info "Please complete setup manually:"
+    echo -e "  ${WHITE}1. Open your Salesforce org${NC}"
+    echo -e "  ${WHITE}2. Go to App Launcher (waffle icon)${NC}"
+    echo -e "  ${WHITE}3. Search for: ${CYAN}Voice Assistant Setup${NC}"
+    echo -e "  ${WHITE}4. Follow the post-deployment setup instructions${NC}"
     echo ""
 fi
 
