@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!--
+    ================================================================================
+    MT RECORD SUGGESTION - Lightning Web Component
+    ================================================================================
+    Author: Michael Tietze, Principal AI Architect
+    Contact: mtietze@salesforce.com
+    Created: December 2025
+    Version: 1.5
+    
+    COPYRIGHT AND DISTRIBUTION
+    Copyright © 2025 Salesforce, Inc. All rights reserved.
+    
+    INTERNAL USE ONLY - This code may not be shared externally or distributed
+    outside of Salesforce without prior written approval from Michael Tietze
+    (mtietze@salesforce.com).
+    ================================================================================
+    -->
+
+    <fullName>TranscriptionProvider__c</fullName>
+    <description>The transcription service provider to use (Einstein or Whisper)</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Transcription Provider</label>
+    <required>true</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Einstein</fullName>
+                <default>true</default>
+                <label>Einstein</label>
+            </value>
+            <value>
+                <fullName>Whisper</fullName>
+                <default>false</default>
+                <label>Whisper</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+================================================================================
+MT RECORD SUGGESTION - Lightning Web Component
+================================================================================
+Author: Michael Tietze, Principal AI Architect
+Contact: mtietze@salesforce.com
+Created: December 2025
+Version: 1.5
+
+COPYRIGHT AND DISTRIBUTION
+Copyright © 2025 Salesforce, Inc. All rights reserved.
+
+INTERNAL USE ONLY - This code may not be shared externally or distributed
+outside of Salesforce without prior written approval from Michael Tietze
+(mtietze@salesforce.com).
+================================================================================
+-->
+
+<CspTrustedSite xmlns="http://soap.sforce.com/2006/04/metadata">
+    <canAccessCamera>false</canAccessCamera>
+    <canAccessMicrophone>false</canAccessMicrophone>
+    <context>All</context>
+    <endpointUrl>https://api.salesforce.com</endpointUrl>
+    <isActive>true</isActive>
+    <isApplicableToConnectSrc>true</isApplicableToConnectSrc>
+    <isApplicableToFontSrc>false</isApplicableToFontSrc>
+    <isApplicableToFrameSrc>false</isApplicableToFrameSrc>
+    <isApplicableToImgSrc>false</isApplicableToImgSrc>
+    <isApplicableToMediaSrc>false</isApplicableToMediaSrc>
+    <isApplicableToStyleSrc>false</isApplicableToStyleSrc>
+</CspTrustedSite>

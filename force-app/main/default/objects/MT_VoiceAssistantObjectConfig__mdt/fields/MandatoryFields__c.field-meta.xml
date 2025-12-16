@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!--
+    ================================================================================
+    MT RECORD SUGGESTION - Lightning Web Component
+    ================================================================================
+    Author: Michael Tietze, Principal AI Architect
+    Contact: mtietze@salesforce.com
+    Created: December 2025
+    Version: 1.5
+    
+    COPYRIGHT AND DISTRIBUTION
+    Copyright © 2025 Salesforce, Inc. All rights reserved.
+    
+    INTERNAL USE ONLY - This code may not be shared externally or distributed
+    outside of Salesforce without prior written approval from Michael Tietze
+    (mtietze@salesforce.com).
+    ================================================================================
+    -->
+
+    <fullName>MandatoryFields__c</fullName>
+    <description>JSON array of field API names that must always be displayed, even if not mentioned in the transcript. Example: [&quot;Amount&quot;,&quot;CloseDate&quot;,&quot;StageName&quot;]</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Mandatory Fields</label>
+    <length>32768</length>
+    <type>LongTextArea</type>
+    <visibleLines>5</visibleLines>
+</CustomField>

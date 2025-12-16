@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+================================================================================
+MT RECORD SUGGESTION - Lightning Web Component
+================================================================================
+Author: Michael Tietze, Principal AI Architect
+Contact: mtietze@salesforce.com
+Created: December 2025
+Version: 1.5
+
+COPYRIGHT AND DISTRIBUTION
+Copyright © 2025 Salesforce, Inc. All rights reserved.
+
+INTERNAL USE ONLY - This code may not be shared externally or distributed
+outside of Salesforce without prior written approval from Michael Tietze
+(mtietze@salesforce.com).
+================================================================================
+-->
+
+<!--
+================================================================================
+MT RECORD SUGGESTION - Lightning Web Component
+================================================================================
+Author: Michael Tietze, Principal AI Architect
+Contact: mtietze@salesforce.com
+Created: November 2025
+Version: 1.5
+
+COPYRIGHT AND DISTRIBUTION
+Copyright © 2025 Salesforce, Inc. All rights reserved.
+
+INTERNAL USE ONLY - This code may not be shared externally or distributed
+outside of Salesforce without prior written approval from Michael Tietze
+(mtietze@salesforce.com).
+================================================================================
+-->
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>63.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>MT Record Suggestion</masterLabel>
+    <description>Dynamic component that processes AI-generated JSON and renders create/update forms for ANY Salesforce object type. Fully flexible - adapts to whatever objects are in the payload.</description>
+    <targets>
+        <target>lightning__FlowScreen</target>
+        <target>lightning__RecordPage</target>
+        <target>lightning__AppPage</target>
+        <target>lightning__HomePage</target>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <!-- INPUT PROPERTIES -->
+            <property name="payload" type="String" label="AI Payload (JSON)" description="JSON payload with records array. Works with ANY object type." required="true"/>
+            <property name="accountId" type="String" label="Account ID" description="Account ID for related record queries"/>
+            <property name="configName" type="String" label="Configuration Profile" description="Name of the Voice Assistant configuration profile (e.g., 'Default', 'Sales_Config')" default="Default"/>
+            <property name="requiredFieldsConfig" type="String" label="Required Fields Config (JSON)" description="Optional JSON config - overrides configName settings"/>
+            <property name="defaultLayout" type="String" label="Default Layout Columns" description="1, 2, or 3" default="1"/>
+            
+            <!-- DYNAMIC OUTPUT PROPERTIES (Recommended) -->
+            <property name="savedRecordIds" type="String[]" label="All Saved Record IDs" description="Flat collection of ALL saved IDs (any object type)" role="outputOnly"/>
+            <property name="savedRecordsJson" type="String" label="Saved Records by Type (JSON)" description="JSON: {ObjectType: [ids...]} - works with ANY object" role="outputOnly"/>
+            <property name="savedObjectTypes" type="String[]" label="Object Types with Saves" description="List of object API names that had saves" role="outputOnly"/>
+            <property name="savedRecordsCount" type="Integer" label="Total Saved Count" description="Total records saved" role="outputOnly"/>
+            <property name="savedRecordsCountByType" type="String" label="Counts by Type (JSON)" description="JSON: {ObjectType: count}" role="outputOnly"/>
+            <property name="recordsSummaryJson" type="String" label="Full Summary (JSON)" description="Comprehensive JSON summary" role="outputOnly"/>
+            
+            <!-- LEGACY OUTPUT PROPERTIES (for backward compatibility) -->
+            <property name="savedContactIds" type="String[]" label="Saved Contact IDs" description="Contact IDs (use savedRecordsJson for dynamic access)" role="outputOnly"/>
+            <property name="savedOpportunityIds" type="String[]" label="Saved Opportunity IDs" description="Opportunity IDs" role="outputOnly"/>
+            <property name="savedTaskIds" type="String[]" label="Saved Task IDs" description="Task IDs" role="outputOnly"/>
+            <property name="savedEventIds" type="String[]" label="Saved Event IDs" description="Event IDs" role="outputOnly"/>
+            <property name="savedCaseIds" type="String[]" label="Saved Case IDs" description="Case IDs" role="outputOnly"/>
+            <property name="savedLeadIds" type="String[]" label="Saved Lead IDs" description="Lead IDs" role="outputOnly"/>
+        </targetConfig>
+        <targetConfig targets="lightning__RecordPage,lightning__AppPage,lightning__HomePage">
+            <property name="payload" type="String" label="AI Payload (JSON)" description="JSON payload - works with any object type"/>
+            <property name="accountId" type="String" label="Account ID" description="Account ID for related record queries"/>
+            <supportedFormFactors>
+                <supportedFormFactor type="Large" />
+                <supportedFormFactor type="Small" />
+            </supportedFormFactors>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+================================================================================
+MT RECORD SUGGESTION - Lightning Web Component
+================================================================================
+Author: Michael Tietze, Principal AI Architect
+Contact: mtietze@salesforce.com
+Created: December 2025
+Version: 1.5
+
+COPYRIGHT AND DISTRIBUTION
+Copyright © 2025 Salesforce, Inc. All rights reserved.
+
+INTERNAL USE ONLY - This code may not be shared externally or distributed
+outside of Salesforce without prior written approval from Michael Tietze
+(mtietze@salesforce.com).
+================================================================================
+-->
+
+<!--
+============================================================================
+MT Einstein Transcribe LWC - Metadata Configuration
+============================================================================
+
+@description     Metadata configuration for MT Einstein Transcribe component.
+                 Defines exposed properties for Flow Builder and App Builder.
+
+@author          Michael Tietze, Principal AI Architect
+@created         November 2025
+@contact         mtietze@salesforce.com
+
+============================================================================
+COPYRIGHT & CONFIDENTIALITY NOTICE
+============================================================================
+© 2025 Salesforce, Inc. All rights reserved.
+
+This code is the confidential and proprietary information of Salesforce, Inc.
+It is intended solely for internal use within Salesforce.
+
+DISTRIBUTION RESTRICTION: This code may NOT be shared externally or 
+distributed outside of Salesforce without explicit written approval 
+from Michael Tietze (mtietze@salesforce.com).
+============================================================================
+-->
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>63.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>MT Einstein Transcribe Advanced</masterLabel>
+    <description>Enhanced MT Speech-to-Text and Text-to-Speech component with all advanced API features including voice discovery, enhanced TTS v2, transcription v2 with diarization, async jobs, translation, and terminology management</description>
+    <targets>
+        <target>lightning__AppPage</target>
+        <target>lightning__RecordPage</target>
+        <target>lightning__HomePage</target>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <!-- App Builder Configuration -->
+        <targetConfig targets="lightning__AppPage,lightning__RecordPage,lightning__HomePage">
+            <property name="recordId" type="String" label="Record ID" description="Record ID to find the related Account from (e.g., Contact, Opportunity, Case, etc.)" />
+            <property name="outputText" type="String" label="Output Text" description="Exposes transcription result for flows" />
+            <property name="mode" type="String" default="speech-to-text" label="Mode" description="Select the mode: 'speech-to-text', 'text-to-speech', or 'both'" />
+            <property name="label" type="String" default="Transcription Result" label="Label" description="Label for the result textarea"/>
+            <property name="required" type="Boolean" default="false" label="Required" description="Marks the textarea as required"/>
+            <property name="placeholder" type="String" default="Result will appear here" label="Placeholder" description="Placeholder text for the result textarea"/>
+            <property name="rows" type="Integer" default="64" label="Rows" description="Number of rows for the result textarea"/>
+            <property name="fieldRequiredMessage" type="String" default="This field is required" label="Required Error Message" description="Error message for required field"/>
+            <property name="einsteinTranscribe" type="Boolean" label="Enable Einstein Transcribe" default="true" description="Toggle to enable or disable Einstein Transcribe" />
+            <property name="showAllVisualizers" type="Boolean" label="Show All Visualizers (Test)" default="false" description="Show all 4 visualization options for comparison" />
+            <property name="configName" type="String" default="Default" label="Configuration Profile" description="Name of the configuration profile to use (e.g., 'Default', 'Sales_Config')" />
+            <property name="enableImageInput" type="Boolean" label="Enable Image Input" default="false" description="Allow users to upload images for AI analysis alongside transcription" />
+            <property name="showProviderSelectorProp" type="Boolean" label="Show Provider Selector" default="false" description="Show dropdown to switch between Einstein and Whisper transcription providers" />
+        </targetConfig>
+        
+        <!-- Flow Screen Configuration -->
+        <targetConfig targets="lightning__FlowScreen">
+            <!-- Input: Record ID to find related Account -->
+            <property name="recordId" type="String" label="Record ID" description="Record ID to find the related Account from (e.g., Contact, Opportunity, Case)" />
+            
+            <!-- Outputs: Resolved Account info -->
+            <property name="account" type="@salesforce/schema/Account" role="outputOnly" label="Account" description="The resolved Account SObject (for Prompt Templates)" />
+            <property name="accountId" type="String" role="outputOnly" label="Account ID" description="The resolved Account ID" />
+            <property name="accountName" type="String" role="outputOnly" label="Account Name" description="The resolved Account Name" />
+            <property name="sourceObjectType" type="String" role="outputOnly" label="Source Object Type" description="The object type of the input record" />
+            
+            <!-- Transcription output -->
+            <property name="outputText" type="String" role="outputOnly" label="Transcript" description="The transcribed text from audio recording" />
+            
+            <!-- Date/Time output (set when transcription completes) -->
+            <property name="currentDateTime" type="String" role="outputOnly" label="Current Date and Time" description="When transcription completed (e.g., Friday, November 28, 2025 at 15:30)" />
+            
+            <!-- Image Input Outputs (Multi-Image Support) -->
+            <property name="imageBase64" type="String" role="outputOnly" label="Image Base64" description="Base64 encoded image data (JSON array if multiple images)" />
+            <property name="imageFileName" type="String" role="outputOnly" label="Image File Name" description="File name or count indicator for multiple images" />
+            <property name="imageMimeType" type="String" role="outputOnly" label="Image MIME Type" description="MIME type (application/json+multiimage for multiple)" />
+            <property name="imageInstructions" type="String" role="outputOnly" label="Image Instructions" description="Instructions for AI on how to analyze the image" />
+            <property name="imageCount" type="Integer" role="outputOnly" label="Image Count" description="Number of images attached (0-5)" />
+            
+            <!-- Configuration -->
+            <property name="mode" type="String" default="speech-to-text" label="Mode" description="Select the mode: 'speech-to-text', 'text-to-speech', or 'both'" />
+            <property name="label" type="String" default="Transcription Result" label="Label" description="Label for the result textarea"/>
+            <property name="required" type="Boolean" default="false" label="Required" description="Marks the textarea as required"/>
+            <property name="placeholder" type="String" default="Result will appear here" label="Placeholder" description="Placeholder text for the result textarea"/>
+            <property name="rows" type="Integer" default="6" label="Rows" description="Number of rows for the result textarea"/>
+            <property name="fieldRequiredMessage" type="String" default="This field is required" label="Required Error Message" description="Error message for required field"/>
+            <property name="einsteinTranscribe" type="Boolean" label="Enable Einstein Transcribe" default="true" description="Toggle to enable or disable Einstein Transcribe" />
+            <property name="showAllVisualizers" type="Boolean" label="Show All Visualizers (Test)" default="false" description="Show all 4 visualization options for comparison" />
+            <property name="configName" type="String" default="Default" label="Configuration Profile" description="Name of the configuration profile to use (e.g., 'Default', 'Sales_Config')" />
+            <property name="enableImageInput" type="Boolean" label="Enable Image Input" default="false" description="Allow users to upload images for AI analysis alongside transcription" />
+            <property name="showProviderSelectorProp" type="Boolean" label="Show Provider Selector" default="false" description="Show dropdown to switch between Einstein and Whisper transcription providers" />
+            
+            <!-- Legacy Multi-Image Properties (for backwards compatibility with existing flows) -->
+            <property name="imageData1" type="String" role="outputOnly" label="Image Data 1" description="Base64 data for image 1 (legacy)" />
+            <property name="imageData2" type="String" role="outputOnly" label="Image Data 2" description="Base64 data for image 2 (legacy)" />
+            <property name="imageData3" type="String" role="outputOnly" label="Image Data 3" description="Base64 data for image 3 (legacy)" />
+            <property name="imageData4" type="String" role="outputOnly" label="Image Data 4" description="Base64 data for image 4 (legacy)" />
+            <property name="imageData5" type="String" role="outputOnly" label="Image Data 5" description="Base64 data for image 5 (legacy)" />
+            <property name="imageFileName1" type="String" role="outputOnly" label="Image File Name 1" description="File name for image 1 (legacy)" />
+            <property name="imageFileName2" type="String" role="outputOnly" label="Image File Name 2" description="File name for image 2 (legacy)" />
+            <property name="imageFileName3" type="String" role="outputOnly" label="Image File Name 3" description="File name for image 3 (legacy)" />
+            <property name="imageFileName4" type="String" role="outputOnly" label="Image File Name 4" description="File name for image 4 (legacy)" />
+            <property name="imageFileName5" type="String" role="outputOnly" label="Image File Name 5" description="File name for image 5 (legacy)" />
+            <property name="imageMimeType1" type="String" role="outputOnly" label="Image MIME Type 1" description="MIME type for image 1 (legacy)" />
+            <property name="imageMimeType2" type="String" role="outputOnly" label="Image MIME Type 2" description="MIME type for image 2 (legacy)" />
+            <property name="imageMimeType3" type="String" role="outputOnly" label="Image MIME Type 3" description="MIME type for image 3 (legacy)" />
+            <property name="imageMimeType4" type="String" role="outputOnly" label="Image MIME Type 4" description="MIME type for image 4 (legacy)" />
+            <property name="imageMimeType5" type="String" role="outputOnly" label="Image MIME Type 5" description="MIME type for image 5 (legacy)" />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

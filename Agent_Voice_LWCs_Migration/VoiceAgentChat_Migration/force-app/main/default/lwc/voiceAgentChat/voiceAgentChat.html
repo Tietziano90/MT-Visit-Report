@@ -1,0 +1,352 @@
+<template>
+    <!-- Voice Agent Chat Card -->
+    <div class="voice-card">
+        <!-- Header with Agent Selector, Connect, and Settings -->
+        <div class="voice-header">
+            <div class="voice-header-left">
+                <img src={agentforceIconUrl} alt="Agentforce" class="agentforce-logo">
+                <div class="agent-selector" onclick={toggleAgentList}>
+                    <span class="voice-title">{displayAgentName}</span>
+                    <lightning-icon icon-name="utility:down" size="xx-small" class="dropdown-icon"></lightning-icon>
+                </div>
+            </div>
+            <div class="voice-header-right">
+                <button class="btn-config" onclick={toggleSettings} title="Settings">
+                    <lightning-icon icon-name="utility:settings" size="x-small"></lightning-icon>
+                </button>
+                <button class={connectButtonClass} onclick={toggleConnection} disabled={isConnecting}>
+                    {connectButtonLabel}
+                </button>
+            </div>
+        </div>
+
+        <!-- Agent List Dropdown -->
+        <template if:true={showAgentList}>
+            <div class={agentListClass}>
+                <div class="agent-list">
+                    <template if:true={isLoadingAgents}>
+                        <div class="loading-message">Loading agents...</div>
+                    </template>
+                    <template if:false={isLoadingAgents}>
+                        <template if:true={agents.length}>
+                            <template for:each={agents} for:item="agent">
+                                <div key={agent.id} 
+                                     class="agent-item" 
+                                     data-agent-id={agent.id}
+                                     onclick={handleAgentSelection}>
+                                    <div class="agent-name">{agent.masterLabel}</div>
+                                    <div class="agent-description">{agent.description}</div>
+                                </div>
+                            </template>
+                        </template>
+                        <template if:false={agents.length}>
+                            <div class="no-agents-message">No agents available</div>
+                        </template>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+        <!-- Waveform Visualization (Hold to Talk) -->
+        <div class="waveform-container"
+             onmousedown={handleStartTalking}
+             onmouseup={handleStopTalking}
+             onmouseleave={handleStopTalking}
+             ontouchstart={handleStartTalking}
+             ontouchend={handleStopTalking}>
+            <div class="waveform-bar" data-bar="0"></div>
+            <div class="waveform-bar" data-bar="1"></div>
+            <div class="waveform-bar" data-bar="2"></div>
+            <div class="waveform-bar" data-bar="3"></div>
+            <div class="waveform-bar" data-bar="4"></div>
+            <div class="waveform-bar" data-bar="5"></div>
+            <div class="waveform-bar" data-bar="6"></div>
+            <div class="waveform-bar" data-bar="7"></div>
+            <div class="waveform-bar" data-bar="8"></div>
+            <div class="waveform-bar" data-bar="9"></div>
+            <div class="waveform-bar" data-bar="10"></div>
+            <div class="waveform-bar" data-bar="11"></div>
+            <div class="waveform-bar" data-bar="12"></div>
+            <div class="waveform-bar" data-bar="13"></div>
+            <div class="waveform-bar" data-bar="14"></div>
+            <div class="waveform-bar" data-bar="15"></div>
+            <div class="waveform-bar" data-bar="16"></div>
+            <div class="waveform-bar" data-bar="17"></div>
+            <div class="waveform-bar" data-bar="18"></div>
+            <div class="waveform-bar" data-bar="19"></div>
+        </div>
+
+        <!-- Status Container -->
+        <div class="status-container">
+            <div class="status-main">{statusText}</div>
+            <div class="status-sub">{statusDetail}</div>
+        </div>
+
+        <!-- Conversation Messages (last 3 messages) -->
+        <template if:true={showConversation}>
+            <template if:true={displayMessages.length}>
+                <div class="conversation-separator"></div>
+                <div class="conversation-container">
+                    <template for:each={displayMessages} for:item="msg">
+                        <div key={msg.id} data-sender={msg.sender}>
+                            <div class="message-bubble">
+                                <span class="message-text">{msg.text}</span>
+                                <template if:true={msg.interim}>
+                                    <span class="interim-indicator">...</span>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </template>
+
+    </div>
+
+    <!-- Settings Modal -->
+    <template if:true={showSettings}>
+        <div class="config-overlay" onclick={handleOverlayClick}>
+            <div class="config-panel" onclick={handlePanelClick}>
+                <!-- Header -->
+                <div class="config-header">
+                    <h3>Voice & Agent Settings</h3>
+                    <button class="close-btn" onclick={toggleSettings}>×</button>
+                </div>
+
+                <!-- Content -->
+                <div class="config-content">
+                    <!-- STT Settings Section -->
+                    <div class="settings-section">
+                        <h4 class="section-title">Speech-to-Text (STT) Settings</h4>
+                        
+                        <!-- STT Engine -->
+                        <div class="input-group">
+                            <label class="input-label">STT Engine</label>
+                            <select class="input-select" onchange={handleSttEngineChange}>
+                                <option value="deepgram_falcon" selected={isSttDeepgramFalcon}>Deepgram Falcon</option>
+                                <option value="deepgram_remote" selected={isSttDeepgramRemote}>Deepgram Remote</option>
+                                <option value="aws" selected={isSttAws}>AWS Transcribe</option>
+                            </select>
+                        </div>
+
+                        <!-- STT Model (if applicable) -->
+                        <template if:true={showSttModel}>
+                            <div class="input-group">
+                                <label class="input-label">STT Model</label>
+                                <select class="input-select" onchange={handleSttModelChange}>
+                                    <template for:each={sttModelOptions} for:item="opt">
+                                        <option key={opt.value} value={opt.value} selected={opt.selected}>{opt.label}</option>
+                                    </template>
+                                </select>
+                            </div>
+                        </template>
+
+                        <!-- STT Language -->
+                        <div class="input-group">
+                            <label class="input-label">STT Language</label>
+                            <select class="input-select" onchange={handleSttLanguageChange}>
+                                <template for:each={sttLanguageOptions} for:item="opt">
+                                    <option key={opt.value} value={opt.value} selected={opt.selected}>{opt.label}</option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <!-- STT Features -->
+                        <template if:true={showSttSmartFormat}>
+                            <div class="input-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" checked={sttSmartFormat} onchange={handleSttSmartFormatChange} />
+                                    <span>Smart Format</span>
+                                </label>
+                            </div>
+                        </template>
+
+                        <div class="input-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" checked={sttProfanityFilter} onchange={handleSttProfanityFilterChange} />
+                                <span>Profanity Filter</span>
+                            </label>
+                        </div>
+
+                        <!-- Utterance End Detection (Deepgram only) -->
+                        <template if:true={showSttUtteranceEnd}>
+                            <div class="input-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" checked={sttUtteranceEndEnabled} onchange={handleSttUtteranceEndEnabledChange} />
+                                    <span>Utterance End Detection</span>
+                                </label>
+                            </div>
+                            
+                            <template if:true={sttUtteranceEndEnabled}>
+                                <div class="input-group">
+                                    <label class="input-label">Utterance End (ms)</label>
+                                    <input 
+                                        type="number" 
+                                        class="input-text"
+                                        min="500"
+                                        max="3000"
+                                        step="100"
+                                        value={sttUtteranceEndMs}
+                                        onchange={handleSttUtteranceEndMsChange}
+                                        placeholder="1000" />
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- Keywords (Deepgram Falcon only) -->
+                        <template if:true={showSttKeywords}>
+                            <div class="input-group">
+                                <label class="input-label">Keywords (comma-separated)</label>
+                                <input 
+                                    type="text" 
+                                    class="input-text"
+                                    value={sttKeywords}
+                                    oninput={handleSttKeywordsChange}
+                                    placeholder="keyword1, keyword2, keyword3" />
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- TTS Settings Section -->
+                    <div class="settings-section">
+                        <h4 class="section-title">Text-to-Speech (TTS) Settings</h4>
+                        
+                        <!-- TTS Engine -->
+                        <div class="input-group">
+                            <label class="input-label">TTS Engine</label>
+                            <select class="input-select" onchange={handleTtsEngineChange}>
+                                <option value="elevenlabs" selected={isElevenLabs}>ElevenLabs</option>
+                                <option value="aws" selected={isAwsPolly}>AWS Polly</option>
+                            </select>
+                        </div>
+
+                        <!-- TTS Voice -->
+                        <div class="input-group">
+                            <label class="input-label">TTS Voice</label>
+                            <select class="input-select" onchange={handleTtsVoiceChange}>
+                                <template for:each={ttsVoiceOptions} for:item="opt">
+                                    <option key={opt.value} value={opt.value} selected={opt.selected}>{opt.label}</option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <!-- ElevenLabs Specific Settings -->
+                        <template if:true={isElevenLabs}>
+                            <!-- Language Code -->
+                            <div class="input-group">
+                                <label class="input-label">Language</label>
+                                <select class="input-select" onchange={handleTtsLanguageCodeChange}>
+                                    <template for:each={ttsLanguageOptions} for:item="opt">
+                                        <option key={opt.value} value={opt.value} selected={opt.selected}>{opt.label}</option>
+                                    </template>
+                                </select>
+                            </div>
+
+                            <!-- Stability Slider -->
+                            <div class="input-group">
+                                <label class="input-label">Stability: {ttsStability}</label>
+                                <input 
+                                    type="range" 
+                                    min="0" 
+                                    max="1" 
+                                    step="0.01"
+                                    value={ttsStability}
+                                    oninput={handleTtsStabilityChange}
+                                    class="input-slider" />
+                            </div>
+
+                            <!-- Speed Slider -->
+                            <div class="input-group">
+                                <label class="input-label">Speed: {ttsSpeed}</label>
+                                <input 
+                                    type="range" 
+                                    min="0.7" 
+                                    max="1.3" 
+                                    step="0.01"
+                                    value={ttsSpeed}
+                                    oninput={handleTtsSpeedChange}
+                                    class="input-slider" />
+                            </div>
+
+                            <!-- Similarity Boost Slider -->
+                            <div class="input-group">
+                                <label class="input-label">Similarity Boost: {ttsSimilarityBoost}</label>
+                                <input 
+                                    type="range" 
+                                    min="0" 
+                                    max="1" 
+                                    step="0.01"
+                                    value={ttsSimilarityBoost}
+                                    oninput={handleTtsSimilarityBoostChange}
+                                    class="input-slider" />
+                            </div>
+
+                            <!-- Style Slider -->
+                            <div class="input-group">
+                                <label class="input-label">Style: {ttsStyle}</label>
+                                <input 
+                                    type="range" 
+                                    min="0" 
+                                    max="1" 
+                                    step="0.01"
+                                    value={ttsStyle}
+                                    oninput={handleTtsStyleChange}
+                                    class="input-slider" />
+                            </div>
+
+                            <!-- Speaker Boost -->
+                            <div class="input-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" checked={ttsUseSpeakerBoost} onchange={handleTtsUseSpeakerBoostChange} />
+                                    <span>Use Speaker Boost</span>
+                                </label>
+                            </div>
+
+                            <!-- Enable SSML -->
+                            <div class="input-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" checked={ttsEnableSsml} onchange={handleTtsEnableSsmlChange} />
+                                    <span>Enable SSML Parsing</span>
+                                </label>
+                            </div>
+                        </template>
+
+                        <!-- Text Normalization (Both Engines) -->
+                        <div class="input-group">
+                            <label class="input-label">Text Normalization</label>
+                            <select class="input-select" onchange={handleTtsTextNormalizationChange}>
+                                <template for:each={ttsNormalizationOptions} for:item="opt">
+                                    <option key={opt.value} value={opt.value} selected={opt.selected}>{opt.label}</option>
+                                </template>
+                            </select>
+                        </div>
+
+                        <!-- Speed (AWS Polly - outside ElevenLabs template) -->
+                        <template if:false={isElevenLabs}>
+                            <div class="input-group">
+                                <label class="input-label">Speed: {ttsSpeed}</label>
+                                <input 
+                                    type="range" 
+                                    min="0.7" 
+                                    max="1.3" 
+                                    step="0.01"
+                                    value={ttsSpeed}
+                                    oninput={handleTtsSpeedChange}
+                                    class="input-slider" />
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </template>
+
+    <!-- Error Display -->
+    <template if:true={errorMessage}>
+        <div class="error-toast">
+            <span class="error-text">⚠️ {errorMessage}</span>
+        </div>
+    </template>
+</template>
+

@@ -1,0 +1,42 @@
+<!--
+================================================================================
+MT RECORD SUGGESTION - Lightning Web Component
+================================================================================
+Author: Michael Tietze, Principal AI Architect
+Contact: mtietze@salesforce.com
+Created: December 2025
+Version: 1.5
+
+COPYRIGHT AND DISTRIBUTION
+Copyright © 2025 Salesforce, Inc. All rights reserved.
+
+INTERNAL USE ONLY - This code may not be shared externally or distributed
+outside of Salesforce without prior written approval from Michael Tietze
+(mtietze@salesforce.com).
+================================================================================
+-->
+
+<template>
+    <div class="slds-form-element">
+        <label class="slds-form-element__label" for={inputId}>
+            <template lwc:if={required}>
+                <abbr class="slds-required" title="required">*</abbr>
+            </template>
+            {label}
+        </label>
+        <div class="slds-form-element__control">
+            <input
+                id={inputId}
+                class="slds-input mt-date-input"
+                type="date"
+                value={value}
+                required={required}
+                disabled={disabled}
+                onclick={handleSelect}
+                onfocus={handleSelect}
+                onchange={handleChange}
+            />
+        </div>
+    </div>
+</template>
+

@@ -1,0 +1,607 @@
+<!--
+================================================================================
+MT VOICE ASSISTANT ADVANCED - Lightning Web Component
+================================================================================
+Author: Michael Tietze, Principal AI Architect
+Contact: mtietze@salesforce.com
+Created: December 2025
+Version: 2.0
+
+COPYRIGHT AND DISTRIBUTION
+Copyright © 2025 Salesforce, Inc. All rights reserved.
+
+INTERNAL USE ONLY - This code may not be shared externally or distributed
+outside of Salesforce without prior written approval from Michael Tietze
+(mtietze@salesforce.com).
+================================================================================
+-->
+
+<template>
+    <lightning-card title="Voice Assistant Advanced Features" icon-name="utility:settings">
+        <!-- Error Message -->
+        <template lwc:if={error}>
+            <div class="slds-m-around_medium">
+                <lightning-alert variant="error" message={error}></lightning-alert>
+            </div>
+        </template>
+        
+        <!-- Success Message -->
+        <template lwc:if={successMessage}>
+            <div class="slds-m-around_medium">
+                <lightning-alert variant="success" message={successMessage}></lightning-alert>
+            </div>
+        </template>
+        
+        <!-- Loading Spinner -->
+        <template lwc:if={isLoading}>
+            <div class="slds-is-relative slds-m-around_medium" style="height: 4rem;">
+                <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+        
+        <!-- Feature Tabs -->
+        <lightning-tabset active-tab-value={activeFeature} onchange={handleFeatureChange}>
+            
+            <!-- Voice Discovery Tab -->
+            <lightning-tab label="Voice Discovery" value="voice-discovery" icon-name="utility:user">
+                <div class="slds-p-around_medium">
+                    <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                        <div class="slds-col slds-size_1-of-3">
+                            <lightning-combobox
+                                label="Filter by Engine"
+                                value={selectedEngine}
+                                options={engineOptions}
+                                onchange={handleEngineFilterChange}
+                                placeholder="All Engines">
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_2-of-3">
+                            <lightning-input
+                                type="text"
+                                label="Search Voices"
+                                value={voiceFilter}
+                                onchange={handleVoiceFilterChange}
+                                placeholder="Search by name, language, or provider">
+                            </lightning-input>
+                        </div>
+                    </div>
+                    
+                    <lightning-button
+                        label="Refresh Voices"
+                        icon-name="utility:refresh"
+                        onclick={loadVoices}
+                        class="slds-m-bottom_medium">
+                    </lightning-button>
+                    
+                    <div class="slds-scrollable slds-box" style="max-height: 500px; overflow-y: auto;">
+                        <template lwc:if={hasFilteredVoices}>
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col">Voice ID</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Provider</th>
+                                        <th scope="col">Language</th>
+                                        <th scope="col">Gender</th>
+                                        <th scope="col">Premium</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={filteredVoices} for:item="voice">
+                                        <tr key={voice.voice_id}>
+                                            <td>{voice.voice_id}</td>
+                                            <td>{voice.name}</td>
+                                            <td>{voice.provider}</td>
+                                            <td>{voice.language} ({voice.language_code})</td>
+                                            <td>{voice.gender}</td>
+                                            <td>
+                                                <template lwc:if={voice.is_premium}>
+                                                    <lightning-icon icon-name="utility:premium" size="x-small"></lightning-icon>
+                                                </template>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </template>
+                        <template lwc:else>
+                            <p class="slds-text-align_center slds-p-around_medium">No voices found</p>
+                        </template>
+                    </div>
+                </div>
+            </lightning-tab>
+            
+            <!-- Enhanced TTS v2 Tab -->
+            <lightning-tab label="Enhanced TTS v2" value="tts-v2" icon-name="utility:volume_high">
+                <div class="slds-p-around_medium">
+                    <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox
+                                label="Engine"
+                                value={ttsEngine}
+                                options={engineOptions}
+                                onchange={handleTTSEngineChange}>
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                        <lightning-combobox
+                            label="Voice"
+                            value={selectedVoiceId}
+                            options={voiceOptions}
+                            onchange={handleTTSVoiceChange}
+                            placeholder="Select a voice">
+                        </lightning-combobox>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-m-bottom_medium">
+                        <lightning-textarea
+                            label="Text to Synthesize"
+                            value={ttsText}
+                            onchange={handleTTSTextChange}
+                            placeholder="Enter text to convert to speech"
+                            rows="5">
+                        </lightning-textarea>
+                    </div>
+                    
+                    <div class="slds-box slds-m-bottom_medium">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Voice Settings</h3>
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input
+                                    type="number"
+                                    label="Stability (0.0 - 1.0)"
+                                    value={voiceSettings.stability}
+                                    min="0"
+                                    max="1"
+                                    step="0.1"
+                                    data-field="stability"
+                                    onchange={handleVoiceSettingChange}>
+                                </lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input
+                                    type="number"
+                                    label="Similarity Boost (0.0 - 1.0)"
+                                    value={voiceSettings.similarityBoost}
+                                    min="0"
+                                    max="1"
+                                    step="0.1"
+                                    data-field="similarityBoost"
+                                    onchange={handleVoiceSettingChange}>
+                                </lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input
+                                    type="number"
+                                    label="Style (0.0 - 1.0)"
+                                    value={voiceSettings.style}
+                                    min="0"
+                                    max="1"
+                                    step="0.1"
+                                    data-field="style"
+                                    onchange={handleVoiceSettingChange}>
+                                </lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input
+                                    type="number"
+                                    label="Speed (0.7 - 1.2)"
+                                    value={voiceSettings.speed}
+                                    min="0.7"
+                                    max="1.2"
+                                    step="0.1"
+                                    data-field="speed"
+                                    onchange={handleVoiceSettingChange}>
+                                </lightning-input>
+                            </div>
+                        </div>
+                        <div class="slds-m-top_small">
+                            <lightning-input
+                                type="checkbox"
+                                label="Use Speaker Boost"
+                                checked={voiceSettings.useSpeakerBoost}
+                                data-field="useSpeakerBoost"
+                                onchange={handleVoiceSettingChange}>
+                            </lightning-input>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-m-bottom_medium">
+                        <lightning-combobox
+                            label="Output Format"
+                            value={ttsOutputFormat}
+                            options={ttsOutputFormatOptions}
+                            onchange={handleTTSOutputFormatChange}>
+                        </lightning-combobox>
+                    </div>
+                    
+                    <lightning-button
+                        label="Synthesize Speech"
+                        variant="brand"
+                        icon-name="utility:volume_high"
+                        onclick={handleSynthesizeSpeech}
+                        disabled={isLoading}>
+                    </lightning-button>
+                    
+                    <template lwc:if={ttsAudioSrc}>
+                        <div class="slds-m-top_medium">
+                            <h3 class="slds-text-heading_small slds-m-bottom_small">Generated Audio</h3>
+                            <audio controls src={ttsAudioSrc} class="slds-m-bottom_small"></audio>
+                        </div>
+                    </template>
+                </div>
+            </lightning-tab>
+            
+            <!-- Transcription v2 with Diarization Tab -->
+            <lightning-tab label="Transcription v2" value="transcription-v2" icon-name="utility:mic">
+                <div class="slds-p-around_medium">
+                    <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox
+                                label="Engine"
+                                value={transcriptionEngine}
+                                options={engineOptions}
+                                onchange={handleTranscriptionEngineChange}>
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox
+                                label="Language"
+                                value={transcriptionLanguage}
+                                options={languageOptions}
+                                onchange={handleTranscriptionLanguageChange}>
+                            </lightning-combobox>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-m-bottom_medium">
+                        <lightning-input
+                            type="checkbox"
+                            label="Enable Speaker Diarization"
+                            checked={diarizationEnabled}
+                            onchange={handleDiarizationToggle}>
+                        </lightning-input>
+                    </div>
+                    
+                    <div class="slds-m-bottom_medium">
+                        <label class="slds-form-element__label">Upload Audio File</label>
+                        <div class="slds-form-element__control">
+                            <input
+                                type="file"
+                                accept="audio/*"
+                                onchange={handleTranscriptionFileChange}
+                                class="slds-input">
+                        </div>
+                    </div>
+                    
+                    <lightning-button
+                        label="Transcribe Audio"
+                        variant="brand"
+                        icon-name="utility:mic"
+                        onclick={handleTranscribeV2}
+                        disabled={isLoading}>
+                    </lightning-button>
+                    
+                    <template lwc:if={transcriptionResult}>
+                        <div class="slds-m-top_medium">
+                            <h3 class="slds-text-heading_small slds-m-bottom_small">Full Transcript</h3>
+                            <div class="slds-box slds-m-bottom_medium">
+                                <p>{transcriptionResult}</p>
+                            </div>
+                            
+                            <template lwc:if={hasTranscriptionSegments}>
+                                <h3 class="slds-text-heading_small slds-m-bottom_small">Segments with Speaker Labels</h3>
+                                <div class="slds-scrollable slds-box" style="max-height: 400px; overflow-y: auto;">
+                                    <template for:each={transcriptionSegments} for:item="segment">
+                                        <div key={segment.startTime} class="slds-m-bottom_small slds-p-bottom_small" style="border-bottom: 1px solid #e5e5e5;">
+                                            <div class="slds-grid slds-grid_align-spread">
+                                                <div>
+                                                    <strong>{segment.speaker}</strong>
+                                                    <span class="slds-text-color_weak slds-m-left_small">
+                                                        {segment.startTime}s - {segment.endTime}s
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <p class="slds-m-top_x-small">{segment.text}</p>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </lightning-tab>
+            
+            <!-- Async Transcription Jobs Tab -->
+            <lightning-tab label="Async Jobs" value="async-jobs" icon-name="utility:clock">
+                <div class="slds-p-around_medium">
+                    <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox
+                                label="Engine"
+                                value={jobEngine}
+                                options={engineOptions}
+                                onchange={handleJobEngineChange}>
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox
+                                label="Language"
+                                value={jobLanguage}
+                                options={languageOptions}
+                                onchange={handleJobLanguageChange}>
+                            </lightning-combobox>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-m-bottom_medium">
+                        <label class="slds-form-element__label">Upload Audio File (Large files supported)</label>
+                        <div class="slds-form-element__control">
+                            <input
+                                type="file"
+                                accept="audio/*"
+                                onchange={handleJobFileChange}
+                                class="slds-input">
+                        </div>
+                    </div>
+                    
+                    <lightning-button
+                        label="Create Transcription Job"
+                        variant="brand"
+                        icon-name="utility:clock"
+                        onclick={handleCreateJob}
+                        disabled={isLoading}>
+                    </lightning-button>
+                    
+                    <template lwc:if={currentJobId}>
+                        <div class="slds-m-top_medium slds-box">
+                            <h3 class="slds-text-heading_small slds-m-bottom_small">Job Status</h3>
+                            <p><strong>Job ID:</strong> {currentJobId}</p>
+                            <p><strong>Status:</strong> 
+                                <template lwc:if={isJobInProgress}>
+                                    <lightning-badge label={jobStatus} variant="warning"></lightning-badge>
+                                </template>
+                                <template lwc:elseif={isJobCompleted}>
+                                    <lightning-badge label={jobStatus} variant="success"></lightning-badge>
+                                </template>
+                                <template lwc:elseif={isJobFailed}>
+                                    <lightning-badge label={jobStatus} variant="error"></lightning-badge>
+                                </template>
+                                <template lwc:else>
+                                    {jobStatus}
+                                </template>
+                            </p>
+                            
+                            <template lwc:if={isJobCompleted}>
+                                <div class="slds-m-top_medium">
+                                    <h4 class="slds-text-heading_small">Transcript</h4>
+                                    <div class="slds-box slds-m-top_small">
+                                        <p>{transcriptionResult}</p>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </lightning-tab>
+            
+            <!-- Text Translation Tab -->
+            <lightning-tab label="Text Translation" value="translation" icon-name="utility:translate">
+                <div class="slds-p-around_medium">
+                    <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox
+                                label="Source Language"
+                                value={translationSourceLang}
+                                options={languageOptions}
+                                onchange={handleSourceLangChange}>
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox
+                                label="Target Language"
+                                value={translationTargetLang}
+                                options={languageOptions}
+                                onchange={handleTargetLangChange}>
+                            </lightning-combobox>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-m-bottom_medium">
+                        <lightning-textarea
+                            label="Text to Translate"
+                            value={translationText}
+                            onchange={handleTranslationTextChange}
+                            placeholder="Enter text to translate"
+                            rows="5">
+                        </lightning-textarea>
+                    </div>
+                    
+                    <lightning-button
+                        label="Translate Text"
+                        variant="brand"
+                        icon-name="utility:translate"
+                        onclick={handleTranslateText}
+                        disabled={isLoading}>
+                    </lightning-button>
+                    
+                    <template lwc:if={translationResult}>
+                        <div class="slds-m-top_medium">
+                            <h3 class="slds-text-heading_small slds-m-bottom_small">Translated Text</h3>
+                            <div class="slds-box">
+                                <p>{translationResult}</p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </lightning-tab>
+            
+            <!-- Document Translation Tab -->
+            <lightning-tab label="Document Translation" value="document-translation" icon-name="utility:file">
+                <div class="slds-p-around_medium">
+                    <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox
+                                label="Source Language"
+                                value={translationSourceLang}
+                                options={languageOptions}
+                                onchange={handleSourceLangChange}>
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox
+                                label="Target Language"
+                                value={translationTargetLang}
+                                options={languageOptions}
+                                onchange={handleTargetLangChange}>
+                            </lightning-combobox>
+                        </div>
+                    </div>
+                    
+                    <div class="slds-m-bottom_medium">
+                        <label class="slds-form-element__label">Upload Document</label>
+                        <div class="slds-form-element__control">
+                            <input
+                                type="file"
+                                accept=".pdf,.doc,.docx,.txt"
+                                onchange={handleTranslationDocumentChange}
+                                class="slds-input">
+                        </div>
+                    </div>
+                    
+                    <lightning-button
+                        label="Translate Document"
+                        variant="brand"
+                        icon-name="utility:file"
+                        onclick={handleTranslateDocument}
+                        disabled={isLoading}>
+                    </lightning-button>
+                    
+                    <template lwc:if={translationDocumentResult}>
+                        <div class="slds-m-top_medium">
+                            <h3 class="slds-text-heading_small slds-m-bottom_small">Translation Complete</h3>
+                            <lightning-button
+                                label="Download Translated Document"
+                                variant="brand"
+                                icon-name="utility:download"
+                                onclick={handleDownloadTranslatedDocument}>
+                            </lightning-button>
+                        </div>
+                    </template>
+                </div>
+            </lightning-tab>
+            
+            <!-- Terminology Management Tab -->
+            <lightning-tab label="Terminology" value="terminology" icon-name="utility:bookmark">
+                <div class="slds-p-around_medium">
+                    <div class="slds-box slds-m-bottom_medium">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Import Terminology</h3>
+                        <div class="slds-m-bottom_small">
+                            <lightning-input
+                                type="text"
+                                label="Terminology Name"
+                                value={terminologyName}
+                                onchange={handleTerminologyNameChange}
+                                placeholder="Enter terminology name">
+                            </lightning-input>
+                        </div>
+                        <div class="slds-m-bottom_small">
+                            <lightning-combobox
+                                label="Engine"
+                                value={terminologyEngine}
+                                options={engineOptions}
+                                onchange={handleTerminologyEngineChange}>
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-m-bottom_small">
+                            <label class="slds-form-element__label">Upload Terminology File (CSV)</label>
+                            <div class="slds-form-element__control">
+                                <input
+                                    type="file"
+                                    accept=".csv"
+                                    onchange={handleTerminologyFileChange}
+                                    class="slds-input">
+                            </div>
+                        </div>
+                        <lightning-button
+                            label="Import Terminology"
+                            variant="brand"
+                            icon-name="utility:upload"
+                            onclick={handleImportTerminology}
+                            disabled={isLoading}>
+                        </lightning-button>
+                    </div>
+                    
+                    <div class="slds-box">
+                        <h3 class="slds-text-heading_small slds-m-bottom_small">Manage Terminology</h3>
+                        <div class="slds-m-bottom_small">
+                            <lightning-combobox
+                                label="Select Terminology"
+                                value={selectedTerminology}
+                                options={terminologyList}
+                                onchange={handleTerminologySelect}
+                                placeholder="Enter terminology name to load">
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col">
+                                <lightning-button
+                                    label="Load Terminology"
+                                    variant="neutral"
+                                    icon-name="utility:search"
+                                    onclick={loadTerminology}
+                                    disabled={isLoadTerminologyDisabled}>
+                                </lightning-button>
+                            </div>
+                            <div class="slds-col">
+                                <lightning-button
+                                    label="Delete Selected"
+                                    variant="destructive"
+                                    icon-name="utility:delete"
+                                    onclick={handleDeleteTerminology}
+                                    disabled={isDeleteTerminologyDisabled}>
+                                </lightning-button>
+                            </div>
+                            <div class="slds-col">
+                                <lightning-button
+                                    label="Delete All"
+                                    variant="destructive"
+                                    icon-name="utility:delete"
+                                    onclick={handleDeleteAllTerminologies}
+                                    disabled={isLoading}>
+                                </lightning-button>
+                            </div>
+                        </div>
+                        
+                        <template lwc:if={hasTerminologyTerms}>
+                            <div class="slds-m-top_medium">
+                                <h4 class="slds-text-heading_small">Terms</h4>
+                                <div class="slds-scrollable slds-box" style="max-height: 300px; overflow-y: auto;">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Source Text</th>
+                                                <th>Target Text</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template for:each={terminologyTerms} for:item="term">
+                                                <tr key={term.sourceText}>
+                                                    <td>{term.sourceText}</td>
+                                                    <td>{term.targetText}</td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </lightning-tab>
+            
+        </lightning-tabset>
+    </lightning-card>
+</template>
+

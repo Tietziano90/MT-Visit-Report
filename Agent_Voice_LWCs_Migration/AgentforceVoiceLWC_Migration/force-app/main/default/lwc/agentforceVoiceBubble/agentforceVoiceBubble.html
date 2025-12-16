@@ -1,0 +1,296 @@
+<template>
+    <!-- Rectangular Voice Card - Full Width -->
+    <div class={cardClass}>
+        <!-- Header with Logo, Title, and Buttons -->
+        <div class="voice-header">
+            <div class="voice-header-left">
+                <img src={agentforceIconUrl} alt="Agentforce" class="agentforce-logo">
+                <div class="agent-selector" onclick={toggleAgentList}>
+                    <span class="voice-title">{displayAgentName}</span>
+                    <lightning-icon icon-name="utility:down" size="xx-small" class="dropdown-icon"></lightning-icon>
+                </div>
+            </div>
+            <div class="voice-header-right">
+                <button class="btn-config" onclick={toggleConfig} title="Audio Configuration">
+                    <lightning-icon icon-name="utility:settings" size="x-small"></lightning-icon>
+                </button>
+                <button class={muteButtonClass} onclick={toggleMute} title={muteButtonTitle}>
+                    <lightning-icon icon-name={muteIconName} size="x-small"></lightning-icon>
+                </button>
+                <button class={connectButtonClass} onclick={toggleConnection}>
+                    {connectButtonLabel}
+                </button>
+            </div>
+        </div>
+
+        <!-- Agent Selection Dropdown -->
+        <div class={agentListClass}>
+            <div class="agent-list">
+                <template if:true={isLoadingAgents}>
+                    <div class="loading-message">Loading voice agents...</div>
+                </template>
+                <template if:false={isLoadingAgents}>
+                    <template if:true={voiceAgents}>
+                        <template for:each={voiceAgents} for:item="agent">
+                            <div key={agent.id} 
+                                 class="agent-item" 
+                                 data-agent-id={agent.id}
+                                 onclick={handleAgentSelection}>
+                                <div class="agent-name">{agent.masterLabel}</div>
+                                <div class="agent-description">{agent.description}</div>
+                            </div>
+                        </template>
+                    </template>
+                    <template if:false={voiceAgents.length}>
+                        <div class="no-agents-message">No voice-enabled agents found</div>
+                    </template>
+                </template>
+            </div>
+        </div>
+
+        <!-- Waveform Animation (iPhone-style, audio-reactive) -->
+        <div class="waveform-container">
+            <div class="waveform-bar" data-bar="0"></div>
+            <div class="waveform-bar" data-bar="1"></div>
+            <div class="waveform-bar" data-bar="2"></div>
+            <div class="waveform-bar" data-bar="3"></div>
+            <div class="waveform-bar" data-bar="4"></div>
+            <div class="waveform-bar" data-bar="5"></div>
+            <div class="waveform-bar" data-bar="6"></div>
+            <div class="waveform-bar" data-bar="7"></div>
+            <div class="waveform-bar" data-bar="8"></div>
+            <div class="waveform-bar" data-bar="9"></div>
+            <div class="waveform-bar" data-bar="10"></div>
+            <div class="waveform-bar" data-bar="11"></div>
+            <div class="waveform-bar" data-bar="12"></div>
+            <div class="waveform-bar" data-bar="13"></div>
+            <div class="waveform-bar" data-bar="14"></div>
+            <div class="waveform-bar" data-bar="15"></div>
+            <div class="waveform-bar" data-bar="16"></div>
+            <div class="waveform-bar" data-bar="17"></div>
+            <div class="waveform-bar" data-bar="18"></div>
+            <div class="waveform-bar" data-bar="19"></div>
+        </div>
+
+        <!-- Status Text -->
+        <div class="status-container">
+            <div class="status-main">{statusText}</div>
+            <div class="status-sub" if:true={statusDetail}>{statusDetail}</div>
+        </div>
+
+        <!-- Conversation Separator & Messages -->
+        <template if:true={connected}>
+            <div class="conversation-separator"></div>
+            <div class="conversation-container">
+                <template if:true={displayMessages.length}>
+                    <template for:each={displayMessages} for:item="msg">
+                        <div key={msg.id} class={msg.sender} data-sender={msg.sender}>
+                            <div class="message-bubble">
+                                <span class="message-text">{msg.text}</span>
+                                <template if:true={msg.interim}>
+                                    <span class="interim-indicator">...</span>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+                <template if:false={displayMessages.length}>
+                    <div class="no-messages">
+                        <span class="placeholder-text">Start speaking to see the conversation...</span>
+                    </div>
+                </template>
+            </div>
+        </template>
+    </div>
+
+    <!-- Audio Configuration Panel -->
+    <template if:true={showConfig}>
+        <div class="config-overlay" onclick={handleOverlayClick}>
+            <div class="config-panel" onclick={handlePanelClick}>
+                <div class="config-header">
+                    <h3>🎚️ Audio Configuration</h3>
+                    <button class="close-btn" onclick={toggleConfig}>×</button>
+                </div>
+
+                <div class="config-content">
+                    <!-- Mic Activity Detection -->
+                    <div class="config-item">
+                        <label class="config-label">
+                            Mic Activity Detection
+                            <span class="config-hint">Threshold to detect user speaking (0-100)</span>
+                        </label>
+                        <div class="config-controls">
+                            <input 
+                                type="range" 
+                                min="1" 
+                                max="20" 
+                                step="1"
+                                value={configMicThreshold}
+                                oninput={handleMicThresholdChange}
+                                class="config-slider">
+                            <input 
+                                type="number" 
+                                min="1" 
+                                max="20"
+                                value={configMicThreshold}
+                                onchange={handleMicThresholdInput}
+                                class="config-input">
+                        </div>
+                        <div class="config-current">Current: {configMicThreshold}</div>
+                    </div>
+
+                    <!-- Speaker Activity Detection -->
+                    <div class="config-item">
+                        <label class="config-label">
+                            Speaker Activity Detection
+                            <span class="config-hint">Threshold to detect agent speaking (0-100)</span>
+                        </label>
+                        <div class="config-controls">
+                            <input 
+                                type="range" 
+                                min="1" 
+                                max="20" 
+                                step="1"
+                                value={configSpeakerThreshold}
+                                oninput={handleSpeakerThresholdChange}
+                                class="config-slider">
+                            <input 
+                                type="number" 
+                                min="1" 
+                                max="20"
+                                value={configSpeakerThreshold}
+                                onchange={handleSpeakerThresholdInput}
+                                class="config-input">
+                        </div>
+                        <div class="config-current">Current: {configSpeakerThreshold}</div>
+                    </div>
+
+                    <!-- State Priority Multiplier -->
+                    <div class="config-item">
+                        <label class="config-label">
+                            State Priority Multiplier
+                            <span class="config-hint">User must be this much louder to interrupt (1.0-2.0x)</span>
+                        </label>
+                        <div class="config-controls">
+                            <input 
+                                type="range" 
+                                min="1.0" 
+                                max="2.0" 
+                                step="0.1"
+                                value={configPriorityMultiplier}
+                                oninput={handlePriorityMultiplierChange}
+                                class="config-slider">
+                            <input 
+                                type="number" 
+                                min="1.0" 
+                                max="2.0"
+                                step="0.1"
+                                value={configPriorityMultiplier}
+                                onchange={handlePriorityMultiplierInput}
+                                class="config-input">
+                        </div>
+                        <div class="config-current">Current: {configPriorityMultiplier}x</div>
+                    </div>
+
+                    <!-- User Silence Threshold -->
+                    <div class="config-item">
+                        <label class="config-label">
+                            User Silence Threshold
+                            <span class="config-hint">Milliseconds of silence before unmuting agent (100-2000ms)</span>
+                        </label>
+                        <div class="config-controls">
+                            <input 
+                                type="range" 
+                                min="100" 
+                                max="2000" 
+                                step="100"
+                                value={configSilenceThreshold}
+                                oninput={handleSilenceThresholdChange}
+                                class="config-slider">
+                            <input 
+                                type="number" 
+                                min="100" 
+                                max="2000"
+                                step="100"
+                                value={configSilenceThreshold}
+                                onchange={handleSilenceThresholdInput}
+                                class="config-input">
+                        </div>
+                        <div class="config-current">Current: {configSilenceThreshold}ms</div>
+                    </div>
+
+                    <!-- State Change Lock -->
+                    <div class="config-item">
+                        <label class="config-label">
+                            State Change Lock
+                            <span class="config-hint">Minimum time in state before changing (200-3000ms)</span>
+                        </label>
+                        <div class="config-controls">
+                            <input 
+                                type="range" 
+                                min="200" 
+                                max="3000" 
+                                step="100"
+                                value={configStateLock}
+                                oninput={handleStateLockChange}
+                                class="config-slider">
+                            <input 
+                                type="number" 
+                                min="200" 
+                                max="3000"
+                                step="100"
+                                value={configStateLock}
+                                onchange={handleStateLockInput}
+                                class="config-input">
+                        </div>
+                        <div class="config-current">Current: {configStateLock}ms</div>
+                    </div>
+                </div>
+
+                <div class="config-footer">
+                    <button class="btn-reset" onclick={handleResetConfig}>Reset to Defaults</button>
+                    <button class="btn-confirm" onclick={handleConfirmConfig}>Confirm & Apply</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Debug Panel (shown on triple-click on title) -->
+    <template if:true={showDebug}>
+        <div class="debug-panel">
+            <div class="debug-header">
+                <span>⚙️ Configuration</span>
+                <button class="close-btn" onclick={toggleDebug}>×</button>
+            </div>
+
+            <div class="input-group">
+                <label>Selected Agent</label>
+                <p>{displayAgentName}</p>
+            </div>
+
+            <div class="input-group">
+                <label>Instance URL</label>
+                <p>{instanceUrl}</p>
+            </div>
+
+            <div class="input-group">
+                <label>Agent ID</label>
+                <p>{agentId}</p>
+            </div>
+
+            <div class="input-group">
+                <label>Version ID</label>
+                <p>{versionId}</p>
+            </div>
+
+            <div class="button-group">
+                <lightning-button 
+                    label={connectButtonLabel}
+                    variant="brand"
+                    onclick={toggleConnection}
+                    disabled={isConnecting}>
+                </lightning-button>
+            </div>
+        </div>
+    </template>
+</template>

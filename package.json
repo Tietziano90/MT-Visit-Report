@@ -1,0 +1,22 @@
+{
+  "name": "mt-voice-assistant-installer",
+  "version": "1.0.0",
+  "description": "MT Voice Assistant - Visual Deployment Wizard",
+  "main": "installer.js",
+  "scripts": {
+    "start": "electron .",
+    "package-mac": "electron-packager . 'MT Voice Assistant Installer' --platform=darwin --arch=x64 --icon=icon.icns --out=dist/",
+    "package-win": "electron-packager . 'MT Voice Assistant Installer' --platform=win32 --arch=x64 --icon=icon.ico --out=dist/",
+    "package-all": "npm run package-mac && npm run package-win"
+  },
+  "keywords": ["salesforce", "deployment", "voice-assistant"],
+  "author": "Michael Tietze <mtietze@salesforce.com>",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "electron": "^28.0.0"
+  },
+  "devDependencies": {
+    "electron-packager": "^17.1.2"
+  }
+}
+

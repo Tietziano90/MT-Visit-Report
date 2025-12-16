@@ -1,0 +1,1812 @@
+<!--
+================================================================================
+MT RECORD SUGGESTION - Lightning Web Component
+================================================================================
+Author: Michael Tietze, Principal AI Architect
+Contact: mtietze@salesforce.com
+Created: December 2025
+Version: 1.5
+
+COPYRIGHT AND DISTRIBUTION
+Copyright © 2025 Salesforce, Inc. All rights reserved.
+
+INTERNAL USE ONLY - This code may not be shared externally or distributed
+outside of Salesforce without prior written approval from Michael Tietze
+(mtietze@salesforce.com).
+================================================================================
+-->
+
+<template>
+    <div class={containerClass}>
+        <!-- Loading State -->
+        <template lwc:if={isLoading}>
+            <div class="loading-container">
+                <div class="loading-spinner-wrapper">
+                    <lightning-spinner alternative-text="Loading..." size="large"></lightning-spinner>
+                </div>
+                <p class="loading-text">Processing AI suggestions...</p>
+            </div>
+        </template>
+
+        <!-- Error State -->
+        <template lwc:if={hasError}>
+            <div class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_medium" role="alert">
+                <lightning-icon icon-name="utility:error" variant="inverse" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                <span>{errorMessage}</span>
+            </div>
+        </template>
+
+        <!-- No Records State -->
+        <template lwc:if={noRecords}>
+            <div class="empty-state slds-p-around_large slds-text-align_center">
+                <lightning-icon icon-name="utility:info" size="large" class="slds-m-bottom_medium"></lightning-icon>
+                <h2 class="slds-text-heading_medium">No Recommendations</h2>
+                <p class="slds-text-body_regular slds-text-color_weak">No record suggestions were generated from the meeting.</p>
+            </div>
+        </template>
+
+        <!-- Records Display -->
+        <template lwc:if={hasRecords}>
+            <!-- Summary Section - Collapsible like record groups -->
+            <template lwc:if={hasSummary}>
+                <div class="record-group-section summary-group-section">
+                    <!-- Section Header -->
+                    <div class="section-header" onclick={handleToggleSummary}>
+                        <div class="section-header-left">
+                            <template lwc:if={isSummaryExpanded}>
+                                <lightning-icon icon-name="utility:chevrondown" size="x-small" class="chevron-icon"></lightning-icon>
+                            </template>
+                            <template lwc:else>
+                                <lightning-icon icon-name="utility:chevronright" size="x-small" class="chevron-icon"></lightning-icon>
+                            </template>
+                            <lightning-icon icon-name="standard:note" size="small" class="section-icon"></lightning-icon>
+                            <strong class="section-label">Meeting Summary</strong>
+                        </div>
+                        <div class="section-header-right" onclick={handleStopPropagation}>
+                            <template lwc:if={isSummaryReadOnly}>
+                                <lightning-button-icon 
+                                    icon-name="utility:edit" 
+                                    alternative-text="Edit summary"
+                                    title="Edit summary"
+                                    onclick={handleEditSummary}
+                                    class="summary-edit-btn">
+                                </lightning-button-icon>
+                            </template>
+                            <template lwc:else>
+                                <lightning-button-icon 
+                                    icon-name="utility:check" 
+                                    alternative-text="Done editing"
+                                    title="Done editing"
+                                    variant="brand"
+                                    onclick={handleSaveSummary}
+                                    class="summary-edit-btn">
+                                </lightning-button-icon>
+                            </template>
+                        </div>
+                    </div>
+                    <!-- Section Content -->
+                    <template lwc:if={isSummaryExpanded}>
+                        <div class="summary-content">
+                            <template lwc:if={isSummaryReadOnly}>
+                                <lightning-formatted-rich-text value={summary}></lightning-formatted-rich-text>
+                            </template>
+                            <template lwc:else>
+                                <lightning-input-rich-text
+                                    value={summaryText}
+                                    onchange={handleSummaryChange}
+                                    label-visible="false"
+                                    placeholder="Edit meeting summary..."
+                                    class="summary-rich-text">
+                                </lightning-input-rich-text>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- Image/File Section (if present) -->
+            <template lwc:if={hasAttachedFile}>
+                <div class="record-group-section slds-m-top_small">
+                    <div class="section-header">
+                        <div class="section-header-left">
+                            <lightning-icon icon-name="utility:image" size="small" class="section-icon"></lightning-icon>
+                            <strong class="section-label">Attached File</strong>
+                        </div>
+                    </div>
+                    <div class="summary-content slds-p-around_small">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-icon icon-name="utility:file" size="small" class="slds-m-right_small"></lightning-icon>
+                            <div>
+                                <p class="slds-text-body_regular">{attachedFileName}</p>
+                                <p class="slds-text-body_small slds-text-color_weak">{attachedFileType}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Settings Modal -->
+            <template lwc:if={isSettingsOpen}>
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small mt-scroll-modal">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <lightning-button-icon
+                                icon-name="utility:close"
+                                alternative-text="Close"
+                                class="slds-modal__close"
+                                onclick={handleCloseSettings}>
+                            </lightning-button-icon>
+                            <h2 class="slds-modal__title">Display Settings</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium">
+                            <lightning-combobox
+                                label="Layout Columns"
+                                value={layoutColumns}
+                                options={layoutOptions}
+                                onchange={handleLayoutChange}
+                                class="slds-m-bottom_medium">
+                            </lightning-combobox>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning-button
+                                label="Done"
+                                variant="brand"
+                                onclick={handleCloseSettings}>
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open mt-scroll-backdrop" onclick={handleCloseSettings}></div>
+            </template>
+
+            <!-- Add Field Modal -->
+            <template lwc:if={isAddFieldModalOpen}>
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium add-field-modal mt-scroll-modal">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <lightning-button-icon
+                                icon-name="utility:close"
+                                alternative-text="Close"
+                                class="slds-modal__close"
+                                onclick={handleCancelAddField}>
+                            </lightning-button-icon>
+                            <h2 class="slds-modal__title">
+                                <lightning-icon icon-name="utility:add" size="small" class="slds-m-right_x-small"></lightning-icon>
+                                Add Field to {addFieldModalTitle}
+                            </h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium" style="min-height: 300px;">
+                            <div class="slds-form">
+                                <div class="slds-form-element slds-m-bottom_medium">
+                                    <lightning-combobox
+                                        label="Select Field"
+                                        placeholder="Choose a field to add..."
+                                        options={addFieldModalOptions}
+                                        value={addFieldModalSelectedField}
+                                        onchange={handleModalFieldSelect}>
+                                    </lightning-combobox>
+                                </div>
+                                <template lwc:if={addFieldModalSelectedField}>
+                                    <div class="slds-form-element">
+                                        <!-- Dynamic input based on field type -->
+                                        <template lwc:if={addFieldModalIsDate}>
+                                            <lightning-input
+                                                type="date"
+                                                label="Value"
+                                                value={addFieldModalValue}
+                                                onchange={handleModalValueChange}>
+                                            </lightning-input>
+                                        </template>
+                                        <template lwc:elseif={addFieldModalIsDateTime}>
+                                            <lightning-input
+                                                type="datetime"
+                                                label="Value"
+                                                value={addFieldModalValue}
+                                                onchange={handleModalValueChange}>
+                                            </lightning-input>
+                                        </template>
+                                        <template lwc:elseif={addFieldModalIsNumber}>
+                                            <lightning-input
+                                                type="number"
+                                                label="Value"
+                                                value={addFieldModalValue}
+                                                onchange={handleModalValueChange}>
+                                            </lightning-input>
+                                        </template>
+                                        <template lwc:elseif={addFieldModalIsPicklist}>
+                                            <lightning-combobox
+                                                label="Value"
+                                                placeholder="Select a value..."
+                                                options={addFieldModalPicklistOptions}
+                                                value={addFieldModalValue}
+                                                onchange={handleModalValueChange}>
+                                            </lightning-combobox>
+                                        </template>
+                                        <template lwc:elseif={addFieldModalIsBoolean}>
+                                            <lightning-input
+                                                type="checkbox"
+                                                label="Value"
+                                                checked={addFieldModalValue}
+                                                onchange={handleModalValueChange}>
+                                            </lightning-input>
+                                        </template>
+                                        <template lwc:else>
+                                            <lightning-input
+                                                type="text"
+                                                label="Value"
+                                                placeholder="Enter value..."
+                                                value={addFieldModalValue}
+                                                onchange={handleModalValueChange}>
+                                            </lightning-input>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning-button
+                                label="Cancel"
+                                onclick={handleCancelAddField}
+                                class="slds-m-right_x-small">
+                            </lightning-button>
+                            <lightning-button
+                                label="Add Field"
+                                variant="brand"
+                                disabled={addFieldModalDisabled}
+                                onclick={handleModalAddFieldConfirm}>
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open mt-scroll-backdrop" onclick={handleCancelAddField}></div>
+            </template>
+
+            <!-- Polymorphic Lookup Modal (Mobile) - Positioned at scroll position -->
+            <template lwc:if={isPolymorphicModalOpen}>
+                <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium polymorphic-dropdown-modal">
+                    <div class="slds-modal__container">
+                        <header class="slds-modal__header">
+                            <lightning-button-icon
+                                icon-name="utility:close"
+                                alternative-text="Close"
+                                class="slds-modal__close"
+                                onclick={handleClosePolymorphicModal}>
+                            </lightning-button-icon>
+                            <h2 class="slds-modal__title">Select Related Record</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium">
+                            <lightning-combobox
+                                label="Record Type"
+                                value={_polymorphicModalObjectType}
+                                options={polymorphicModalField.polymorphicObjectOptions}
+                                onchange={handlePolymorphicModalObjectChange}
+                                class="slds-m-bottom_medium">
+                            </lightning-combobox>
+                            
+                            <template lwc:if={_polymorphicModalObjectType}>
+                                <lightning-record-picker
+                                    label="Select Record"
+                                    placeholder="Search..."
+                                    object-api-name={_polymorphicModalObjectType}
+                                    value={_polymorphicModalRecordId}
+                                    onchange={handlePolymorphicModalRecordChange}>
+                                </lightning-record-picker>
+                            </template>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning-button
+                                label="Cancel"
+                                onclick={handleClosePolymorphicModal}>
+                            </lightning-button>
+                            <lightning-button
+                                label="Save"
+                                variant="brand"
+                                onclick={handleSavePolymorphicModal}>
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open" onclick={handleClosePolymorphicModal}></div>
+            </template>
+
+            <!-- Record Groups (by Object Type) - Custom Collapsible Sections -->
+            <div class="record-groups-container">
+                <template for:each={recordGroups} for:item="group" for:index="groupIndex">
+                    <div class="record-group-section" key={group.objectType}>
+                        <!-- Custom Section Header -->
+                        <div class="section-header" data-group-index={groupIndex} onclick={handleToggleSection}>
+                            <div class="section-header-left">
+                                <template lwc:if={group.isExpanded}>
+                                    <lightning-icon icon-name="utility:chevrondown" size="x-small" class="chevron-icon"></lightning-icon>
+                                </template>
+                                <template lwc:else>
+                                    <lightning-icon icon-name="utility:chevronright" size="x-small" class="chevron-icon"></lightning-icon>
+                                </template>
+                                <lightning-icon icon-name={group.icon} size="small" class="section-icon"></lightning-icon>
+                                <strong class="section-label">{group.labelPlural}</strong>
+                                <lightning-badge label={group.records.length} class="record-count-badge-subtle"></lightning-badge>
+                            </div>
+                            <div class="section-header-right" onclick={handleStopPropagation}>
+                                <lightning-button
+                                    variant="brand"
+                                    label={group.saveAllLabel}
+                                    icon-name="utility:save"
+                                    data-group-index={groupIndex}
+                                    onclick={handleSaveAllInGroup}
+                                    disabled={group.allSaved}
+                                    size="small">
+                                </lightning-button>
+                            </div>
+                        </div>
+                        
+                        <!-- Section Content (collapsible) -->
+                        <template lwc:if={group.isExpanded}>
+                        <div class="records-container">
+                            <lightning-layout multiple-rows class="records-grid">
+                                <template for:each={group.records} for:item="record" for:index="recordIndex">
+                                    <lightning-layout-item 
+                                        key={record.uuid} 
+                                        size="12" 
+                                        medium-device-size={layoutItemSize}
+                                        large-device-size={layoutItemSize}
+                                        padding="around-small"
+                                        class="record-item">
+                                        
+                                        <!-- Record Card -->
+                                        <lightning-card class={record.cardClass}>
+                                            <!-- Card Header -->
+                                            <h3 slot="title">
+                                                <lightning-icon 
+                                                    icon-name={group.icon} 
+                                                    size="small" 
+                                                    class="slds-m-right_x-small">
+                                                </lightning-icon>
+                                                <!-- Show existing record name for updates, or title for new -->
+                                                <template lwc:if={record.existingName}>
+                                                    {record.existingName}
+                                                </template>
+                                                <template lwc:else>
+                                                    {record.title}
+                                                </template>
+                                                <template lwc:if={record.isNew}>
+                                                    <lightning-badge label="New" class="slds-m-left_x-small"></lightning-badge>
+                                                </template>
+                                                <template lwc:if={record.isExisting}>
+                                                    <lightning-badge label="Update" variant="warning" class="slds-m-left_x-small"></lightning-badge>
+                                                </template>
+                                                <template lwc:if={record.isSaved}>
+                                                    <lightning-icon 
+                                                        icon-name="utility:success" 
+                                                        variant="success" 
+                                                        size="x-small"
+                                                        class="slds-m-left_x-small">
+                                                    </lightning-icon>
+                                                </template>
+                                            </h3>
+
+                                            <!-- Card Actions -->
+                                            <div slot="actions" class="action-buttons">
+                                                <!-- Mobile: dropdown menu; Desktop: buttons -->
+                                                <template lwc:if={isMobile}>
+                                                    <template lwc:if={record.isNotSaved}>
+                                                        <lightning-button-menu alternative-text="Show actions" variant="border-filled" menu-alignment="right" icon-size="x-small" class="slds-m-left_small mt-action-menu">
+                                                            <template lwc:if={group.useUiApi}>
+                                                                <lightning-menu-item
+                                                                    value="link"
+                                                                    label="Link to different record"
+                                                                    prefix-icon-name="utility:change_record_type"
+                                                                    data-group-index={groupIndex}
+                                                                    data-record-index={recordIndex}
+                                                                    onclick={handleLinkToExisting}>
+                                                                </lightning-menu-item>
+                                                            </template>
+
+                                                            <!-- Existing-record-only options -->
+                                                            <template lwc:if={record.isExisting}>
+                                                                <lightning-menu-item
+                                                                    value="toggle_layout"
+                                                                    label={record.layoutToggleLabel}
+                                                                    prefix-icon-name="utility:layout"
+                                                                    data-group-index={groupIndex}
+                                                                    data-record-index={recordIndex}
+                                                                    onclick={handleLayoutToggle}>
+                                                                </lightning-menu-item>
+                                                                <template lwc:if={record.isEditMode}>
+                                                                    <lightning-menu-item
+                                                                        value="cancel_edit"
+                                                                        label="Cancel Edit"
+                                                                        prefix-icon-name="utility:close"
+                                                                        data-group-index={groupIndex}
+                                                                        data-record-index={recordIndex}
+                                                                        onclick={handleEditToggle}>
+                                                                    </lightning-menu-item>
+                                                                </template>
+                                                                <template lwc:else>
+                                                                    <lightning-menu-item
+                                                                        value="edit"
+                                                                        label="Edit"
+                                                                        prefix-icon-name="utility:edit"
+                                                                        data-group-index={groupIndex}
+                                                                        data-record-index={recordIndex}
+                                                                        onclick={handleEditToggle}>
+                                                                    </lightning-menu-item>
+                                                                </template>
+                                                                <lightning-menu-item
+                                                                    value="refresh"
+                                                                    label="Refresh"
+                                                                    prefix-icon-name="utility:refresh"
+                                                                    data-group-index={groupIndex}
+                                                                    data-record-index={recordIndex}
+                                                                    onclick={handleRefreshRecord}>
+                                                                </lightning-menu-item>
+                                                            </template>
+                                                        </lightning-button-menu>
+                                                    </template>
+                                                </template>
+                                                <template lwc:else>
+                                                    <template lwc:if={record.isNotSaved}>
+                                                        <lightning-button-group>
+                                                            <template lwc:if={group.useUiApi}>
+                                                                <lightning-button
+                                                                    label="Link"
+                                                                    icon-name="utility:change_record_type"
+                                                                    data-group-index={groupIndex}
+                                                                    data-record-index={recordIndex}
+                                                                    onclick={handleLinkToExisting}>
+                                                                </lightning-button>
+                                                            </template>
+                                                            <template lwc:if={record.isExisting}>
+                                                                <lightning-button
+                                                                    label={record.layoutToggleLabel}
+                                                                    icon-name="utility:layout"
+                                                                    data-group-index={groupIndex}
+                                                                    data-record-index={recordIndex}
+                                                                    onclick={handleLayoutToggle}>
+                                                                </lightning-button>
+                                                                <template lwc:if={record.isEditMode}>
+                                                                    <lightning-button
+                                                                        label="Cancel Edit"
+                                                                        icon-name="utility:close"
+                                                                        data-group-index={groupIndex}
+                                                                        data-record-index={recordIndex}
+                                                                        onclick={handleEditToggle}>
+                                                                    </lightning-button>
+                                                                </template>
+                                                                <template lwc:else>
+                                                                    <lightning-button
+                                                                        label="Edit"
+                                                                        icon-name="utility:edit"
+                                                                        data-group-index={groupIndex}
+                                                                        data-record-index={recordIndex}
+                                                                        onclick={handleEditToggle}>
+                                                                    </lightning-button>
+                                                                </template>
+                                                                <lightning-button
+                                                                    label="Refresh"
+                                                                    icon-name="utility:refresh"
+                                                                    data-group-index={groupIndex}
+                                                                    data-record-index={recordIndex}
+                                                                    onclick={handleRefreshRecord}>
+                                                                </lightning-button>
+                                                            </template>
+                                                        </lightning-button-group>
+                                                    </template>
+                                                </template>
+                                                <!-- On mobile, Save is always shown at the bottom-right (mobile-save-footer). -->
+                                                <template lwc:if={isMobile}></template>
+                                                <template lwc:else>
+                                                    <!-- For NEW records on desktop, Save lives in the Add Field row (same line). -->
+                                                    <template lwc:if={record.isNew}></template>
+                                                    <template lwc:else>
+                                                    <template lwc:if={record.isSaving}>
+                                                        <lightning-button variant="brand" label="Saving..." icon-name="utility:save" disabled></lightning-button>
+                                                    </template>
+                                                    <template lwc:elseif={record.isSaved}>
+                                                        <lightning-button variant="success" label="Saved" icon-name="utility:success" disabled></lightning-button>
+                                                    </template>
+                                                    <template lwc:else>
+                                                        <lightning-button
+                                                            variant="brand"
+                                                            label="Save"
+                                                            icon-name="utility:save"
+                                                            data-group-index={groupIndex}
+                                                            data-record-index={recordIndex}
+                                                            onclick={handleSaveRecord}>
+                                                        </lightning-button>
+                                                    </template>
+                                                    </template>
+                                                </template>
+                                            </div>
+
+                                            <!-- Card Body -->
+                                            <div class="slds-p-horizontal_small">
+                                                <!-- Existing Record: Show lightning-record-form -->
+                                                <template lwc:if={record.isExisting}>
+                                                    <div class="existing-record-form slds-m-bottom_small">
+                                                        <!-- Record Form - switches between readonly and edit -->
+                                                        <template lwc:if={record.isEditMode}>
+                                                            <!-- Edit Mode -->
+                                                            <template lwc:if={record.isLayoutFull}>
+                                                                <lightning-record-form
+                                                                    record-id={record.id}
+                                                                    object-api-name={group.objectType}
+                                                                    layout-type="Full"
+                                                                    columns={formColumns}
+                                                                    mode="edit">
+                                                                </lightning-record-form>
+                                                            </template>
+                                                            <template lwc:else>
+                                                                <lightning-record-form
+                                                                    record-id={record.id}
+                                                                    object-api-name={group.objectType}
+                                                                    layout-type="Compact"
+                                                                    columns={formColumns}
+                                                                    mode="edit">
+                                                                </lightning-record-form>
+                                                            </template>
+                                                        </template>
+                                                        <template lwc:else>
+                                                            <!-- Readonly Mode -->
+                                                            <template lwc:if={record.isLayoutFull}>
+                                                                <lightning-record-form
+                                                                    record-id={record.id}
+                                                                    object-api-name={group.objectType}
+                                                                    layout-type="Full"
+                                                                    columns={formColumns}
+                                                                    mode="readonly">
+                                                                </lightning-record-form>
+                                                            </template>
+                                                            <template lwc:else>
+                                                                <lightning-record-form
+                                                                    record-id={record.id}
+                                                                    object-api-name={group.objectType}
+                                                                    layout-type="Compact"
+                                                                    columns={formColumns}
+                                                                    mode="readonly">
+                                                                </lightning-record-form>
+                                                            </template>
+                                                        </template>
+                                                    </div>
+                                                    <!-- Only show Proposed Changes for records that existed before (not just created) -->
+                                                    <template lwc:if={record.hasProposedChanges}>
+                                                        <div class="proposed-changes-header">
+                                                            <span class="proposed-changes-title">Proposed Changes</span>
+                                                        </div>
+                                                    </template>
+                                                </template>
+                                                <!-- Duplicate Detection Message -->
+                                                <template lwc:if={record.isDuplicateError}>
+                                                    <div class="slds-box slds-box_x-small slds-m-bottom_small warning-box" role="alert">
+                                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                                            <lightning-icon icon-name="utility:info" size="x-small" variant="inverse" class="slds-m-right_x-small"></lightning-icon>
+                                                            <p class="slds-col slds-text-body_regular">
+                                                                Similar record may exist
+                                                            </p>
+                                                            <lightning-button
+                                                                label="View Matches"
+                                                                variant="neutral"
+                                                                size="small"
+                                                                data-group-index={groupIndex}
+                                                                data-record-index={recordIndex}
+                                                                onclick={handleOpenDuplicateModal}
+                                                                class="slds-m-left_small">
+                                                            </lightning-button>
+                                                            <lightning-button-icon
+                                                                icon-name="utility:close"
+                                                                variant="bare-inverse"
+                                                                alternative-text="Dismiss"
+                                                                title="Dismiss"
+                                                                class="slds-m-left_small"
+                                                                data-group-index={groupIndex}
+                                                                data-record-index={recordIndex}
+                                                                onclick={handleDismissError}>
+                                                            </lightning-button-icon>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                <!-- Required Fields Missing Message -->
+                                                <template lwc:elseif={record.isMissingRequiredFields}>
+                                                    <div class="slds-box slds-box_x-small slds-theme_error slds-m-bottom_small error-box" role="alert">
+                                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                                            <lightning-icon icon-name="utility:error" variant="inverse" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                                                            <p class="slds-col slds-text-body_regular slds-text-color_inverse">
+                                                                Missing required field: <strong>{record.missingFieldsList}</strong>
+                                                            </p>
+                                                            <lightning-button-icon
+                                                                icon-name="utility:close"
+                                                                variant="bare-inverse"
+                                                                alternative-text="Dismiss"
+                                                                title="Dismiss"
+                                                                class="slds-m-left_small"
+                                                                data-group-index={groupIndex}
+                                                                data-record-index={recordIndex}
+                                                                onclick={handleDismissError}>
+                                                            </lightning-button-icon>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                <!-- Regular Error Message (non-duplicate) -->
+                                                <template lwc:elseif={record.hasNonDuplicateError}>
+                                                    <div class="slds-box slds-box_x-small slds-theme_error slds-m-bottom_small error-box" role="alert">
+                                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                                            <lightning-icon icon-name="utility:error" variant="inverse" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                                                            <p class="slds-col slds-text-body_regular slds-text-color_inverse">
+                                                                {record.errorMessage}
+                                                            </p>
+                                                            <span class="info-tooltip-container slds-m-left_x-small">
+                                                                <lightning-button-icon
+                                                                    icon-name="utility:info"
+                                                                    variant="bare-inverse"
+                                                                    size="small"
+                                                                    alternative-text="More info"
+                                                                    onclick={handleShowErrorInfo}>
+                                                                </lightning-button-icon>
+                                                                <div class="info-tooltip" lwc:if={_showErrorInfoTooltip}>
+                                                                    <div class="slds-popover slds-popover_tooltip slds-nubbin_bottom-left" role="tooltip">
+                                                                        <div class="slds-popover__body">
+                                                                            <strong>Possible causes:</strong><br/>
+                                                                            • Record is locked<br/>
+                                                                            • Validation rule<br/>
+                                                                            • No edit permission<br/>
+                                                                            • Approval process<br/>
+                                                                            • Automation (workflow/trigger/flow)<br/>
+                                                                            • Field-level security
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </span>
+                                                            <lightning-button-icon
+                                                                icon-name="utility:close"
+                                                                variant="bare-inverse"
+                                                                alternative-text="Dismiss"
+                                                                title="Dismiss"
+                                                                class="slds-m-left_small"
+                                                                data-group-index={groupIndex}
+                                                                data-record-index={recordIndex}
+                                                                onclick={handleDismissError}>
+                                                            </lightning-button-icon>
+                                                        </div>
+                                                    </div>
+                                                </template>
+
+                                                <!-- Loading Spinner -->
+                                                <template lwc:if={record.isSaving}>
+                                                    <div class="slds-is-relative" style="min-height: 50px;">
+                                                        <lightning-spinner alternative-text="Saving..." size="small"></lightning-spinner>
+                                                    </div>
+                                                </template>
+
+                                                <!-- Saved Fields Display (for non-UI API objects after save) -->
+                                                <template lwc:if={record.showSavedFieldsOnly}>
+                                                    <div class="saved-fields-container">
+                                                        <div class="slds-text-title_caps slds-p-vertical_x-small slds-m-bottom_small saved-header">
+                                                            <lightning-icon icon-name="utility:check" size="x-small" class="slds-m-right_x-small" variant="success"></lightning-icon>
+                                                            Record Saved
+                                                        </div>
+                                                        <div class="slds-grid slds-wrap">
+                                                            <template for:each={record.fields} for:item="savedField">
+                                                                <template lwc:if={savedField.isSelected}>
+                                                                    <div key={savedField.apiName} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-p-around_x-small">
+                                                                        <div class="slds-form-element">
+                                                                            <span class="slds-form-element__label slds-text-color_weak">{savedField.label}</span>
+                                                                            <div class="slds-form-element__static">
+                                                                                <template lwc:if={savedField.displayValue}>
+                                                                                    {savedField.displayValue}
+                                                                                </template>
+                                                                                <template lwc:else>
+                                                                                    {savedField.newValue}
+                                                                                </template>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </template>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </template>
+
+                                                <!-- Fields (for records not yet saved or existing records) -->
+                                                <template lwc:elseif={record.fields.length}>
+                                                    <template for:each={record.fields} for:item="field">
+                                                        <div key={field.apiName} 
+                                                             class={field.rowClass}
+                                                             onclick={handleFieldRowClick}
+                                                             data-group-index={groupIndex}
+                                                             data-record-index={recordIndex}
+                                                             data-field-name={field.apiName}
+                                                             data-is-saved={record.isSaved}
+                                                             data-is-selected={field.isSelected}>
+                                                            <!-- For existing records with old values: show comparison -->
+                                                            <template lwc:if={field.hasOldValue}>
+                                                                <template lwc:if={isMobile}>
+                                                                    <!-- Mobile Comparison: Vertical Stack, Single Selection -->
+                                                                    <div class="field-comparison-mobile">
+                                                                        <div class="slds-grid slds-gutters_x-small">
+                                                                            <div class="slds-col slds-size_10-of-12">
+                                                                                <template lwc:if={group.useUiApi}>
+                                                                                    <template lwc:if={field.isDate}>
+                                                                                        <c-mt-date-input
+                                                                                            label={field.label}
+                                                                                            value={field.newValue}
+                                                                                            required={field.isRequired}
+                                                                                            disabled={record.isSaved}
+                                                                                            data-group-index={groupIndex}
+                                                                                            data-record-index={recordIndex}
+                                                                                            data-field-name={field.apiName}
+                                                                                            onmtselect={handleDateFieldSelect}
+                                                                                            onchange={handleFieldChange}>
+                                                                                        </c-mt-date-input>
+                                                                                    </template>
+                                                                                    <template lwc:else>
+                                                                                        <lightning-record-edit-form object-api-name={group.objectType} density="comfy">
+                                                                                            <lightning-input-field
+                                                                                                field-name={field.apiName}
+                                                                                                value={field.newValue}
+                                                                                                variant="label-stacked"
+                                                                                                data-group-index={groupIndex}
+                                                                                                data-record-index={recordIndex}
+                                                                                                data-field-name={field.apiName}
+                                                                                                onchange={handleFieldChange}>
+                                                                                            </lightning-input-field>
+                                                                                        </lightning-record-edit-form>
+                                                                                    </template>
+                                                                                </template>
+                                                                                <template lwc:else>
+                                                                                    <!-- Fallback for non-UI API (Task/Event): render by type (dates were not showing reliably otherwise) -->
+                                                                                    <template lwc:if={field.isDate}>
+                                                                                        <c-mt-date-input
+                                                                                            label={field.label}
+                                                                                            value={field.newValue}
+                                                                                            data-group-index={groupIndex}
+                                                                                            data-record-index={recordIndex}
+                                                                                            data-field-name={field.apiName}
+                                                                                            onmtselect={handleDateFieldSelect}
+                                                                                            onchange={handleFieldChange}>
+                                                                                        </c-mt-date-input>
+                                                                                    </template>
+                                                                                    <template lwc:elseif={field.isDateTime}>
+                                                                                        <lightning-input
+                                                                                            type="datetime"
+                                                                                            label={field.label}
+                                                                                            value={field.newValue}
+                                                                                            variant="label-stacked"
+                                                                                            onchange={handleFieldChange}>
+                                                                                        </lightning-input>
+                                                                                    </template>
+                                                                                    <template lwc:elseif={field.isBoolean}>
+                                                                                        <lightning-input
+                                                                                            type="checkbox"
+                                                                                            label={field.label}
+                                                                                            checked={field.newValue}
+                                                                                            onchange={handleFieldChange}>
+                                                                                        </lightning-input>
+                                                                                    </template>
+                                                                                    <template lwc:else>
+                                                                                        <lightning-input
+                                                                                            type="text"
+                                                                                            label={field.label}
+                                                                                            value={field.newValue}
+                                                                                            variant="label-stacked"
+                                                                                            onchange={handleFieldChange}>
+                                                                                        </lightning-input>
+                                                                                    </template>
+                                                                                </template>
+                                                                                
+                                                                                <!-- Current Value Display below the input -->
+                                                                                <div class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">
+                                                                                    Current: {field.oldValue}
+                                                                                </div>
+                                                                            </div>
+                                                                            
+                                                                            <!-- Accept Button -->
+                                                                            <div class="slds-col slds-size_2-of-12 accept-btn-col">
+                                                                                <template lwc:if={field.isSelected}>
+                                                                                    <lightning-button-icon
+                                                                                        icon-name="utility:check"
+                                                                                        variant="brand"
+                                                                                        alternative-text="Accepted"
+                                                                                        title="Click to exclude"
+                                                                                        disabled={record.isSaved}
+                                                                                        data-group-index={groupIndex}
+                                                                                        data-record-index={recordIndex}
+                                                                                        data-field-name={field.apiName}
+                                                                                        onclick={handleAcceptField}
+                                                                                        class="accept-btn accepted">
+                                                                                    </lightning-button-icon>
+                                                                                </template>
+                                                                                <template lwc:else>
+                                                                                    <lightning-button-icon
+                                                                                        icon-name="utility:add"
+                                                                                        variant="border"
+                                                                                        alternative-text="Accept"
+                                                                                        title="Click to include"
+                                                                                        disabled={record.isSaved}
+                                                                                        data-group-index={groupIndex}
+                                                                                        data-record-index={recordIndex}
+                                                                                        data-field-name={field.apiName}
+                                                                                        onclick={handleAcceptField}
+                                                                                        class="accept-btn">
+                                                                                    </lightning-button-icon>
+                                                                                </template>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </template>
+                                                                <template lwc:else>
+                                                                    <!-- Desktop Comparison: Side-by-Side (Existing Logic) -->
+                                                                    <div class="field-comparison slds-grid slds-gutters_x-small">
+                                                                <!-- Old Value (read-only) -->
+                                                                <div class="slds-col slds-size_5-of-12">
+                                                                    <template lwc:if={field.isReference}>
+                                                                        <div class="slds-form-element reference-field-container">
+                                                                            <label class="slds-form-element__label">{field.label}</label>
+                                                                            <div class="slds-form-element__control reference-display old-value-display">
+                                                                                <template lwc:if={field.oldDisplayValue}>
+                                                                                    <lightning-icon icon-name="standard:record" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                                    <span class="reference-name">{field.oldDisplayValue}</span>
+                                                                                </template>
+                                                                                <template lwc:else>
+                                                                                    <span class="reference-id">{field.oldValue}</span>
+                                                                                </template>
+                                                                            </div>
+                                                                        </div>
+                                                                    </template>
+                                                                    <template lwc:else>
+                                                                        <!-- Show preSaveValue after save, otherwise oldValue -->
+                                                                        <template lwc:if={record.showUpdatedLabels}>
+                                                                            <lightning-input
+                                                                                type="text"
+                                                                                label={field.label}
+                                                                                value={field.preSaveValue}
+                                                                                disabled
+                                                                                variant="label-stacked"
+                                                                                class="old-value-field">
+                                                                            </lightning-input>
+                                                                        </template>
+                                                                        <template lwc:else>
+                                                                            <template lwc:if={isMobile}>
+                                                                                <template lwc:if={field.isDate}>
+                                                                                    <lightning-record-edit-form object-api-name={group.objectType}>
+                                                                                    <c-mt-date-input
+                                                                                        label={field.label}
+                                                                                        value={field.oldValue}
+                                                                                        disabled
+                                                                                        class="old-value-field">
+                                                                                    </c-mt-date-input>
+                                                                                    </lightning-record-edit-form>
+                                                                                </template>
+                                                                                <template lwc:elseif={field.isDateTime}>
+                                                                                    <lightning-record-edit-form object-api-name={group.objectType}>
+                                                                                        <lightning-input-field
+                                                                                            field-name={field.apiName}
+                                                                                            label={field.label}
+                                                                                            value={field.oldValue}
+                                                                                            disabled
+                                                                                            variant="label-stacked"
+                                                                                            class="old-value-field">
+                                                                                        </lightning-input-field>
+                                                                                    </lightning-record-edit-form>
+                                                                                </template>
+                                                                                <template lwc:else>
+                                                                                    <lightning-input
+                                                                                        type="text"
+                                                                                        label={field.label}
+                                                                                        value={field.oldValue}
+                                                                                        disabled
+                                                                                        variant="label-stacked"
+                                                                                        class="old-value-field">
+                                                                                    </lightning-input>
+                                                                                </template>
+                                                                            </template>
+                                                                            <template lwc:else>
+                                                                                <lightning-input
+                                                                                    type="text"
+                                                                                    label={field.label}
+                                                                                    value={field.oldValue}
+                                                                                    disabled
+                                                                                    variant="label-stacked"
+                                                                                    class="old-value-field">
+                                                                                </lightning-input>
+                                                                            </template>
+                                                                        </template>
+                                                                    </template>
+                                                                    <template lwc:if={record.showUpdatedLabels}>
+                                                                        <span class="field-hint old-hint">Old</span>
+                                                                    </template>
+                                                                    <template lwc:else>
+                                                                        <span class="field-hint current-hint">Current</span>
+                                                                    </template>
+                                                                </div>
+                                                                
+                                                                <!-- New Value (editable) -->
+                                                                <div class="slds-col slds-size_5-of-12">
+                                                                    <template lwc:if={field.isString}>
+                                                                        <lightning-input
+                                                                            type="text"
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            disabled={record.isSaved}
+                                                                            variant="label-stacked"
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}
+                                                                            class="new-value-field">
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={field.isTextArea}>
+                                                                        <lightning-textarea
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            disabled={record.isSaved}
+                                                                            variant="label-stacked"
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}
+                                                                            class="new-value-field">
+                                                                        </lightning-textarea>
+                                                                    </template>
+                                                                    <template lwc:if={field.isReference}>
+                                                                        <!-- Lookup field with record picker -->
+                                                                        <lightning-record-picker
+                                                                            label={field.label}
+                                                                            placeholder="Search..."
+                                                                            object-api-name={field.referenceObjectApiName}
+                                                                            value={field.newValue}
+                                                                            disabled={record.isSaved}
+                                                                            variant="label-stacked"
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleLookupChange}
+                                                                            class="new-value-field">
+                                                                        </lightning-record-picker>
+                                                                    </template>
+                                                                    <template lwc:if={field.isPolymorphicReference}>
+                                                                        <!-- Polymorphic lookup - Inline combobox with overlay dropdown -->
+                                                                        <div class="slds-form-element polymorphic-field-container">
+                                                                            <label class="slds-form-element__label">{field.label}</label>
+                                                                            <div class="polymorphic-picker slds-grid slds-gutters_x-small">
+                                                                                <!-- Object Type Selector -->
+                                                                                <div class="slds-col slds-size_4-of-12">
+                                                                                    <lightning-combobox
+                                                                                        label="Object Type"
+                                                                                        value={field.selectedPolymorphicObject}
+                                                                                        options={field.polymorphicObjectOptions}
+                                                                                        disabled={record.isSaved}
+                                                                                        variant="label-hidden"
+                                                                                        data-group-index={groupIndex}
+                                                                                        data-record-index={recordIndex}
+                                                                                        data-field-name={field.apiName}
+                                                                                        data-is-polymorphic="true"
+                                                                                        class="polymorphic-combobox"
+                                                                                        onclick={handlePolymorphicComboboxClick}
+                                                                                        onchange={handlePolymorphicObjectChange}>
+                                                                                    </lightning-combobox>
+                                                                                </div>
+                                                                                <!-- Record Picker -->
+                                                                                <div class="slds-col slds-size_8-of-12">
+                                                                                    <template lwc:if={field.selectedPolymorphicObject}>
+                                                                                        <lightning-record-picker
+                                                                                            label="Record"
+                                                                                            placeholder="Search..."
+                                                                                            object-api-name={field.selectedPolymorphicObject}
+                                                                                            value={field.newValue}
+                                                                                            disabled={record.isSaved}
+                                                                                            variant="label-hidden"
+                                                                                            data-group-index={groupIndex}
+                                                                                            data-record-index={recordIndex}
+                                                                                            data-field-name={field.apiName}
+                                                                                            onchange={handleLookupChange}>
+                                                                                        </lightning-record-picker>
+                                                                                    </template>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </template>
+                                                                    <template lwc:if={field.isPicklist}>
+                                                                        <lightning-combobox
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            options={field.picklistValues}
+                                                                            disabled={record.isSaved}
+                                                                            variant="label-stacked"
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}
+                                                                            class="new-value-field">
+                                                                        </lightning-combobox>
+                                                                    </template>
+                                                                    <template lwc:if={field.isMultiPicklist}>
+                                                                        <lightning-dual-listbox
+                                                                            label={field.label}
+                                                                            source-label="Available"
+                                                                            selected-label="Selected"
+                                                                            options={field.picklistValues}
+                                                                            value={field.multiPicklistSelectedValues}
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleMultiPicklistChange}
+                                                                            class="new-value-field">
+                                                                        </lightning-dual-listbox>
+                                                                    </template>
+                                                                    <template lwc:if={field.isTime}>
+                                                                        <lightning-input
+                                                                            type="time"
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            disabled={record.isSaved}
+                                                                            variant="label-stacked"
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}
+                                                                            class="new-value-field">
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={field.isDate}>
+                                                                        <template lwc:if={isMobile}>
+                                                                            <template lwc:if={group.useUiApi}>
+                                                                                <lightning-record-edit-form object-api-name={group.objectType}>
+                                                                                    <c-mt-date-input
+                                                                                        label={field.label}
+                                                                                        value={field.newValue}
+                                                                                        required={field.isRequired}
+                                                                                        disabled={record.isSaved}
+                                                                                        data-group-index={groupIndex}
+                                                                                        data-record-index={recordIndex}
+                                                                                        data-field-name={field.apiName}
+                                                                                        onmtselect={handleDateFieldSelect}
+                                                                                        onchange={handleFieldChange}
+                                                                                        class="new-value-field">
+                                                                                    </c-mt-date-input>
+                                                                                </lightning-record-edit-form>
+                                                                            </template>
+                                                                            <template lwc:else>
+                                                                                <!-- Task/Event: avoid lightning-input-field date quirks on mobile -->
+                                                                                <c-mt-date-input
+                                                                                    label={field.label}
+                                                                                    value={field.newValue}
+                                                                                    required={field.isRequired}
+                                                                                    disabled={record.isSaved}
+                                                                                    data-group-index={groupIndex}
+                                                                                    data-record-index={recordIndex}
+                                                                                    data-field-name={field.apiName}
+                                                                                    onmtselect={handleDateFieldSelect}
+                                                                                    onchange={handleFieldChange}
+                                                                                    class="new-value-field">
+                                                                                </c-mt-date-input>
+                                                                            </template>
+                                                                        </template>
+                                                                        <template lwc:else>
+                                                                            <lightning-input
+                                                                                type="date"
+                                                                                label={field.label}
+                                                                                value={field.newValue}
+                                                                                disabled={record.isSaved}
+                                                                                variant="label-stacked"
+                                                                                data-group-index={groupIndex}
+                                                                                data-record-index={recordIndex}
+                                                                                data-field-name={field.apiName}
+                                                                                onchange={handleFieldChange}
+                                                                                class="new-value-field date-field">
+                                                                            </lightning-input>
+                                                                        </template>
+                                                                    </template>
+                                                                    <template lwc:if={field.isDateTime}>
+                                                                        <template lwc:if={isMobile}>
+                                                                            <template lwc:if={group.useUiApi}>
+                                                                                <lightning-record-edit-form object-api-name={group.objectType}>
+                                                                                    <lightning-input-field
+                                                                                        field-name={field.apiName}
+                                                                                        label={field.label}
+                                                                                        value={field.newValue}
+                                                                                        disabled={record.isSaved}
+                                                                                        variant="label-stacked"
+                                                                                        data-group-index={groupIndex}
+                                                                                        data-record-index={recordIndex}
+                                                                                        data-field-name={field.apiName}
+                                                                                        onchange={handleFieldChange}
+                                                                                        class="new-value-field">
+                                                                                    </lightning-input-field>
+                                                                                </lightning-record-edit-form>
+                                                                            </template>
+                                                                            <template lwc:else>
+                                                                                <!-- Task/Event: avoid lightning-input-field datetime quirks on mobile -->
+                                                                                <lightning-input
+                                                                                    type="datetime"
+                                                                                    label={field.label}
+                                                                                    value={field.newValue}
+                                                                                    disabled={record.isSaved}
+                                                                                    variant="label-stacked"
+                                                                                    data-group-index={groupIndex}
+                                                                                    data-record-index={recordIndex}
+                                                                                    data-field-name={field.apiName}
+                                                                                    onchange={handleFieldChange}
+                                                                                    class="new-value-field date-field">
+                                                                                </lightning-input>
+                                                                            </template>
+                                                                        </template>
+                                                                        <template lwc:else>
+                                                                            <lightning-input
+                                                                                type="datetime"
+                                                                                label={field.label}
+                                                                                value={field.newValue}
+                                                                                disabled={record.isSaved}
+                                                                                variant="label-stacked"
+                                                                                data-group-index={groupIndex}
+                                                                                data-record-index={recordIndex}
+                                                                                data-field-name={field.apiName}
+                                                                                onchange={handleFieldChange}
+                                                                                class="new-value-field date-field">
+                                                                            </lightning-input>
+                                                                        </template>
+                                                                    </template>
+                                                                    <template lwc:if={field.isDouble}>
+                                                                        <lightning-input
+                                                                            type="number"
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            disabled={record.isSaved}
+                                                                            variant="label-stacked"
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}
+                                                                            class="new-value-field">
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={field.isCurrency}>
+                                                                        <lightning-input
+                                                                            type="number"
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            formatter="currency"
+                                                                            disabled={record.isSaved}
+                                                                            variant="label-stacked"
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}
+                                                                            class="new-value-field">
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={field.isBoolean}>
+                                                                        <lightning-input
+                                                                            type="checkbox"
+                                                                            label={field.label}
+                                                                            checked={field.newValue}
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}
+                                                                            class="new-value-field">
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={field.isEmail}>
+                                                                        <lightning-input
+                                                                            type="email"
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            disabled={record.isSaved}
+                                                                            variant="label-stacked"
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}
+                                                                            class="new-value-field">
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={field.isPhone}>
+                                                                        <lightning-input
+                                                                            type="tel"
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            disabled={record.isSaved}
+                                                                            variant="label-stacked"
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}
+                                                                            class="new-value-field">
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={field.isUrl}>
+                                                                        <lightning-input
+                                                                            type="url"
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            disabled={record.isSaved}
+                                                                            variant="label-stacked"
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}
+                                                                            class="new-value-field">
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={record.showUpdatedLabels}>
+                                                                        <span class="field-hint current-hint">Current</span>
+                                                                    </template>
+                                                                    <template lwc:else>
+                                                                        <span class="field-hint new-hint">New</span>
+                                                                    </template>
+                                                                </div>
+                                                                
+                                                                <!-- Accept Button - aligned with input -->
+                                                                <div class="slds-col slds-size_2-of-12 accept-btn-col">
+                                                                    <template lwc:if={field.isSelected}>
+                                                                        <lightning-button-icon
+                                                                            icon-name="utility:check"
+                                                                            variant="brand"
+                                                                            alternative-text="Accepted"
+                                                                            title="Click to exclude"
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onclick={handleAcceptField}
+                                                                            class="accept-btn accepted">
+                                                                        </lightning-button-icon>
+                                                                    </template>
+                                                                    <template lwc:else>
+                                                                        <lightning-button-icon
+                                                                            icon-name="utility:add"
+                                                                            variant="border"
+                                                                            alternative-text="Accept"
+                                                                            title="Click to include"
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onclick={handleAcceptField}
+                                                                            class="accept-btn">
+                                                                        </lightning-button-icon>
+                                                                    </template>
+                                                                </div>
+                                                            </div>
+                                                    </template>
+                                                </template>
+                                                <template lwc:else>
+                                                                <div class="slds-grid slds-gutters_x-small">
+                                                                    <div class="slds-col slds-size_10-of-12">
+                                                                    <template lwc:if={field.isString}>
+                                                                        <lightning-input
+                                                                            type="text"
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            required={field.isRequired}
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}>
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={field.isTextArea}>
+                                                                        <lightning-textarea
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            required={field.isRequired}
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}>
+                                                                        </lightning-textarea>
+                                                                    </template>
+                                                                    <template lwc:if={field.isReference}>
+                                                                        <!-- Lookup field with record picker -->
+                                                                        <lightning-record-picker
+                                                                            label={field.label}
+                                                                            placeholder="Search..."
+                                                                            object-api-name={field.referenceObjectApiName}
+                                                                            value={field.newValue}
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleLookupChange}>
+                                                                        </lightning-record-picker>
+                                                                    </template>
+                                                                    <template lwc:if={field.isPolymorphicReference}>
+                                                                        <!-- Polymorphic lookup - Inline combobox with overlay dropdown -->
+                                                                        <div class="slds-form-element polymorphic-field-container">
+                                                                            <label class="slds-form-element__label">{field.label}</label>
+                                                                            <div class="polymorphic-picker slds-grid slds-gutters_x-small">
+                                                                                <!-- Object Type Selector -->
+                                                                                <div class="slds-col slds-size_4-of-12">
+                                                                                    <lightning-combobox
+                                                                                        label="Object Type"
+                                                                                        value={field.selectedPolymorphicObject}
+                                                                                        options={field.polymorphicObjectOptions}
+                                                                                        disabled={record.isSaved}
+                                                                                        variant="label-hidden"
+                                                                                        data-group-index={groupIndex}
+                                                                                        data-record-index={recordIndex}
+                                                                                        data-field-name={field.apiName}
+                                                                                        data-is-polymorphic="true"
+                                                                                        class="polymorphic-combobox"
+                                                                                        onclick={handlePolymorphicComboboxClick}
+                                                                                        onchange={handlePolymorphicObjectChange}>
+                                                                                    </lightning-combobox>
+                                                                                </div>
+                                                                                <!-- Record Picker -->
+                                                                                <div class="slds-col slds-size_8-of-12">
+                                                                                    <template lwc:if={field.selectedPolymorphicObject}>
+                                                                                        <lightning-record-picker
+                                                                                            label="Record"
+                                                                                            placeholder="Search..."
+                                                                                            object-api-name={field.selectedPolymorphicObject}
+                                                                                            value={field.newValue}
+                                                                                            disabled={record.isSaved}
+                                                                                            variant="label-hidden"
+                                                                                            data-group-index={groupIndex}
+                                                                                            data-record-index={recordIndex}
+                                                                                            data-field-name={field.apiName}
+                                                                                            onchange={handleLookupChange}>
+                                                                                        </lightning-record-picker>
+                                                                                    </template>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </template>
+                                                                    <template lwc:if={field.isDate}>
+                                                                        <template lwc:if={isMobile}>
+                                                                            <lightning-record-edit-form object-api-name={group.objectType}>
+                                                                                <c-mt-date-input
+                                                                                    label={field.label}
+                                                                                    value={field.newValue}
+                                                                                    required={field.isRequired}
+                                                                                    disabled={record.isSaved}
+                                                                                    data-group-index={groupIndex}
+                                                                                    data-record-index={recordIndex}
+                                                                                    data-field-name={field.apiName}
+                                                                                    onmtselect={handleDateFieldSelect}
+                                                                                    onchange={handleFieldChange}>
+                                                                                </c-mt-date-input>
+                                                                            </lightning-record-edit-form>
+                                                                        </template>
+                                                                        <template lwc:else>
+                                                                            <lightning-input
+                                                                                type="date"
+                                                                                label={field.label}
+                                                                                value={field.newValue}
+                                                                                disabled={record.isSaved}
+                                                                                data-group-index={groupIndex}
+                                                                                data-record-index={recordIndex}
+                                                                                data-field-name={field.apiName}
+                                                                                onchange={handleFieldChange}>
+                                                                            </lightning-input>
+                                                                        </template>
+                                                                    </template>
+                                                                    <template lwc:if={field.isDateTime}>
+                                                                        <template lwc:if={isMobile}>
+                                                                            <lightning-record-edit-form object-api-name={group.objectType}>
+                                                                                <lightning-input-field
+                                                                                    field-name={field.apiName}
+                                                                                    label={field.label}
+                                                                                    value={field.newValue}
+                                                                                    disabled={record.isSaved}
+                                                                                    data-group-index={groupIndex}
+                                                                                    data-record-index={recordIndex}
+                                                                                    data-field-name={field.apiName}
+                                                                                    onchange={handleFieldChange}>
+                                                                                </lightning-input-field>
+                                                                            </lightning-record-edit-form>
+                                                                        </template>
+                                                                        <template lwc:else>
+                                                                            <lightning-input
+                                                                                type="datetime"
+                                                                                label={field.label}
+                                                                                value={field.newValue}
+                                                                                disabled={record.isSaved}
+                                                                                data-group-index={groupIndex}
+                                                                                data-record-index={recordIndex}
+                                                                                data-field-name={field.apiName}
+                                                                                onchange={handleFieldChange}>
+                                                                            </lightning-input>
+                                                                        </template>
+                                                                    </template>
+                                                                    <template lwc:if={field.isPicklist}>
+                                                                        <lightning-combobox
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            options={field.picklistValues}
+                                                                            required={field.isRequired}
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}>
+                                                                        </lightning-combobox>
+                                                                    </template>
+                                                                    <template lwc:if={field.isMultiPicklist}>
+                                                                        <lightning-dual-listbox
+                                                                            label={field.label}
+                                                                            source-label="Available"
+                                                                            selected-label="Selected"
+                                                                            options={field.picklistValues}
+                                                                            value={field.multiPicklistSelectedValues}
+                                                                            required={field.isRequired}
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleMultiPicklistChange}>
+                                                                        </lightning-dual-listbox>
+                                                                    </template>
+                                                                    <template lwc:if={field.isTime}>
+                                                                        <lightning-input
+                                                                            type="time"
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            required={field.isRequired}
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}>
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={field.isDouble}>
+                                                                        <lightning-input
+                                                                            type="number"
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            required={field.isRequired}
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}>
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={field.isCurrency}>
+                                                                        <lightning-input
+                                                                            type="number"
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            formatter="currency"
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}>
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={field.isBoolean}>
+                                                                        <lightning-input
+                                                                            type="checkbox"
+                                                                            label={field.label}
+                                                                            checked={field.newValue}
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}>
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={field.isEmail}>
+                                                                        <lightning-input
+                                                                            type="email"
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}>
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={field.isPhone}>
+                                                                        <lightning-input
+                                                                            type="tel"
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}>
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                    <template lwc:if={field.isUrl}>
+                                                                        <lightning-input
+                                                                            type="url"
+                                                                            label={field.label}
+                                                                            value={field.newValue}
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onchange={handleFieldChange}>
+                                                                        </lightning-input>
+                                                                    </template>
+                                                                </div>
+                                                                <div class="slds-col slds-size_2-of-12 slds-align-bottom slds-text-align_center">
+                                                                    <template lwc:if={field.isSelected}>
+                                                                        <lightning-button-icon
+                                                                            icon-name="utility:check"
+                                                                            variant="brand"
+                                                                            alternative-text="Accepted"
+                                                                            title="Click to exclude"
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onclick={handleAcceptField}
+                                                                            class="accept-btn accepted">
+                                                                        </lightning-button-icon>
+                                                                    </template>
+                                                                    <template lwc:else>
+                                                                        <lightning-button-icon
+                                                                            icon-name="utility:add"
+                                                                            variant="border"
+                                                                            alternative-text="Accept"
+                                                                            title="Click to include"
+                                                                            disabled={record.isSaved}
+                                                                            data-group-index={groupIndex}
+                                                                            data-record-index={recordIndex}
+                                                                            data-field-name={field.apiName}
+                                                                            onclick={handleAcceptField}
+                                                                            class="accept-btn">
+                                                                        </lightning-button-icon>
+                                                                    </template>
+                                                                </div>
+                                                            </div>
+                                                    </template>
+                                                    </div>
+                                                </template>
+                                                </template>
+
+                                                <!-- Desktop footer row (Add Field left, Save right) for unsaved records -->
+                                                <template lwc:if={record.isNotSaved}>
+                                                    <div class="add-field-section slds-m-top_medium slds-p-top_small slds-border_top">
+                                                        <div class="desktop-add-save-row">
+                                                        <lightning-button
+                                                            label="Add Field"
+                                                            icon-name="utility:add"
+                                                            variant="base"
+                                                            disabled={record.isSaved}
+                                                            data-group-index={groupIndex}
+                                                            data-record-index={recordIndex}
+                                                            onclick={handleStartAddField}
+                                                            class="add-field-btn">
+                                                        </lightning-button>
+                                                        <template lwc:if={isMobile}></template>
+                                                        <template lwc:else>
+                                                            <template lwc:if={record.isSaving}>
+                                                                <lightning-button
+                                                                    variant="brand"
+                                                                    label="Saving..."
+                                                                    icon-name="utility:save"
+                                                                    disabled>
+                                                                </lightning-button>
+                                                            </template>
+                                                            <template lwc:elseif={record.isSaved}>
+                                                                <lightning-button
+                                                                    variant="success"
+                                                                    label="Saved"
+                                                                    icon-name="utility:success"
+                                                                    disabled>
+                                                                </lightning-button>
+                                                            </template>
+                                                            <template lwc:else>
+                                                                <lightning-button
+                                                                    variant="brand"
+                                                                    label="Save"
+                                                                    icon-name="utility:save"
+                                                                    data-group-index={groupIndex}
+                                                                    data-record-index={recordIndex}
+                                                                    onclick={handleSaveRecord}>
+                                                                </lightning-button>
+                                                            </template>
+                                                        </template>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                
+                                                <!-- Mobile: Footer Row (Add Field + Save on one line) -->
+                                                <div class="mobile-save-footer">
+                                                    <template lwc:if={record.isNotSaved}>
+                                                        <lightning-button
+                                                            label="Add Field"
+                                                            icon-name="utility:add"
+                                                            variant="base"
+                                                            disabled={record.isSaved}
+                                                            data-group-index={groupIndex}
+                                                            data-record-index={recordIndex}
+                                                            onclick={handleStartAddField}
+                                                            class="mobile-add-field-btn">
+                                                        </lightning-button>
+                                                    </template>
+                                                    <template lwc:if={record.isSaving}>
+                                                        <lightning-button 
+                                                            variant="brand" 
+                                                            label="Saving..." 
+                                                            icon-name="utility:save" 
+                                                            disabled
+                                                            class="mobile-save-btn">
+                                                        </lightning-button>
+                                                    </template>
+                                                    <template lwc:elseif={record.isSaved}>
+                                                        <lightning-button 
+                                                            variant="success" 
+                                                            label="Saved" 
+                                                            icon-name="utility:success" 
+                                                            disabled
+                                                            class="mobile-save-btn">
+                                                        </lightning-button>
+                                                    </template>
+                                                    <template lwc:else>
+                                                        <lightning-button
+                                                            variant="brand"
+                                                            label="Save"
+                                                            icon-name="utility:save"
+                                                            data-group-index={groupIndex}
+                                                            data-record-index={recordIndex}
+                                                            onclick={handleSaveRecord}
+                                                            class="mobile-save-btn">
+                                                        </lightning-button>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </lightning-card>
+                                    </lightning-layout-item>
+                                </template>
+                            </lightning-layout>
+                        </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Reasoning Section (collapsible) -->
+            <template lwc:if={reasoning}>
+                <details class="reasoning-section slds-m-top_medium">
+                    <summary class="slds-text-title_caps slds-p-around_small">
+                        <lightning-icon icon-name="utility:info" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                        AI Reasoning
+                    </summary>
+                    <div class="slds-box slds-theme_shade slds-text-body_small reasoning-content">
+                        <lightning-formatted-rich-text value={reasoning}></lightning-formatted-rich-text>
+                    </div>
+                </details>
+            </template>
+        </template>
+    </div>
+
+    <!-- Record Picker Modal (for duplicates or linking new records to existing) -->
+    <template lwc:if={isRecordPickerModalOpen}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large record-picker-modal mt-scroll-modal" aria-modal="true">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning-button-icon
+                        icon-name="utility:close"
+                        alternative-text="Close"
+                        class="slds-modal__close"
+                        onclick={handleCloseRecordPickerModal}>
+                    </lightning-button-icon>
+                    <h2 class="slds-modal__title">{recordPickerModalTitle}</h2>
+                    <p class="slds-text-body_small slds-m-top_xx-small slds-text-color_weak">{recordPickerModalSubtitle}</p>
+                </header>
+                <div class="slds-modal__content slds-p-around_none">
+                    <!-- Loading -->
+                    <template lwc:if={recordPickerModalLoading}>
+                        <div class="slds-is-relative slds-p-around_large" style="min-height: 200px;">
+                            <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+                        </div>
+                    </template>
+
+                    <template lwc:else>
+                        <!-- Search Section (only for Link mode, not duplicates) -->
+                        <template lwc:if={showRecordPickerSearch}>
+                            <div class="search-section slds-p-around_medium">
+                                <lightning-input
+                                    type="search"
+                                    placeholder="Search records..."
+                                    value={recordPickerSearchTerm}
+                                    onchange={handleRecordPickerSearch}>
+                                </lightning-input>
+                            </div>
+                        </template>
+
+                        <!-- Records List -->
+                        <template lwc:if={hasSuggestedRecords}>
+                            <div class="suggested-records-list">
+                                <template for:each={suggestedRecords} for:item="suggested">
+                                    <div key={suggested.recordId} class="suggested-record-item">
+                                        <div class="slds-grid slds-grid_vertical-align-center slds-p-around_small">
+                                            <div class="slds-col slds-grow">
+                                                <p class="slds-text-body_regular"><strong>{suggested.name}</strong></p>
+                                                <template lwc:if={suggested.subtitle}>
+                                                    <p class="slds-text-body_small slds-text-color_weak">{suggested.subtitle}</p>
+                                                </template>
+                                            </div>
+                                            <div class="slds-col slds-no-flex">
+                                                <lightning-button-group>
+                                                    <lightning-button
+                                                        label="Preview"
+                                                        data-record-id={suggested.recordId}
+                                                        onclick={handlePreviewRecord}>
+                                                    </lightning-button>
+                                                    <lightning-button
+                                                        label="Select"
+                                                        variant="brand"
+                                                        data-record-id={suggested.recordId}
+                                                        onclick={handleSelectRecord}>
+                                                    </lightning-button>
+                                                </lightning-button-group>
+                                            </div>
+                                        </div>
+                                        <!-- Preview Panel (expandable) -->
+                                        <template lwc:if={suggested.showPreview}>
+                                            <div class="record-preview-panel slds-p-around_medium slds-m-bottom_small">
+                                                <div class="slds-grid slds-grid_align-end slds-m-bottom_x-small">
+                                                    <lightning-button-stateful
+                                                        label-when-off="Full"
+                                                        label-when-on="Compact"
+                                                        selected={suggested.isFullLayout}
+                                                        data-record-id={suggested.recordId}
+                                                        onclick={handleTogglePreviewLayout}>
+                                                    </lightning-button-stateful>
+                                                </div>
+                                                <template lwc:if={suggested.isFullLayout}>
+                                                    <lightning-record-form
+                                                        record-id={suggested.recordId}
+                                                        object-api-name={recordPickerModalObjectType}
+                                                        layout-type="Full"
+                                                        columns={formColumns}
+                                                        mode="readonly">
+                                                    </lightning-record-form>
+                                                </template>
+                                                <template lwc:else>
+                                                    <lightning-record-form
+                                                        record-id={suggested.recordId}
+                                                        object-api-name={recordPickerModalObjectType}
+                                                        layout-type="Compact"
+                                                        columns={formColumns}
+                                                        mode="readonly">
+                                                    </lightning-record-form>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+
+                        <!-- No Records Found -->
+                        <template lwc:elseif={showRecordPickerSearch}>
+                            <div class="slds-p-around_large slds-text-align_center">
+                                <lightning-icon icon-name="utility:search" size="large" class="slds-m-bottom_small"></lightning-icon>
+                                <p class="slds-text-body_regular slds-text-color_weak">No records found. Try a different search.</p>
+                            </div>
+                        </template>
+                    </template>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button
+                        label="Cancel"
+                        onclick={handleCloseRecordPickerModal}
+                        class="slds-m-right_x-small">
+                    </lightning-button>
+                    <template lwc:if={recordPickerModalAllowCreate}>
+                        <lightning-button
+                            label="Create New Instead"
+                            variant="neutral"
+                            onclick={handleCreateNewFromModal}>
+                        </lightning-button>
+                    </template>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open mt-scroll-backdrop" onclick={handleCloseRecordPickerModal}></div>
+    </template>
+</template>

@@ -1,0 +1,76 @@
+# Salesforce cache
+.sf/
+.sfdx/
+.localdevserver/
+
+# LWC VSCode autocomplete
+**/lwc/**/*.d.ts
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+
+# Eslint cache
+.eslintcache
+
+# MacOS system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Local environment variables
+.env
+.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# IntelliJ
+.idea/
+*.iml
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Temp files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Test results
+test-results/
+coverage/
+
+# Agent tools (cursor)
+agent-tools/
+
+# Deployment artifacts
+.deployments/
+deployments/
+
+# Scratch org info
+config/project-scratch-def.json.bak
+
+# Terminal output files
+terminals/
+

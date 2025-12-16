@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+================================================================================
+MT RECORD SUGGESTION - Lightning Web Component
+================================================================================
+Author: Michael Tietze, Principal AI Architect
+Contact: mtietze@salesforce.com
+Created: December 2025
+Version: 1.5
+
+COPYRIGHT AND DISTRIBUTION
+Copyright © 2025 Salesforce, Inc. All rights reserved.
+
+INTERNAL USE ONLY - This code may not be shared externally or distributed
+outside of Salesforce without prior written approval from Michael Tietze
+(mtietze@salesforce.com).
+================================================================================
+-->
+
+<!--
+============================================================================
+MT Voice Assistant Admin - Metadata Configuration
+============================================================================
+
+@description     Metadata configuration for MT Voice Assistant Admin component.
+                 This component is intended for System Administrators only.
+
+@author          Michael Tietze, Principal AI Architect
+@created         December 2025
+@contact         mtietze@salesforce.com
+
+============================================================================
+COPYRIGHT & CONFIDENTIALITY NOTICE
+============================================================================
+© 2025 Salesforce, Inc. All rights reserved.
+============================================================================
+-->
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>63.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Voice Assistant Setup</masterLabel>
+    <description>Admin settings page for Voice Assistant. Manage configuration profiles, API keys, and test connections.</description>
+    <targets>
+        <target>lightning__AppPage</target>
+        <target>lightning__Tab</target>
+    </targets>
+    <!-- No configurable properties needed - this is an admin-only component -->
+</LightningComponentBundle>

@@ -1,0 +1,64 @@
+/* ============================================================================
+   MT VOICE ASSISTANT ADVANCED - Lightning Web Component Styles
+   ============================================================================
+   Author: Michael Tietze, Principal AI Architect
+   Contact: mtietze@salesforce.com
+   Created: December 2025
+   Version: 2.0
+   ============================================================================ */
+
+.slds-scrollable {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.slds-table {
+    width: 100%;
+}
+
+.slds-box {
+    border: 1px solid #e5e5e5;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    background-color: white;
+}
+
+/* Audio player styling */
+audio {
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+/* Segment display styling */
+.segment-item {
+    border-bottom: 1px solid #e5e5e5;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.segment-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+/* Job status badge styling */
+.slds-badge {
+    margin-left: 0.5rem;
+}
+
+/* Terminology table styling */
+.terminology-table {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+/* Loading state */
+.slds-is-relative {
+    position: relative;
+}
+
+/* Feature tab content spacing */
+.slds-tabs_default__content {
+    padding: 1rem 0;
+}
+

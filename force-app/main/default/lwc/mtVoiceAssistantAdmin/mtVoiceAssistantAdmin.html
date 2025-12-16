@@ -1,0 +1,1960 @@
+<!--
+================================================================================
+MT RECORD SUGGESTION - Lightning Web Component
+================================================================================
+Author: Michael Tietze, Principal AI Architect
+Contact: mtietze@salesforce.com
+Created: December 2025
+Version: 1.5
+
+COPYRIGHT AND DISTRIBUTION
+Copyright © 2025 Salesforce, Inc. All rights reserved.
+
+INTERNAL USE ONLY - This code may not be shared externally or distributed
+outside of Salesforce without prior written approval from Michael Tietze
+(mtietze@salesforce.com).
+================================================================================
+-->
+
+<template>
+    <!-- Access Denied State -->
+    <template lwc:if={isAccessDenied}>
+        <div class="slds-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="utility:lock" size="small"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title slds-text-heading_small">Access Denied</h2>
+                    </div>
+                </header>
+            </div>
+            <div class="slds-card__body slds-card__body_inner">
+                <div class="slds-illustration slds-illustration_small slds-p-around_medium">
+                    <lightning-icon icon-name="utility:warning" alternative-text="Warning" size="large" class="slds-m-bottom_small warning-icon"></lightning-icon>
+                    <p class="slds-text-body_regular slds-text-align_center">
+                        You do not have permission to access Voice Assistant Settings.<br/>
+                        Please contact your System Administrator.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Loading State -->
+    <template lwc:elseif={isLoading}>
+        <div class="slds-is-relative loading-container">
+            <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+        </div>
+    </template>
+
+    <!-- Main Admin Interface -->
+    <template lwc:else>
+        <div class="slds-card">
+            <!-- Card Header -->
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="microphone-icon" title="Voice Assistant">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                <line x1="12" x2="12" y1="19" y2="22"></line>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title slds-text-heading_small">Voice Assistant Setup</h2>
+                    </div>
+                </header>
+                <div class="slds-no-flex">
+                    <lightning-button-icon 
+                        icon-name="utility:refresh" 
+                        alternative-text="Refresh"
+                        title="Refresh"
+                        onclick={handleRefresh}
+                        variant="border-filled">
+                    </lightning-button-icon>
+                </div>
+            </div>
+
+            <div class="slds-card__body slds-card__body_inner">
+                <!-- How It Works Section (Above Tabs) -->
+                <div class="slds-box slds-m-bottom_medium overview-section">
+                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                        <lightning-icon icon-name="utility:info" size="small" class="slds-m-right_small"></lightning-icon>
+                        <h3 class="slds-text-heading_small">How It Works</h3>
+                    </div>
+                    <p class="slds-text-body_regular slds-m-bottom_small">
+                        The <strong>Voice Assistant</strong> converts speech to text, then uses AI to extract actionable records from the transcript.
+                    </p>
+                    <div class="flow-diagram slds-p-around_small">
+                        <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+                            <div class="flow-step">
+                                <span class="flow-mic-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                        <line x1="12" x2="12" y1="19" y2="22"></line>
+                                    </svg>
+                                </span>
+                                <span>Voice Input</span>
+                                <div style="font-size: 0.625rem; margin-top: 0.25rem;">
+                                    <lightning-icon icon-name="utility:image" size="xx-small"></lightning-icon>
+                                    <span>+ Image (Optional)</span>
+                                </div>
+                            </div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">
+                                <lightning-icon icon-name="utility:einstein" size="small"></lightning-icon>
+                                <span>Transcribe</span>
+                            </div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">
+                                <lightning-icon icon-name="utility:magicwand" size="small"></lightning-icon>
+                                <span>AI Analysis</span>
+                            </div>
+                            <span class="flow-arrow">→</span>
+                            <div class="flow-step">
+                                <lightning-icon icon-name="utility:record" size="small"></lightning-icon>
+                                <span>Records</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <lightning-tabset variant="scoped" active-tab-value={activeTabValue}>
+                    <!-- Setup Tab (First Tab) -->
+                    <lightning-tab label="Setup" icon-name="utility:task" value="setup">
+                        <div class="slds-p-around_small">
+                            <!-- Accordion-based Setup Steps -->
+                            <lightning-accordion allow-multiple-sections-open class="setup-accordion">
+                                <!-- Step 0: Permission Sets -->
+                                <lightning-accordion-section name="step0" label="Permission Sets">
+                                    <div class="step-content">
+                                        <p class="slds-text-body_small slds-m-bottom_small">
+                                            By deployment, permission sets have been automatically assigned to all System Administrators.
+                                        </p>
+                                        <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_medium">
+                                            <strong>For other users:</strong> Manually assign the <em>MT Voice Assistant User</em> permission set via <strong>Setup → Users → Permission Set Assignments</strong>
+                                        </p>
+                                        <lightning-button
+                                            label="Open Permission Set"
+                                            variant="neutral"
+                                            icon-name="utility:new_window"
+                                            icon-position="right"
+                                            onclick={handleNavigatePermissionSet}>
+                                        </lightning-button>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <!-- Step 1: App Setup (Combined: Credentials + Client Flow + App Manager) -->
+                                <lightning-accordion-section name="step1" label="1. App Setup">
+                                    <div class="step-header" slot="actions">
+                                        <lightning-input 
+                                            type="checkbox" 
+                                            label="Complete"
+                                            checked={setupSteps.step1}
+                                            data-step="step1"
+                                            onchange={handleStepComplete}
+                                            class="step-checkbox">
+                                        </lightning-input>
+                                    </div>
+                                    <div class="step-content">
+                                        <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                                            <p class="slds-text-body_small slds-text-color_weak slds-grow">
+                                                Configure the Connected App and add it to the App Manager.
+                                            </p>
+                                            <lightning-button
+                                                label="Open App Manager"
+                                                icon-name="utility:new_window"
+                                                icon-position="right"
+                                                variant="neutral"
+                                                onclick={handleNavigateAppManager}
+                                                class="slds-m-left_small">
+                                            </lightning-button>
+                                        </div>
+                                        
+                                        <!-- Part A: Get Consumer Credentials -->
+                                        <h4 class="slds-text-title_caps slds-m-bottom_x-small slds-m-top_small">A. Get Consumer Credentials</h4>
+                                        <div class="checklist-steps slds-m-bottom_medium">
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Go to <strong>Setup → App Manager</strong></div>
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Find <strong>MT Einstein Transcribe</strong> → Click dropdown (▼) → <strong>View</strong></div>
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Click <strong>Manage Consumer Details</strong> (verify identity if prompted)</div>
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Copy <strong>Consumer Key</strong> (starts with 3MVG...)</div>
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Copy <strong>Consumer Secret</strong></div>
+                                            <div class="checklist-sub-item highlight-important">
+                                                <lightning-icon icon-name="utility:warning" size="xx-small" class="slds-m-right_xx-small warning-icon"></lightning-icon>
+                                                <strong>Save these values!</strong> You'll need them in Step 2.
+                                            </div>
+                                        </div>
+
+                                        <!-- Part B: Configure Client Credentials Flow -->
+                                        <h4 class="slds-text-title_caps slds-m-bottom_x-small">B. Configure Client Credentials Flow</h4>
+                                        <div class="checklist-steps">
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Find <strong>MT Einstein Transcribe</strong> → Click dropdown (▼) → <strong>Manage</strong></div>
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Click <strong>Edit Policies</strong></div>
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Scroll down to <strong>Client Credentials Flow</strong> section</div>
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Set <strong>Run As</strong> to your admin user</div>
+                                            <div class="checklist-sub-item highlight-important">
+                                                <lightning-icon icon-name="utility:error" size="xx-small" class="slds-m-right_xx-small error-icon"></lightning-icon>
+                                                <strong>IMPORTANT: Click Save!</strong> (Often missed - causes "no client credentials user enabled" error)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <!-- Step 2: Credentials Configuration (Combined: Named Credential + External Credential) -->
+                                <lightning-accordion-section name="step2" label="2. Credentials Configuration">
+                                    <div class="step-header" slot="actions">
+                                        <lightning-input 
+                                            type="checkbox" 
+                                            label="Complete"
+                                            checked={setupSteps.step2}
+                                            data-step="step2"
+                                            onchange={handleStepComplete}
+                                            class="step-checkbox">
+                                        </lightning-input>
+                                    </div>
+                                    <div class="step-content">
+                                        <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                                            <p class="slds-text-body_small slds-text-color_weak slds-grow">
+                                                Configure Named Credential URL and External Credential parameters.
+                                            </p>
+                                            <lightning-button
+                                                label="Open Named Credentials"
+                                                icon-name="utility:new_window"
+                                                icon-position="right"
+                                                variant="neutral"
+                                                onclick={handleNavigateNamedCredential}
+                                                class="slds-m-left_small">
+                                            </lightning-button>
+                                        </div>
+                                        
+                                        <!-- Part A: Named Credential URL (only if needs update) -->
+                                        <template lwc:if={showNamedCredentialStep}>
+                                            <h4 class="slds-text-title_caps slds-m-bottom_x-small slds-m-top_small">A. Update Named Credential URL</h4>
+                                            <div class="auto-setup-box slds-m-bottom_small">
+                                                <div class="slds-grid slds-grid_vertical-align-center">
+                                                    <div class="slds-col slds-grow">
+                                                        <span class="slds-text-body_small">
+                                                            <strong>Required URL:</strong> <code class="code-inline">{orgDomainUrl}</code>
+                                                            <lightning-button-icon 
+                                                                icon-name="utility:copy_to_clipboard" 
+                                                                alternative-text="Copy URL"
+                                                                title="Copy URL"
+                                                                onclick={handleCopyUrl}
+                                                                variant="bare"
+                                                                size="x-small"
+                                                                class="slds-m-left_xx-small copy-btn">
+                                                            </lightning-button-icon>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="checklist-steps slds-m-bottom_medium">
+                                                <div class="checklist-sub-item"><span class="step-bullet">•</span> Go to <strong>Setup → Named Credentials</strong></div>
+                                                <div class="checklist-sub-item"><span class="step-bullet">•</span> Find <strong>MT Einstein Transcribe</strong> → Click <strong>Edit</strong></div>
+                                                <div class="checklist-sub-item"><span class="step-bullet">•</span> Set <strong>URL</strong> to the value above</div>
+                                                <div class="checklist-sub-item"><span class="step-bullet">•</span> Click <strong>Save</strong></div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Part B: Configure External Credential -->
+                                        <h4 class="slds-text-title_caps slds-m-bottom_x-small">
+                                            <template lwc:if={showNamedCredentialStep}>B. </template>
+                                            Configure External Credential
+                                        </h4>
+                                        <div class="checklist-steps">
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Go to <strong>Setup → Named Credentials</strong></div>
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Click <strong>External Credentials</strong> tab</div>
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Find <strong>MT Einstein Transcribe</strong> → In <strong>Principals</strong> section, find <strong>AuthDetails</strong> → Click dropdown (▼) → <strong>Edit</strong></div>
+                                            <div class="checklist-sub-item">
+                                                <span class="step-bullet">•</span> Click <strong>Add</strong> → Name: <code class="code-inline">client_id</code>
+                                                <lightning-button-icon 
+                                                    icon-name="utility:copy_to_clipboard" 
+                                                    alternative-text="Copy client_id"
+                                                    title="Copy 'client_id'"
+                                                    data-copy-value="client_id"
+                                                    onclick={handleCopyText}
+                                                    variant="bare"
+                                                    size="x-small"
+                                                    class="slds-m-left_xx-small copy-btn">
+                                                </lightning-button-icon>
+                                                → Value: <em>(Consumer Key from Step 1)</em>
+                                            </div>
+                                            <div class="checklist-sub-item">
+                                                <span class="step-bullet">•</span> Click <strong>Add</strong> → Name: <code class="code-inline">client_secret</code>
+                                                <lightning-button-icon 
+                                                    icon-name="utility:copy_to_clipboard" 
+                                                    alternative-text="Copy client_secret"
+                                                    title="Copy 'client_secret'"
+                                                    data-copy-value="client_secret"
+                                                    onclick={handleCopyText}
+                                                    variant="bare"
+                                                    size="x-small"
+                                                    class="slds-m-left_xx-small copy-btn">
+                                                </lightning-button-icon>
+                                                → Value: <em>(Consumer Secret from Step 1)</em>
+                                            </div>
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Click <strong>Save</strong></div>
+                                            <div class="checklist-sub-item slds-text-color_weak">
+                                                <lightning-icon icon-name="utility:info" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                <em>Tip: Consumer Key typically starts with <code class="code-inline">3MVG...</code></em>
+                                            </div>
+                                        </div>
+
+                                        <!-- Part C: Optional - OpenAI Whisper Configuration -->
+                                        <h4 class="slds-text-title_caps slds-m-bottom_x-small slds-m-top_medium">C. Optional: OpenAI Whisper Configuration</h4>
+                                        <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                                            If you want to use OpenAI Whisper as an alternative transcription provider, configure it here.
+                                        </p>
+                                        <div class="checklist-steps">
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Get your OpenAI API key from <a href="https://platform.openai.com/api-keys" target="_blank">https://platform.openai.com/api-keys</a></div>
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Go to <strong>Setup → Named Credentials</strong> → <strong>External Credentials</strong> tab</div>
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Find <strong>MT OpenAI Whisper</strong> → In <strong>Principals</strong> section, find <strong>AuthDetails</strong> → Click dropdown (▼) → <strong>Edit</strong></div>
+                                            <div class="checklist-sub-item">
+                                                <span class="step-bullet">•</span> Click <strong>Add</strong> → Name: <code class="code-inline">api_key</code>
+                                                <lightning-button-icon 
+                                                    icon-name="utility:copy_to_clipboard" 
+                                                    alternative-text="Copy api_key"
+                                                    title="Copy 'api_key'"
+                                                    data-copy-value="api_key"
+                                                    onclick={handleCopyText}
+                                                    variant="bare"
+                                                    size="x-small"
+                                                    class="slds-m-left_xx-small copy-btn">
+                                                </lightning-button-icon>
+                                                → Value: <em>(Your OpenAI API key starting with sk-...)</em>
+                                            </div>
+                                            <div class="checklist-sub-item"><span class="step-bullet">•</span> Click <strong>Save</strong></div>
+                                            <div class="checklist-sub-item slds-text-color_weak">
+                                                <lightning-icon icon-name="utility:info" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                <em>Note: You can then select "OpenAI Whisper" as the transcription provider in your configuration profiles.</em>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <!-- Step 3: Test Connection -->
+                                <lightning-accordion-section name="step3" label="3. Test Connection">
+                                    <div class="step-header" slot="actions">
+                                        <lightning-input 
+                                            type="checkbox" 
+                                            label="Complete"
+                                            checked={setupSteps.step3}
+                                            data-step="step3"
+                                            onchange={handleStepComplete}
+                                            class="step-checkbox">
+                                        </lightning-input>
+                                    </div>
+                                    <div class="step-content">
+                                        <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                                            Verify everything is configured correctly by testing both transcription providers.
+                                        </p>
+                                        
+                                        <!-- Dual Connection Test Buttons -->
+                                        <div class="dual-test-buttons slds-m-bottom_medium">
+                                            <!-- Einstein Transcribe Test -->
+                                            <div class="connection-test-box slds-box">
+                                                <div class="slds-text-align_center slds-m-bottom_small">
+                                                    <lightning-icon icon-name="utility:einstein" size="small" class="einstein-icon"></lightning-icon>
+                                                    <h4 class="slds-text-heading_small slds-m-top_x-small">Einstein Transcribe</h4>
+                                                </div>
+                                                <template lwc:if={einsteinTestResult}>
+                                                    <div class={einsteinTestResultClass}>
+                                                        <lightning-icon icon-name={einsteinTestIcon} size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                        <span>{einsteinTestResult}</span>
+                                                    </div>
+                                                </template>
+                                                <div class="slds-text-align_center slds-m-top_small">
+                                                    <lightning-button
+                                                        label="Test Einstein"
+                                                        variant="brand"
+                                                        icon-name="utility:check"
+                                                        onclick={handleTestEinstein}
+                                                        disabled={isTestingEinstein}
+                                                        class="slds-m-top_x-small">
+                                                    </lightning-button>
+                                                    <template lwc:if={isTestingEinstein}>
+                                                        <lightning-spinner alternative-text="Testing..." size="small" class="slds-m-top_x-small"></lightning-spinner>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- OpenAI Whisper Test -->
+                                            <div class="connection-test-box slds-box">
+                                                <div class="slds-text-align_center slds-m-bottom_small">
+                                                    <lightning-icon icon-name="utility:voice" size="small" class="whisper-icon"></lightning-icon>
+                                                    <h4 class="slds-text-heading_small slds-m-top_x-small">OpenAI Whisper</h4>
+                                                </div>
+                                                <template lwc:if={whisperTestResult}>
+                                                    <div class={whisperTestResultClass}>
+                                                        <lightning-icon icon-name={whisperTestIcon} size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                        <span>{whisperTestResult}</span>
+                                                    </div>
+                                                </template>
+                                                <div class="slds-text-align_center slds-m-top_small">
+                                                    <lightning-button
+                                                        label="Test Whisper"
+                                                        variant="brand"
+                                                        icon-name="utility:check"
+                                                        onclick={handleTestWhisper}
+                                                        disabled={isTestingWhisper}
+                                                        class="slds-m-top_x-small">
+                                                    </lightning-button>
+                                                    <template lwc:if={isTestingWhisper}>
+                                                        <lightning-spinner alternative-text="Testing..." size="small" class="slds-m-top_x-small"></lightning-spinner>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Contextual Error Tips -->
+                                        <template lwc:if={connectionErrorTip}>
+                                            <div class="slds-box slds-box_x-small error-tip-box slds-m-bottom_medium">
+                                                <p class="slds-text-body_small">
+                                                    <lightning-icon icon-name="utility:info" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                    <strong>Tip:</strong> <lightning-formatted-rich-text value={connectionErrorTip}></lightning-formatted-rich-text>
+                                                </p>
+                                            </div>
+                                        </template>
+                                        
+                                        <!-- Live Transcription Test -->
+                                        <h4 class="slds-text-title_caps slds-m-bottom_small slds-m-top_medium">Live Transcription Test</h4>
+                                        <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                                            Select a transcription provider, click the microphone, speak, and verify the transcript appears.
+                                        </p>
+                                        
+                                        <div class="transcription-test-box">
+                                            <c-mt-einstein-transcribe
+                                                mode="speech-to-text"
+                                                label="Test Transcription"
+                                                placeholder="Click the microphone and speak..."
+                                                rows="4"
+                                                config-name="Default"
+                                                show-provider-selector-prop="true">
+                                            </c-mt-einstein-transcribe>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <!-- Configuration Profiles Section -->
+                                <lightning-accordion-section name="configprofiles" label="4. Configuration Profiles">
+                                    <div class="step-content">
+                                        <p class="slds-text-body_small slds-m-bottom_small">
+                                            Configuration profiles control how the Voice Assistant behaves for different use cases. Each profile defines:
+                                        </p>
+                                        
+                                        <div class="config-explanation-box slds-box slds-box_x-small slds-m-bottom_medium">
+                                            <h4 class="slds-text-heading_small slds-m-bottom_small">
+                                                <lightning-icon icon-name="utility:settings" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                What Configuration Profiles Do
+                                            </h4>
+                                            <ul class="slds-list_dotted slds-m-left_medium">
+                                                <li><strong>Transcription Provider</strong>: Choose between Einstein Transcribe or OpenAI Whisper</li>
+                                                <li><strong>Image/File Input</strong>: Enable or disable the ability to attach images (business cards, notes, whiteboards)</li>
+                                                <li><strong>Object Configuration</strong>: Define which Salesforce objects (Contact, Task, Opportunity, etc.) the AI can create or update</li>
+                                                <li><strong>Mandatory Fields</strong>: Specify fields that must always be included in the AI output, even if not mentioned in the transcript</li>
+                                                <li><strong>Allowed Fields</strong>: Limit which fields the AI can populate for each object type</li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="slds-box slds-box_x-small slds-theme_info slds-m-bottom_medium">
+                                            <h4 class="slds-text-heading_small slds-m-bottom_x-small">
+                                                <lightning-icon icon-name="utility:info" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                How Mandatory Fields Work
+                                            </h4>
+                                            <p class="slds-text-body_small">
+                                                The Voice Assistant LWC automatically checks for mandatory fields configured in your profile. 
+                                                These fields will <strong>always be shown</strong> in the record form, regardless of whether they appear in the transcript. 
+                                                This ensures compliance with validation rules and required field constraints.
+                                            </p>
+                                            <p class="slds-text-body_small slds-m-top_x-small">
+                                                <strong>Example:</strong> If you set "Status" as mandatory for Tasks, the Status field will always appear in the form, 
+                                                even if the user didn't mention it during recording.
+                                            </p>
+                                        </div>
+
+                                        <div class="next-step-card slds-box slds-m-bottom_small">
+                                            <h4 class="slds-text-heading_small slds-m-bottom_small">
+                                                <lightning-icon icon-name="utility:forward" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                                                Configure Your Profiles
+                                            </h4>
+                                            <p class="slds-text-body_small slds-m-bottom_small">
+                                                Go to the <strong>Configurations</strong> tab to:
+                                            </p>
+                                            <ul class="slds-list_dotted slds-m-left_medium">
+                                                <li>Create new configuration profiles for different use cases</li>
+                                                <li>Choose your preferred transcription provider (Einstein or Whisper)</li>
+                                                <li>Enable/disable image input capability</li>
+                                                <li>Configure object-specific settings and field restrictions</li>
+                                            </ul>
+                                            <div class="slds-m-top_small">
+                                                <lightning-button
+                                                    label="Go to Configurations"
+                                                    variant="brand"
+                                                    icon-name="utility:forward"
+                                                    onclick={handleGoToConfigurations}>
+                                                </lightning-button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+
+                                <!-- Next Steps Section -->
+                                <lightning-accordion-section name="nextsteps" label="✓ Next Steps (After Setup Complete)">
+                                    <div class="step-content">
+                                        <p class="slds-text-body_small slds-m-bottom_small">
+                                            Once the connection test passes, configure which objects AI can suggest:
+                                        </p>
+                                        
+                                        <!-- Step 1: Configure Objects - Detailed -->
+                                        <div class="next-step-card slds-box slds-m-bottom_medium">
+                                            <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                                                <span class="step-bullet success-bullet slds-m-right_small">1</span>
+                                                <h4 class="slds-text-heading_small slds-grow">Configure Objects &amp; Fields</h4>
+                                                <lightning-button
+                                                    label="Go to Configurations"
+                                                    variant="brand"
+                                                    icon-name="utility:settings"
+                                                    onclick={handleGoToConfigurations}>
+                                                </lightning-button>
+                                            </div>
+                                            <p class="slds-text-body_small slds-m-bottom_small">
+                                                Define which Salesforce objects and fields the AI can suggest from your meeting transcripts.
+                                            </p>
+                                            
+                                            <div class="config-explanation slds-box slds-box_x-small slds-theme_shade">
+                                                <h5 class="slds-text-title_caps slds-m-bottom_x-small">Understanding Configurations</h5>
+                                                <ul class="slds-list_dotted slds-text-body_small">
+                                                    <li><strong>Configuration Profile:</strong> A named bundle of settings (e.g., "Sales_Config", "Support_Config"). Different pages can use different profiles.</li>
+                                                    <li><strong>Allowed Objects:</strong> The Salesforce objects AI can suggest (e.g., Contact, Opportunity, Task). Objects not configured will be ignored.</li>
+                                                    <li><strong>Allow Create:</strong> AI can suggest creating new records of this object type.</li>
+                                                    <li><strong>Allow Edit:</strong> AI can suggest updating existing records (matched from related lists in the prompt).</li>
+                                                    <li><strong>Allowed Fields:</strong> Only these fields will appear in AI suggestions. Other fields are filtered out.</li>
+                                                    <li><strong>Mandatory Fields:</strong> Always displayed in the suggestion form, even if not mentioned in the transcript. Ensures required data (like Email, Phone) is captured.</li>
+                                                </ul>
+                                                <p class="slds-text-body_small slds-m-top_small slds-text-color_weak">
+                                                    <lightning-icon icon-name="utility:info" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                    These configurations are dynamically injected into the AI prompt template, so changes take effect immediately.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Step 2: Add Flow to Page -->
+                                        <div class="next-step-card slds-box slds-m-bottom_medium">
+                                            <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                                                <span class="step-bullet success-bullet slds-m-right_small">2</span>
+                                                <h4 class="slds-text-heading_small">Add Flow to Page</h4>
+                                            </div>
+                                            
+                                            <div class="slds-grid slds-wrap slds-gutters_small">
+                                                <!-- Account-Based Flow -->
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_small">
+                                                    <div class="slds-box slds-box_x-small" style="height: 100%;">
+                                                        <h5 class="slds-text-title_bold slds-m-bottom_x-small">
+                                                            <lightning-icon icon-name="standard:account" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                            MT Visit Report (Account-Based)
+                                                        </h5>
+                                                        <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                                                            For any object page that has a relationship to an Account (Contact, Opportunity, Case, etc.). Can update existing related records using Account context.
+                                                        </p>
+                                                        <ul class="slds-list_dotted slds-text-body_small">
+                                                            <li>Links new records to the Account</li>
+                                                            <li>Matches existing Contacts &amp; Opportunities</li>
+                                                            <li>Set <strong>Record ID</strong> = enabled</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Standalone Flow -->
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_small">
+                                                    <div class="slds-box slds-box_x-small" style="height: 100%;">
+                                                        <h5 class="slds-text-title_bold slds-m-bottom_x-small">
+                                                            <lightning-icon icon-name="utility:new" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                            MT Visit Report Standalone
+                                                        </h5>
+                                                        <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                                                            For any page or Home. Create-only, no Account context needed.
+                                                        </p>
+                                                        <ul class="slds-list_dotted slds-text-body_small">
+                                                            <li>Creates new records only</li>
+                                                            <li>Good for: Leads, Cases, Tasks</li>
+                                                            <li>No Account linking required</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <p class="slds-text-body_small slds-m-top_small">
+                                                <strong>To add:</strong> Edit the page in App Builder → Add Flow component → Select the flow → Set <code class="code-inline">Configuration Profile</code> property
+                                            </p>
+                                        </div>
+                                        
+                                        <!-- Step 3: Test -->
+                                        <div class="next-step-card slds-box slds-m-bottom_medium">
+                                            <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                                                <span class="step-bullet success-bullet slds-m-right_small">3</span>
+                                                <h4 class="slds-text-heading_small">Test the Flow</h4>
+                                            </div>
+                                            <p class="slds-text-body_small">
+                                                Open a record page with the flow, click <strong>Start Recording</strong>, speak a meeting summary, 
+                                                and review the AI-generated suggestions before saving.
+                                            </p>
+                                        </div>
+                                        
+                                        <!-- Prompt Template Tip -->
+                                        <div class="slds-box slds-box_x-small slds-m-top_small prompt-tip-box">
+                                            <p class="slds-text-body_small">
+                                                <lightning-icon icon-name="utility:warning" size="xx-small" class="slds-m-right_xx-small warning-icon"></lightning-icon>
+                                                <strong>Prompt Template Tip:</strong> The output format setting is not currently deployable via metadata. 
+                                                If you experience issues with the AI output format, go to <strong>Setup → Prompt Builder</strong>, 
+                                                open your Prompt Template, and ensure <strong>Response → Format</strong> is set to <code class="code-inline">JSON</code>.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </lightning-accordion-section>
+                            </lightning-accordion>
+
+                        </div>
+                    </lightning-tab>
+
+                    <!-- Combined Configurations Tab (Accordion) -->
+                    <lightning-tab label="Configurations" icon-name="utility:settings" value="configurations">
+                        <div class="slds-p-around_small">
+                            <!-- Header -->
+                            <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_medium">
+                                <div class="slds-col">
+                                    <h3 class="slds-text-heading_small">Configuration Profiles</h3>
+                                    <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">
+                                        Each profile defines transcription settings and which objects/fields the AI can suggest.
+                                    </p>
+                                </div>
+                                <div class="slds-col slds-no-flex">
+                                    <lightning-button 
+                                        label="Add Configuration"
+                                        icon-name="utility:add"
+                                        onclick={handleNewConfig}
+                                        variant="brand">
+                                    </lightning-button>
+                                </div>
+                            </div>
+                            
+                            <!-- How Configurations Work - Explanation Box -->
+                            <div class="slds-box slds-box_x-small slds-theme_shade slds-m-bottom_medium config-explanation-box">
+                                <div class="slds-grid slds-grid_vertical-align-start">
+                                    <lightning-icon icon-name="utility:info" size="small" class="slds-m-right_small slds-m-top_xx-small"></lightning-icon>
+                                    <div>
+                                        <h4 class="slds-text-title_bold slds-m-bottom_x-small">How Configurations Work</h4>
+                                        <p class="slds-text-body_small slds-m-bottom_small">
+                                            Configurations control how the Voice Assistant processes your meeting transcripts and generates record suggestions.
+                                        </p>
+                                        <div class="slds-grid slds-wrap slds-gutters_small">
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                <ul class="slds-list_dotted slds-text-body_small">
+                                                    <li><strong>Profile:</strong> Named settings bundle used by Flow components</li>
+                                                    <li><strong>Provider:</strong> Transcription engine (Einstein or OpenAI Whisper)</li>
+                                                    <li><strong>Objects:</strong> Which Salesforce objects AI can suggest (Contact, Opportunity, etc.)</li>
+                                                </ul>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                                <ul class="slds-list_dotted slds-text-body_small">
+                                                    <li><strong>Create/Edit:</strong> Whether AI can suggest new records or updates to existing</li>
+                                                    <li><strong>Allowed Fields:</strong> Only these fields appear in suggestions</li>
+                                                    <li><strong>Mandatory Fields:</strong> Always shown, even if not in transcript</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <p class="slds-text-body_small slds-text-color_weak slds-m-top_small">
+                                            <lightning-icon icon-name="utility:refresh" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                            Changes are dynamically injected into the AI prompt template—no additional setup needed.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Configurations Accordion -->
+                            <template lwc:if={hasConfigs}>
+                                <lightning-accordion 
+                                    allow-multiple-sections-open
+                                    active-section-name={activeAccordionSections}
+                                    class="config-accordion">
+                                    <template for:each={configsWithObjects} for:item="config">
+                                        <lightning-accordion-section 
+                                            key={config.configName} 
+                                            name={config.configName}
+                                            label={config.accordionLabel}>
+                                            
+                                            <!-- Profile Summary Header (inside accordion) -->
+                                            <div class="accordion-content">
+                                                <!-- Profile Details Row -->
+                                                <div class="profile-details-row slds-box slds-box_x-small slds-theme_shade slds-m-bottom_small">
+                                                    <div class="slds-grid slds-wrap slds-gutters_small">
+                                                        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+                                                            <div class="config-detail">
+                                                                <span class="config-detail-label">Provider</span>
+                                                                <span class="config-detail-value">
+                                                                    <lightning-icon icon-name={config.providerIcon} size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                    {config.provider}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+                                                            <div class="config-detail">
+                                                                <span class="config-detail-label">Prompt Template</span>
+                                                                <span class="config-detail-value">{config.promptTemplateDisplay}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                                                            <div class="config-detail">
+                                                                <span class="config-detail-label">Status</span>
+                                                                <span class="config-detail-value">
+                                                                    <template lwc:if={config.isActive}>
+                                                                        <span class="slds-badge slds-badge_success">Active</span>
+                                                                    </template>
+                                                                    <template lwc:else>
+                                                                        <span class="slds-badge">Inactive</span>
+                                                                    </template>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                                                            <div class="config-detail">
+                                                                <span class="config-detail-label">Description</span>
+                                                                <span class="config-detail-value">{config.descriptionDisplay}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Profile Action Buttons -->
+                                                    <div class="slds-grid slds-grid_align-end slds-m-top_small">
+                                                        <lightning-button 
+                                                            label="Preview Prompt Data"
+                                                            icon-name="utility:preview"
+                                                            data-config-name={config.configName}
+                                                            onclick={handlePreviewPromptData}
+                                                            variant="neutral"
+                                                            class="slds-m-right_small">
+                                                        </lightning-button>
+                                                        <lightning-button 
+                                                            label="Edit Profile"
+                                                            icon-name="utility:edit"
+                                                            data-config-name={config.configName}
+                                                            onclick={handleEditConfig}
+                                                            variant="neutral">
+                                                        </lightning-button>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Objects Section -->
+                                                <div class="objects-section">
+                                                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                                                        <h4 class="slds-text-title_caps slds-text-color_weak slds-grow">
+                                                            <lightning-icon icon-name="utility:record" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                            Allowed Objects ({config.objectCount})
+                                                        </h4>
+                                                        <lightning-button 
+                                                            label="Add Object"
+                                                            icon-name="utility:add"
+                                                            data-config-name={config.configName}
+                                                            onclick={handleNewObjectConfigForProfile}
+                                                            variant="neutral"
+                                                            size="small">
+                                                        </lightning-button>
+                                                    </div>
+                                                    
+                                                    <!-- Object Cards -->
+                                                    <template lwc:if={config.hasObjects}>
+                                                        <div class="object-config-list">
+                                                            <template for:each={config.objects} for:item="objConfig">
+                                                                <div key={objConfig.objectApiName} class="object-config-card slds-box slds-m-bottom_x-small">
+                                                                    <div class="slds-grid slds-grid_vertical-align-start">
+                                                                        <div class="slds-col slds-grow">
+                                                                            <!-- Object Header -->
+                                                                            <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_xx-small">
+                                                                                <lightning-icon icon-name={objConfig.objectIcon} size="small" class="slds-m-right_small"></lightning-icon>
+                                                                                <span class="slds-text-heading_small">{objConfig.objectLabel}</span>
+                                                                                <template lwc:if={objConfig.allowCreate}>
+                                                                                    <span class="slds-badge slds-badge_success slds-m-left_small">Create</span>
+                                                                                </template>
+                                                                                <template lwc:if={objConfig.allowEdit}>
+                                                                                    <span class="slds-badge slds-badge_success slds-m-left_x-small">Edit</span>
+                                                                                </template>
+                                                                            </div>
+                                                                            
+                                                                            <!-- Field Details -->
+                                                                            <div class="slds-grid slds-wrap slds-gutters_x-small">
+                                                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_xx-small">
+                                                                                    <div class="config-detail config-detail-compact">
+                                                                                        <span class="config-detail-label">Allowed Fields</span>
+                                                                                        <span class="config-detail-value field-list">{objConfig.allowedFieldsDisplay}</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_xx-small">
+                                                                                    <div class="config-detail config-detail-compact">
+                                                                                        <span class="config-detail-label">Mandatory Fields</span>
+                                                                                        <span class="config-detail-value field-list mandatory-highlight">{objConfig.mandatoryFieldsDisplay}</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        
+                                                                        <!-- Actions -->
+                                                                        <div class="slds-col slds-no-flex">
+                                                                            <lightning-button-icon 
+                                                                                icon-name="utility:edit"
+                                                                                alternative-text="Edit"
+                                                                                title="Edit Object Configuration"
+                                                                                data-config-name={config.configName}
+                                                                                data-object-name={objConfig.objectApiName}
+                                                                                onclick={handleEditObjectConfigInAccordion}
+                                                                                variant="border-filled"
+                                                                                class="slds-m-left_small">
+                                                                            </lightning-button-icon>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                    </template>
+                                                    <template lwc:else>
+                                                        <div class="slds-box slds-box_x-small slds-theme_default slds-text-align_center empty-objects-box">
+                                                            <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                                                                No objects configured. Add objects to define which records the AI can suggest.
+                                                            </p>
+                                                            <lightning-button 
+                                                                label="Add First Object"
+                                                                icon-name="utility:add"
+                                                                data-config-name={config.configName}
+                                                                onclick={handleNewObjectConfigForProfile}
+                                                                variant="brand"
+                                                                size="small">
+                                                            </lightning-button>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </lightning-accordion-section>
+                                    </template>
+                                </lightning-accordion>
+                            </template>
+                            <template lwc:else>
+                                <div class="slds-illustration slds-illustration_small slds-p-around_medium slds-text-align_center">
+                                    <lightning-icon icon-name="utility:settings" size="large" class="slds-m-bottom_small empty-icon"></lightning-icon>
+                                    <p class="slds-text-body_regular slds-m-bottom_small">No configuration profiles found.</p>
+                                    <lightning-button 
+                                        label="Create First Configuration"
+                                        icon-name="utility:add"
+                                        onclick={handleNewConfig}
+                                        variant="brand">
+                                    </lightning-button>
+                                </div>
+                            </template>
+                        </div>
+                    </lightning-tab>
+
+                    <!-- Components Tab -->
+                    <lightning-tab label="Components" icon-name="utility:package" value="components">
+                        <div class="slds-p-around_small">
+                            <!-- Header -->
+                            <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_medium">
+                                <div class="slds-col">
+                                    <h3 class="slds-text-heading_small">Deployed Components</h3>
+                                    <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">
+                                        All files deployed as part of the MT Voice Meeting Assistant package.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Component Categories Accordion -->
+                            <lightning-accordion allow-multiple-sections-open active-section-name={activeComponentSections} class="components-accordion">
+                                
+                                <!-- Setup & Authentication -->
+                                <lightning-accordion-section name="setup" label="Setup &amp; Authentication (Required)">
+                                    <div class="component-category">
+                                        <p class="slds-text-body_small slds-m-bottom_small category-description">
+                                            Core components for OAuth authentication and API connectivity. Must be configured after deployment.
+                                        </p>
+                                        <template for:each={setupComponents} for:item="comp">
+                                            <div key={comp.name} class="component-item slds-box slds-box_x-small slds-m-bottom_x-small">
+                                                <div class="slds-grid slds-grid_vertical-align-start">
+                                                    <lightning-icon icon-name={comp.icon} size="small" class="slds-m-right_small component-icon"></lightning-icon>
+                                                    <div class="slds-grow">
+                                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                                            <span class="component-name">{comp.name}</span>
+                                                            <span class="slds-badge slds-badge_lightest slds-m-left_x-small">{comp.type}</span>
+                                                        </div>
+                                                        <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">{comp.description}</p>
+                                                        <div class="component-meta slds-m-top_x-small">
+                                                            <span class="meta-item">
+                                                                <lightning-icon icon-name="utility:date_input" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                Created: {comp.created}
+                                                            </span>
+                                                            <span class="meta-item">
+                                                                <lightning-icon icon-name="utility:refresh" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                Updated: {comp.updated}
+                                                            </span>
+                                                        </div>
+                                                        <template lwc:if={comp.changes}>
+                                                            <div class="component-changes slds-m-top_x-small">
+                                                                <span class="changes-label">Latest changes:</span> {comp.changes}
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </lightning-accordion-section>
+                                
+                                <!-- Account-Based Flow -->
+                                <lightning-accordion-section name="accountflow" label="Account-Based Flow (Main)">
+                                    <div class="component-category">
+                                        <p class="slds-text-body_small slds-m-bottom_small category-description">
+                                            <lightning-icon icon-name="standard:account" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                                            For Account, Contact, and Opportunity pages. Can update existing related records.
+                                        </p>
+                                        <template for:each={accountFlowComponents} for:item="comp">
+                                            <div key={comp.name} class="component-item slds-box slds-box_x-small slds-m-bottom_x-small">
+                                                <div class="slds-grid slds-grid_vertical-align-start">
+                                                    <lightning-icon icon-name={comp.icon} size="small" class="slds-m-right_small component-icon"></lightning-icon>
+                                                    <div class="slds-grow">
+                                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                                            <span class="component-name">{comp.name}</span>
+                                                            <span class="slds-badge slds-badge_lightest slds-m-left_x-small">{comp.type}</span>
+                                                        </div>
+                                                        <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">{comp.description}</p>
+                                                        <div class="component-meta slds-m-top_x-small">
+                                                            <span class="meta-item">
+                                                                <lightning-icon icon-name="utility:date_input" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                Created: {comp.created}
+                                                            </span>
+                                                            <span class="meta-item">
+                                                                <lightning-icon icon-name="utility:refresh" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                Updated: {comp.updated}
+                                                            </span>
+                                                        </div>
+                                                        <template lwc:if={comp.changes}>
+                                                            <div class="component-changes slds-m-top_x-small">
+                                                                <span class="changes-label">Latest changes:</span> {comp.changes}
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </lightning-accordion-section>
+                                
+                                <!-- Standalone Flow -->
+                                <lightning-accordion-section name="standaloneflow" label="Standalone Flow (No Account Required)">
+                                    <div class="component-category">
+                                        <p class="slds-text-body_small slds-m-bottom_small category-description">
+                                            <lightning-icon icon-name="utility:new" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                                            For any page including Home. Creates new records only—no Account context needed. Perfect for Leads, Cases, Tasks.
+                                        </p>
+                                        <template for:each={standaloneFlowComponents} for:item="comp">
+                                            <div key={comp.name} class="component-item slds-box slds-box_x-small slds-m-bottom_x-small">
+                                                <div class="slds-grid slds-grid_vertical-align-start">
+                                                    <lightning-icon icon-name={comp.icon} size="small" class="slds-m-right_small component-icon"></lightning-icon>
+                                                    <div class="slds-grow">
+                                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                                            <span class="component-name">{comp.name}</span>
+                                                            <span class="slds-badge slds-badge_lightest slds-m-left_x-small">{comp.type}</span>
+                                                            <span class="slds-badge slds-badge_success slds-m-left_x-small">NEW</span>
+                                                        </div>
+                                                        <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">{comp.description}</p>
+                                                        <div class="component-meta slds-m-top_x-small">
+                                                            <span class="meta-item">
+                                                                <lightning-icon icon-name="utility:date_input" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                Created: {comp.created}
+                                                            </span>
+                                                            <span class="meta-item">
+                                                                <lightning-icon icon-name="utility:refresh" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                Updated: {comp.updated}
+                                                            </span>
+                                                        </div>
+                                                        <template lwc:if={comp.changes}>
+                                                            <div class="component-changes slds-m-top_x-small">
+                                                                <span class="changes-label">Latest changes:</span> {comp.changes}
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </lightning-accordion-section>
+                                
+                                <!-- Shared LWCs -->
+                                <lightning-accordion-section name="lwcs" label="Lightning Web Components (Shared)">
+                                    <div class="component-category">
+                                        <p class="slds-text-body_small slds-m-bottom_small category-description">
+                                            Reusable UI components used by both Account-based and Standalone flows.
+                                        </p>
+                                        <template for:each={lwcComponents} for:item="comp">
+                                            <div key={comp.name} class="component-item slds-box slds-box_x-small slds-m-bottom_x-small">
+                                                <div class="slds-grid slds-grid_vertical-align-start">
+                                                    <lightning-icon icon-name={comp.icon} size="small" class="slds-m-right_small component-icon"></lightning-icon>
+                                                    <div class="slds-grow">
+                                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                                            <span class="component-name">{comp.name}</span>
+                                                            <span class="slds-badge slds-badge_lightest slds-m-left_x-small">{comp.type}</span>
+                                                        </div>
+                                                        <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">{comp.description}</p>
+                                                        <div class="component-meta slds-m-top_x-small">
+                                                            <span class="meta-item">
+                                                                <lightning-icon icon-name="utility:date_input" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                Created: {comp.created}
+                                                            </span>
+                                                            <span class="meta-item">
+                                                                <lightning-icon icon-name="utility:refresh" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                Updated: {comp.updated}
+                                                            </span>
+                                                        </div>
+                                                        <template lwc:if={comp.changes}>
+                                                            <div class="component-changes slds-m-top_x-small">
+                                                                <span class="changes-label">Latest changes:</span> {comp.changes}
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </lightning-accordion-section>
+                                
+                                <!-- Apex Classes -->
+                                <lightning-accordion-section name="apex" label="Apex Classes (Backend)">
+                                    <div class="component-category">
+                                        <p class="slds-text-body_small slds-m-bottom_small category-description">
+                                            Server-side logic for API calls, record operations, and configuration management.
+                                        </p>
+                                        <template for:each={apexComponents} for:item="comp">
+                                            <div key={comp.name} class="component-item slds-box slds-box_x-small slds-m-bottom_x-small">
+                                                <div class="slds-grid slds-grid_vertical-align-start">
+                                                    <lightning-icon icon-name={comp.icon} size="small" class="slds-m-right_small component-icon"></lightning-icon>
+                                                    <div class="slds-grow">
+                                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                                            <span class="component-name">{comp.name}</span>
+                                                            <span class="slds-badge slds-badge_lightest slds-m-left_x-small">{comp.type}</span>
+                                                        </div>
+                                                        <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">{comp.description}</p>
+                                                        <div class="component-meta slds-m-top_x-small">
+                                                            <span class="meta-item">
+                                                                <lightning-icon icon-name="utility:date_input" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                Created: {comp.created}
+                                                            </span>
+                                                            <span class="meta-item">
+                                                                <lightning-icon icon-name="utility:refresh" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                Updated: {comp.updated}
+                                                            </span>
+                                                        </div>
+                                                        <template lwc:if={comp.changes}>
+                                                            <div class="component-changes slds-m-top_x-small">
+                                                                <span class="changes-label">Latest changes:</span> {comp.changes}
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </lightning-accordion-section>
+                                
+                                <!-- Configuration & Metadata -->
+                                <lightning-accordion-section name="metadata" label="Configuration &amp; Metadata">
+                                    <div class="component-category">
+                                        <p class="slds-text-body_small slds-m-bottom_small category-description">
+                                            Custom Metadata Types for storing configuration profiles and object settings.
+                                        </p>
+                                        <template for:each={metadataComponents} for:item="comp">
+                                            <div key={comp.name} class="component-item slds-box slds-box_x-small slds-m-bottom_x-small">
+                                                <div class="slds-grid slds-grid_vertical-align-start">
+                                                    <lightning-icon icon-name={comp.icon} size="small" class="slds-m-right_small component-icon"></lightning-icon>
+                                                    <div class="slds-grow">
+                                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                                            <span class="component-name">{comp.name}</span>
+                                                            <span class="slds-badge slds-badge_lightest slds-m-left_x-small">{comp.type}</span>
+                                                        </div>
+                                                        <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">{comp.description}</p>
+                                                        <div class="component-meta slds-m-top_x-small">
+                                                            <span class="meta-item">
+                                                                <lightning-icon icon-name="utility:date_input" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                Created: {comp.created}
+                                                            </span>
+                                                            <span class="meta-item">
+                                                                <lightning-icon icon-name="utility:refresh" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                                Updated: {comp.updated}
+                                                            </span>
+                                                        </div>
+                                                        <template lwc:if={comp.changes}>
+                                                            <div class="component-changes slds-m-top_x-small">
+                                                                <span class="changes-label">Latest changes:</span> {comp.changes}
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </lightning-accordion-section>
+                                
+                            </lightning-accordion>
+                        </div>
+                    </lightning-tab>
+
+                    <!-- User Instructions Tab -->
+                    <lightning-tab label="User Guide" icon-name="utility:bookmark" value="userguide">
+                        <div class="slds-p-around_small">
+                            <div class="slds-box slds-box_x-small slds-theme_info slds-m-bottom_medium">
+                                <div class="slds-grid slds-grid_vertical-align-center">
+                                    <lightning-icon icon-name="utility:user" size="small" class="slds-m-right_small"></lightning-icon>
+                                    <div>
+                                        <h3 class="slds-text-heading_small">User Guide - How to Use Voice Assistant</h3>
+                                        <p class="slds-text-body_small">Share this guide with your users to help them get the most out of the Voice Assistant.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Start -->
+                            <div class="user-guide-section slds-m-bottom_large">
+                                <h4 class="slds-text-heading_small slds-m-bottom_small">
+                                    <lightning-icon icon-name="utility:zap" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                                    Quick Start
+                                </h4>
+                                <div class="slds-grid slds-wrap slds-gutters_small">
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                        <div class="quick-start-card">
+                                            <div class="quick-start-number">1</div>
+                                            <h5>Record or Type</h5>
+                                            <p>Click the microphone to record your voice, or type directly into the text area.</p>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                        <div class="quick-start-card">
+                                            <div class="quick-start-number">2</div>
+                                            <h5>Add Image (Optional)</h5>
+                                            <p>Attach a business card, notes, or whiteboard photo for AI to analyze.</p>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                        <div class="quick-start-card">
+                                            <div class="quick-start-number">3</div>
+                                            <h5>Review &amp; Save</h5>
+                                            <p>Review AI suggestions, edit if needed, then save records to Salesforce.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Input Methods -->
+                            <div class="user-guide-section slds-m-bottom_large">
+                                <h4 class="slds-text-heading_small slds-m-bottom_small">
+                                    <lightning-icon icon-name="utility:type" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                                    Input Methods - What You Can Use
+                                </h4>
+                                <div class="slds-grid slds-wrap slds-gutters_small">
+                                    <!-- Voice Only -->
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-m-bottom_small">
+                                        <div class="input-method-card">
+                                            <div class="input-method-icon">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                                    <line x1="12" x2="12" y1="19" y2="22"></line>
+                                                </svg>
+                                            </div>
+                                            <h5>🎤 Voice Only</h5>
+                                            <p class="slds-text-body_small">Just speak into your microphone. Perfect for quick meeting notes, follow-up tasks, or describing a conversation.</p>
+                                            <div class="input-method-example">
+                                                <strong>Example:</strong> "Had a great call with John Smith from Acme Corp. He's interested in our premium plan. Need to send a proposal by Friday."
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Image Only -->
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-m-bottom_small">
+                                        <div class="input-method-card">
+                                            <div class="input-method-icon">
+                                                <lightning-icon icon-name="utility:image" size="large"></lightning-icon>
+                                            </div>
+                                            <h5>📷 Image Only</h5>
+                                            <p class="slds-text-body_small">Upload or photograph a business card, whiteboard, or handwritten notes. AI extracts all the details automatically.</p>
+                                            <div class="input-method-example">
+                                                <strong>Works with:</strong> Business cards, meeting notes, whiteboards, documents, screenshots
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Voice + Image -->
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-m-bottom_small">
+                                        <div class="input-method-card featured">
+                                            <div class="input-method-icon">
+                                                <lightning-icon icon-name="utility:magicwand" size="large"></lightning-icon>
+                                            </div>
+                                            <h5>🎤 + 📷 Voice + Image</h5>
+                                            <p class="slds-text-body_small">Combine voice instructions with an image. The most powerful mode - tell AI exactly what to do with the image content.</p>
+                                            <div class="input-method-example">
+                                                <strong>Example:</strong> "Create a contact called Chris Smith, take the details from the business card." (with card photo attached)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Use Case Scenarios -->
+                            <div class="user-guide-section slds-m-bottom_large">
+                                <h4 class="slds-text-heading_small slds-m-bottom_small">
+                                    <lightning-icon icon-name="utility:light_bulb" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                                    Common Scenarios &amp; What to Say
+                                </h4>
+                                
+                                <lightning-accordion allow-multiple-sections-open class="scenario-accordion">
+                                    <!-- Scenario 1: Business Card -->
+                                    <lightning-accordion-section name="businesscard" label="📇 Capture a Business Card">
+                                        <div class="scenario-content">
+                                            <div class="slds-grid slds-wrap">
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
+                                                    <h5 class="slds-text-title_bold slds-m-bottom_x-small">What to do:</h5>
+                                                    <ol class="slds-list_ordered scenario-list">
+                                                        <li>Take a photo or upload the business card</li>
+                                                        <li>Optionally, add voice context about how you met</li>
+                                                        <li>Submit and review the created Lead/Contact</li>
+                                                    </ol>
+                                                    <h5 class="slds-text-title_bold slds-m-top_small slds-m-bottom_x-small">Example phrases:</h5>
+                                                    <ul class="slds-list_dotted example-phrases">
+                                                        <li>"Add this person as a new lead" <span class="phrase-type">(image only)</span></li>
+                                                        <li>"Create a contact from this business card" <span class="phrase-type">(image only)</span></li>
+                                                        <li>"Met Sarah at the trade show, add her as a contact. Take details from the card." <span class="phrase-type">(voice + image)</span></li>
+                                                    </ul>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                                    <div class="scenario-visual">
+                                                        <div class="visual-placeholder business-card-visual">
+                                                            <span>📇</span>
+                                                            <p>Business Card</p>
+                                                        </div>
+                                                        <div class="visual-arrow">↓</div>
+                                                        <div class="visual-result">
+                                                            <lightning-icon icon-name="standard:contact" size="small"></lightning-icon>
+                                                            <span>New Contact/Lead</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-accordion-section>
+
+                                    <!-- Scenario 2: Meeting Notes -->
+                                    <lightning-accordion-section name="meetingnotes" label="📝 Capture Meeting Notes">
+                                        <div class="scenario-content">
+                                            <div class="slds-grid slds-wrap">
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
+                                                    <h5 class="slds-text-title_bold slds-m-bottom_x-small">What to do:</h5>
+                                                    <ol class="slds-list_ordered scenario-list">
+                                                        <li>Record your meeting summary while it's fresh</li>
+                                                        <li>Mention people, deals, action items, and dates</li>
+                                                        <li>Review AI suggestions and save relevant records</li>
+                                                    </ol>
+                                                    <h5 class="slds-text-title_bold slds-m-top_small slds-m-bottom_x-small">Example phrases:</h5>
+                                                    <ul class="slds-list_dotted example-phrases">
+                                                        <li>"Just finished meeting with Paul Partner. He's now the CEO. Update his title." <span class="phrase-type">(update existing)</span></li>
+                                                        <li>"The Power Drills opportunity is now worth 250,000 and closes end of quarter." <span class="phrase-type">(update opp)</span></li>
+                                                        <li>"Need to follow up with Sarah next Tuesday about the proposal." <span class="phrase-type">(create task)</span></li>
+                                                    </ul>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                                    <div class="scenario-visual">
+                                                        <div class="visual-placeholder notes-visual">
+                                                            <span>🗣️</span>
+                                                            <p>Voice Summary</p>
+                                                        </div>
+                                                        <div class="visual-arrow">↓</div>
+                                                        <div class="visual-result">
+                                                            <lightning-icon icon-name="standard:task" size="small"></lightning-icon>
+                                                            <span>Tasks, Contacts, Opps</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-accordion-section>
+
+                                    <!-- Scenario 3: Whiteboard/Handwritten Notes -->
+                                    <lightning-accordion-section name="whiteboard" label="📋 Capture Whiteboard / Handwritten Notes">
+                                        <div class="scenario-content">
+                                            <div class="slds-grid slds-wrap">
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
+                                                    <h5 class="slds-text-title_bold slds-m-bottom_x-small">What to do:</h5>
+                                                    <ol class="slds-list_ordered scenario-list">
+                                                        <li>Take a photo of the whiteboard or notes</li>
+                                                        <li>Optionally add voice context: "These are action items from our planning session"</li>
+                                                        <li>AI extracts text, action items, and creates relevant tasks</li>
+                                                    </ol>
+                                                    <h5 class="slds-text-title_bold slds-m-top_small slds-m-bottom_x-small">Example phrases:</h5>
+                                                    <ul class="slds-list_dotted example-phrases">
+                                                        <li>"Extract action items from these notes" <span class="phrase-type">(image only)</span></li>
+                                                        <li>"Create tasks from the whiteboard" <span class="phrase-type">(image only)</span></li>
+                                                        <li>"These are follow-ups from our Q1 planning. Create tasks for each item on the board." <span class="phrase-type">(voice + image)</span></li>
+                                                    </ul>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                                    <div class="scenario-visual">
+                                                        <div class="visual-placeholder whiteboard-visual">
+                                                            <span>📋</span>
+                                                            <p>Whiteboard</p>
+                                                        </div>
+                                                        <div class="visual-arrow">↓</div>
+                                                        <div class="visual-result">
+                                                            <lightning-icon icon-name="standard:task2" size="small"></lightning-icon>
+                                                            <span>Multiple Tasks</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-accordion-section>
+
+                                    <!-- Scenario 4: Quick Lead Capture -->
+                                    <lightning-accordion-section name="leadcapture" label="🎯 Quick Lead Capture (Standalone)">
+                                        <div class="scenario-content">
+                                            <div class="slds-grid slds-wrap">
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
+                                                    <h5 class="slds-text-title_bold slds-m-bottom_x-small">What to do:</h5>
+                                                    <ol class="slds-list_ordered scenario-list">
+                                                        <li>Use the Standalone flow from your Home page</li>
+                                                        <li>Describe the new prospect you met</li>
+                                                        <li>AI creates a Lead record automatically</li>
+                                                    </ol>
+                                                    <h5 class="slds-text-title_bold slds-m-top_small slds-m-bottom_x-small">Example phrases:</h5>
+                                                    <ul class="slds-list_dotted example-phrases">
+                                                        <li>"New lead: Mike Johnson from TechCorp, interested in enterprise licensing. Phone 555-123-4567." <span class="phrase-type">(voice only)</span></li>
+                                                        <li>"Met a prospect at the conference, add them as a lead." (+ business card) <span class="phrase-type">(voice + image)</span></li>
+                                                    </ul>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                                    <div class="scenario-visual">
+                                                        <div class="visual-placeholder lead-visual">
+                                                            <span>🎯</span>
+                                                            <p>Quick Voice</p>
+                                                        </div>
+                                                        <div class="visual-arrow">↓</div>
+                                                        <div class="visual-result">
+                                                            <lightning-icon icon-name="standard:lead" size="small"></lightning-icon>
+                                                            <span>New Lead</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </lightning-accordion-section>
+                                </lightning-accordion>
+                            </div>
+
+                            <!-- Smart Image References -->
+                            <div class="user-guide-section slds-m-bottom_large">
+                                <h4 class="slds-text-heading_small slds-m-bottom_small">
+                                    <lightning-icon icon-name="utility:einstein" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                                    Smart Image References
+                                </h4>
+                                <div class="slds-box slds-box_x-small slds-theme_shade slds-m-bottom_small">
+                                    <p class="slds-text-body_small">
+                                        <strong>Pro Tip:</strong> You don't need to select image instructions from the dropdown. Just mention the image naturally in your recording, and AI will understand!
+                                    </p>
+                                </div>
+                                <div class="smart-phrases-grid">
+                                    <div class="smart-phrase">
+                                        <span class="phrase">"...from the business card"</span>
+                                        <span class="phrase-effect">→ Extracts contact info</span>
+                                    </div>
+                                    <div class="smart-phrase">
+                                        <span class="phrase">"...from the image/photo"</span>
+                                        <span class="phrase-effect">→ Analyzes image content</span>
+                                    </div>
+                                    <div class="smart-phrase">
+                                        <span class="phrase">"...from the whiteboard"</span>
+                                        <span class="phrase-effect">→ Extracts text &amp; items</span>
+                                    </div>
+                                    <div class="smart-phrase">
+                                        <span class="phrase">"...take details from the file"</span>
+                                        <span class="phrase-effect">→ Uses image as data source</span>
+                                    </div>
+                                    <div class="smart-phrase">
+                                        <span class="phrase">"...check the notes"</span>
+                                        <span class="phrase-effect">→ Reads handwritten notes</span>
+                                    </div>
+                                    <div class="smart-phrase">
+                                        <span class="phrase">"...see the screenshot"</span>
+                                        <span class="phrase-effect">→ Analyzes screen capture</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tips & Best Practices -->
+                            <div class="user-guide-section">
+                                <h4 class="slds-text-heading_small slds-m-bottom_small">
+                                    <lightning-icon icon-name="utility:sparkles" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                                    Tips for Best Results
+                                </h4>
+                                <div class="slds-grid slds-wrap slds-gutters_small">
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_small">
+                                        <div class="tip-card do-card">
+                                            <h5>✅ Do</h5>
+                                            <ul class="slds-list_dotted">
+                                                <li>Mention full names: "John Smith" not just "John"</li>
+                                                <li>Include dates: "next Tuesday", "by Friday", "end of month"</li>
+                                                <li>State actions clearly: "create", "update", "schedule"</li>
+                                                <li>Mention amounts: "50 thousand dollars" or "$50,000"</li>
+                                                <li>Reference the image when combining voice + image</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_small">
+                                        <div class="tip-card dont-card">
+                                            <h5>❌ Avoid</h5>
+                                            <ul class="slds-list_dotted">
+                                                <li>Vague references: "that guy", "the deal"</li>
+                                                <li>Background noise when recording</li>
+                                                <li>Blurry or unclear images</li>
+                                                <li>Very long recordings (break into parts)</li>
+                                                <li>Speaking too fast (AI needs to transcribe)</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </lightning-tab>
+
+                    <!-- Help Tab -->
+                    <lightning-tab label="Help" icon-name="utility:help" value="help">
+                        <div class="slds-p-around_small">
+                            <h3 class="slds-text-heading_small slds-m-bottom_small">Setup &amp; Usage Instructions</h3>
+                            
+                            <lightning-accordion allow-multiple-sections-open active-section-name="accountbased" class="help-accordion">
+                                
+                                <!-- Account-Based Flow Setup -->
+                                <lightning-accordion-section name="accountbased" label="Account-Based Flow Setup">
+                                    <div class="help-section">
+                                        <div class="slds-box slds-box_x-small slds-theme_info slds-m-bottom_small">
+                                            <p class="slds-text-body_small">
+                                                <lightning-icon icon-name="standard:account" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                <strong>Best for:</strong> Account, Contact, and Opportunity record pages where you want to update existing related records.
+                                            </p>
+                                        </div>
+                                        <h4 class="slds-text-title_bold slds-m-bottom_x-small">Steps:</h4>
+                                        <ol class="slds-list_ordered help-list">
+                                            <li>Complete the <strong>Setup Checklist</strong> tab (Einstein credentials, Named Credential URL)</li>
+                                            <li>Go to <strong>Configurations</strong> tab and configure allowed objects/fields for your use case</li>
+                                            <li>Edit the desired record page in <strong>Lightning App Builder</strong></li>
+                                            <li>Add the <strong>Flow</strong> component to the page</li>
+                                            <li>Select <code class="code-inline">MT Visit Report</code> as the Flow</li>
+                                            <li>Enable <strong>"Pass record ID into this variable"</strong> → select <code class="code-inline">recordId</code></li>
+                                            <li>Set <strong>Configuration Profile</strong> to "Default" or your custom profile name</li>
+                                            <li>Save and activate the page</li>
+                                        </ol>
+                                        <h4 class="slds-text-title_bold slds-m-top_small slds-m-bottom_x-small">Features:</h4>
+                                        <ul class="slds-list_dotted">
+                                            <li>Links new records to the Account automatically</li>
+                                            <li>Matches existing Contacts and Opportunities for updates</li>
+                                            <li>Links Tasks/Events to related Account and Contact</li>
+                                        </ul>
+                                    </div>
+                                </lightning-accordion-section>
+                                
+                                <!-- Standalone Flow Setup -->
+                                <lightning-accordion-section name="standalone" label="Standalone Flow Setup (NEW)">
+                                    <div class="help-section">
+                                        <div class="slds-box slds-box_x-small slds-theme_success slds-m-bottom_small">
+                                            <p class="slds-text-body_small">
+                                                <lightning-icon icon-name="utility:new" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                <strong>Best for:</strong> Home page, utility bar, or any page where you want to create records without Account context (Leads, Cases, Tasks).
+                                            </p>
+                                        </div>
+                                        <h4 class="slds-text-title_bold slds-m-bottom_x-small">Steps:</h4>
+                                        <ol class="slds-list_ordered help-list">
+                                            <li>Complete the <strong>Setup Checklist</strong> tab (same as Account-based)</li>
+                                            <li>Go to <strong>Configurations</strong> tab and configure objects like Lead, Case, Task for standalone use</li>
+                                            <li>Edit the desired page in <strong>Lightning App Builder</strong> (e.g., Home Page)</li>
+                                            <li>Add the <strong>Flow</strong> component to the page</li>
+                                            <li>Select <code class="code-inline">MT Visit Report (Standalone)</code> as the Flow</li>
+                                            <li><strong>Do NOT</strong> enable "Pass record ID" (not needed)</li>
+                                            <li>Set <strong>Configuration Profile</strong> if using a custom profile</li>
+                                            <li>Save and activate the page</li>
+                                        </ol>
+                                        <h4 class="slds-text-title_bold slds-m-top_small slds-m-bottom_x-small">Features:</h4>
+                                        <ul class="slds-list_dotted">
+                                            <li>Creates new records only (no update/matching)</li>
+                                            <li>Works without any record context</li>
+                                            <li>Perfect for quick Lead capture, Case logging, Task creation</li>
+                                            <li>Can be placed on Home page or in utility bar</li>
+                                        </ul>
+                                    </div>
+                                </lightning-accordion-section>
+                                
+                                <!-- Einstein Setup -->
+                                <lightning-accordion-section name="einstein" label="Einstein Transcribe Setup">
+                                    <ol class="slds-list_ordered help-list">
+                                        <li>Go to <strong>Setup → Named Credentials</strong></li>
+                                        <li>Find <strong>MT Einstein Transcribe</strong> and click Edit</li>
+                                        <li>Set the URL to your org domain: <code class="code-inline">{orgDomainUrl}</code></li>
+                                        <li>Go to <strong>External Credentials</strong> tab</li>
+                                        <li>Find <strong>MT Einstein Transcribe API</strong></li>
+                                        <li>Add Principal with <code class="code-inline">client_id</code> and <code class="code-inline">client_secret</code> from your Connected App</li>
+                                    </ol>
+                                </lightning-accordion-section>
+                                
+                                
+                                <!-- Configuration Profiles -->
+                                <lightning-accordion-section name="profiles" label="Configuration Profiles">
+                                    <p class="slds-m-bottom_small">Configuration profiles allow different Flows to use different settings:</p>
+                                    <ol class="slds-list_ordered help-list">
+                                        <li>Go to the <strong>Configurations</strong> tab and click <strong>Add Configuration</strong></li>
+                                        <li>Set a unique <strong>Name</strong> (e.g., "Sales_Config")</li>
+                                        <li>Choose the <strong>Transcription Provider</strong> (Einstein or Whisper)</li>
+                                        <li>Select a <strong>Prompt Template</strong> to use</li>
+                                        <li>Expand the profile and click <strong>Add Object</strong> to configure allowed objects/fields</li>
+                                        <li>In your Flow, set the <code class="code-inline">configName</code> property of the LWC</li>
+                                    </ol>
+                                </lightning-accordion-section>
+                                
+                            </lightning-accordion>
+                        </div>
+                    </lightning-tab>
+                </lightning-tabset>
+            </div>
+        </div>
+
+        <!-- Configuration Modal -->
+        <template lwc:if={isModalOpen}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-modal="true">
+                <div class="slds-modal__container">
+                    <!-- Modal Header -->
+                    <header class="slds-modal__header">
+                        <lightning-button-icon
+                            icon-name="utility:close"
+                            alternative-text="Close"
+                            class="slds-modal__close"
+                            onclick={handleCloseModal}>
+                        </lightning-button-icon>
+                        <h2 class="slds-modal__title slds-hyphenate">{modalTitle}</h2>
+                    </header>
+                    
+                    <!-- Modal Body -->
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <template lwc:if={isSaving}>
+                            <div class="slds-is-relative" style="min-height: 200px;">
+                                <lightning-spinner alternative-text="Saving..." size="medium"></lightning-spinner>
+                                <p class="slds-text-align_center slds-m-top_xx-large slds-p-top_xx-large">
+                                    {savingMessage}
+                                </p>
+                            </div>
+                        </template>
+                        <template lwc:else>
+                            <!-- Form Fields -->
+                            <div class="slds-form">
+                                <div class="slds-grid slds-wrap slds-gutters">
+                                    <!-- Label -->
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_small">
+                                        <lightning-input 
+                                            label="Label"
+                                            value={formData.label}
+                                            data-field="label"
+                                            onchange={handleFormChange}
+                                            required>
+                                        </lightning-input>
+                                    </div>
+                                    
+                                    <!-- Developer Name -->
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_small">
+                                        <lightning-input 
+                                            label="API Name"
+                                            value={formData.developerName}
+                                            data-field="developerName"
+                                            onchange={handleFormChange}
+                                            required
+                                            disabled={isEditMode}
+                                            pattern="[A-Za-z][A-Za-z0-9_]*"
+                                            message-when-pattern-mismatch="Must start with a letter and contain only letters, numbers, and underscores">
+                                        </lightning-input>
+                                        <p class="slds-form-element__help slds-text-color_weak">
+                                            <template lwc:if={isEditMode}>
+                                                API Name cannot be changed after creation
+                                            </template>
+                                            <template lwc:else>
+                                                e.g., Sales_Config, Support_Config
+                                            </template>
+                                        </p>
+                                    </div>
+                                    
+                                    <!-- Provider -->
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_small">
+                                        <lightning-combobox
+                                            label="Transcription Provider"
+                                            value={formData.provider}
+                                            data-field="provider"
+                                            options={providerOptions}
+                                            onchange={handleFormChange}
+                                            required>
+                                        </lightning-combobox>
+                                    </div>
+                                    
+                                    
+                                    <!-- Optional: Clone Flow & Prompt Instructions (only for new configs) -->
+                                    <template if:false={isEditMode}>
+                                        <div class="slds-col slds-size_1-of-1 slds-m-bottom_small">
+                                            <div class="slds-box slds-box_x-small slds-theme_shade">
+                                                <div class="slds-grid slds-grid_vertical-align-center">
+                                                    <lightning-icon icon-name="utility:info" size="x-small" class="slds-m-right_small"></lightning-icon>
+                                                    <span class="slds-text-body_regular"><strong>Want a dedicated Flow &amp; Prompt?</strong></span>
+                                                    <lightning-button 
+                                                        variant="base" 
+                                                        label={cloneInstructionsButtonLabel}
+                                                        onclick={handleToggleCloneInstructions}
+                                                        class="slds-m-left_small">
+                                                    </lightning-button>
+                                                </div>
+                                                
+                                                <template if:true={showCloneInstructions}>
+                                                    <div class="slds-m-top_small slds-p-around_small slds-theme_default" style="border-radius: 4px;">
+                                                        <p class="slds-text-body_small slds-m-bottom_small">
+                                                            To create a dedicated Flow and Prompt Template for this configuration:
+                                                        </p>
+                                                        <ol class="slds-list_ordered slds-text-body_small">
+                                                            <li class="slds-m-bottom_x-small">
+                                                                <strong>Clone the Flow:</strong><br/>
+                                                                Go to <em>Setup → Flows</em> → Open "MT Visit Report" → Click <strong>Save As</strong> → Enter a new name (e.g., "MT Visit Report Sales")
+                                                            </li>
+                                                            <li class="slds-m-bottom_x-small">
+                                                                <strong>Clone the Prompt Template:</strong><br/>
+                                                                Go to <em>Setup → Prompt Builder</em> → Find "MT Voice Record Suggestion" → Click <strong>Clone</strong> → Enter a new name
+                                                            </li>
+                                                            <li class="slds-m-bottom_x-small">
+                                                                <strong>Link them together:</strong><br/>
+                                                                In your cloned Flow, click the "Call Prompt Response" action → Change the Prompt Template to your new one → <strong>Save &amp; Activate</strong>
+                                                            </li>
+                                                            <li class="slds-m-bottom_x-small">
+                                                                <strong>Update this config:</strong><br/>
+                                                                Set the "Prompt Template" field above to your new prompt template name
+                                                            </li>
+                                                        </ol>
+                                                        <p class="slds-text-body_small slds-text-color_weak slds-m-top_small">
+                                                            <lightning-icon icon-name="utility:clock" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                            This takes about 2-3 minutes and gives you full customization control.
+                                                        </p>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    
+                                    <!-- Feature Toggles -->
+                                    <div class="slds-col slds-size_1-of-1 slds-m-bottom_medium">
+                                        <div class="slds-grid slds-wrap slds-gutters_small">
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-input 
+                                                    type="checkbox"
+                                                    label="Active"
+                                                    checked={formData.isActive}
+                                                    data-field="isActive"
+                                                    onchange={handleFormChange}>
+                                                </lightning-input>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <lightning-input 
+                                                    type="checkbox"
+                                                    label="Disable Image/File Input"
+                                                    checked={formData.disableImageInput}
+                                                    data-field="disableImageInput"
+                                                    onchange={handleFormChange}>
+                                                </lightning-input>
+                                                <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">
+                                                    Check to hide the image/file attachment option for this profile
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Description -->
+                                    <div class="slds-col slds-size_1-of-1 slds-m-bottom_small">
+                                        <lightning-textarea 
+                                            label="Description"
+                                            value={formData.description}
+                                            data-field="description"
+                                            onchange={handleFormChange}
+                                            max-length="1000">
+                                        </lightning-textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    
+                    <!-- Modal Footer -->
+                    <footer class="slds-modal__footer">
+                        <lightning-button 
+                            label="Cancel" 
+                            onclick={handleCloseModal}
+                            disabled={isSaving}>
+                        </lightning-button>
+                        <lightning-button 
+                            label="Save" 
+                            variant="brand" 
+                            onclick={handleSaveConfig}
+                            disabled={isSaving}
+                            class="slds-m-left_x-small">
+                        </lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- Object Configuration Modal -->
+        <template lwc:if={isObjectModalOpen}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-modal="true">
+                <div class="slds-modal__container">
+                    <!-- Modal Header -->
+                    <header class="slds-modal__header">
+                        <lightning-button-icon
+                            icon-name="utility:close"
+                            alternative-text="Close"
+                            class="slds-modal__close"
+                            onclick={handleCloseObjectModal}>
+                        </lightning-button-icon>
+                        <h2 class="slds-modal__title slds-hyphenate">{objectModalTitle}</h2>
+                    </header>
+                    
+                    <!-- Modal Body -->
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <template lwc:if={isSavingObjectConfig}>
+                            <div class="slds-is-relative" style="min-height: 200px;">
+                                <lightning-spinner alternative-text="Saving..." size="medium"></lightning-spinner>
+                                <p class="slds-text-align_center slds-m-top_xx-large slds-p-top_xx-large">
+                                    Deploying object configuration...
+                                </p>
+                            </div>
+                        </template>
+                        <template lwc:else>
+                            <div class="slds-form">
+                                <div class="slds-grid slds-wrap slds-gutters">
+                                    <!-- Object Selection -->
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_small">
+                                        <lightning-combobox
+                                            label="Object"
+                                            value={objectFormData.objectApiName}
+                                            data-field="objectApiName"
+                                            options={availableObjectOptions}
+                                            onchange={handleObjectFormChange}
+                                            disabled={isObjectEditMode}
+                                            required>
+                                        </lightning-combobox>
+                                    </div>
+                                    
+                                    <!-- Permissions -->
+                                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_small">
+                                        <fieldset class="slds-form-element">
+                                            <legend class="slds-form-element__legend slds-form-element__label">Permissions</legend>
+                                            <div class="slds-form-element__control">
+                                                <div class="slds-checkbox_button-group">
+                                                    <lightning-input 
+                                                        type="checkbox"
+                                                        label="Allow Create"
+                                                        checked={objectFormData.allowCreate}
+                                                        data-field="allowCreate"
+                                                        onchange={handleObjectFormChange}
+                                                        class="slds-m-right_medium">
+                                                    </lightning-input>
+                                                    <lightning-input 
+                                                        type="checkbox"
+                                                        label="Allow Edit"
+                                                        checked={objectFormData.allowEdit}
+                                                        data-field="allowEdit"
+                                                        onchange={handleObjectFormChange}>
+                                                    </lightning-input>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                    
+                                    <!-- Warning about Related Lists for Matching -->
+                                    <template lwc:if={objectFormData.allowEdit}>
+                                        <div class="slds-col slds-size_1-of-1 slds-m-bottom_medium">
+                                            <div class="slds-scoped-notification slds-scoped-notification_light slds-theme_info" role="status">
+                                                <div class="slds-media">
+                                                    <div class="slds-media__figure">
+                                                        <lightning-icon icon-name="utility:info" size="small"></lightning-icon>
+                                                    </div>
+                                                    <div class="slds-media__body">
+                                                        <p class="slds-text-body_small">
+                                                            <strong>Matching Existing Records:</strong> To enable AI to match and update existing records of this type, 
+                                                            make sure to add the related list in the Prompt Template via <em>Insert Resource</em> in Prompt Builder.
+                                                            For <strong>create-only</strong> operations, this is not required.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    
+                                    <!-- Quick Import Fields Section -->
+                                    <div class="slds-col slds-size_1-of-1 slds-m-bottom_medium">
+                                        <div class="slds-box slds-box_x-small slds-theme_shade" style="background: #f3f3f3; border-radius: 8px;">
+                                            <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_2-of-3">
+                                                    <lightning-combobox
+                                                        label="Quick Import Fields"
+                                                        value={selectedLayoutOption}
+                                                        options={layoutOptions}
+                                                        onchange={handleLayoutOptionChange}
+                                                        placeholder="Select a field set to import..."
+                                                        disabled={isLoadingLayoutFields}>
+                                                    </lightning-combobox>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-3">
+                                                    <lightning-button
+                                                        label="Import Fields"
+                                                        icon-name="utility:download"
+                                                        onclick={handleImportFromLayout}
+                                                        disabled={isLoadingLayoutFields}
+                                                        class="slds-m-top_x-small">
+                                                    </lightning-button>
+                                                    <template lwc:if={isLoadingLayoutFields}>
+                                                        <lightning-spinner alternative-text="Loading..." size="small" class="slds-m-left_small"></lightning-spinner>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                            <p class="slds-form-element__help slds-text-color_weak slds-m-top_xx-small" style="font-size: 11px;">
+                                                Quickly populate fields based on common configurations. Required fields will be auto-selected as mandatory.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Allowed Fields -->
+                                    <div class="slds-col slds-size_1-of-1 slds-m-bottom_small">
+                                        <lightning-dual-listbox
+                                            label="Allowed Fields"
+                                            source-label="Available Fields"
+                                            selected-label="Selected Fields"
+                                            options={availableFieldOptions}
+                                            value={objectFormData.allowedFields}
+                                            onchange={handleAllowedFieldsChange}
+                                            required>
+                                        </lightning-dual-listbox>
+                                        <p class="slds-form-element__help slds-text-color_weak">
+                                            Select which fields users can view and edit for this object.
+                                        </p>
+                                    </div>
+                                    
+                                    <!-- Mandatory Fields -->
+                                    <div class="slds-col slds-size_1-of-1 slds-m-bottom_small">
+                                        <div class="slds-grid slds-grid_vertical-align-end slds-m-bottom_xx-small">
+                                            <div class="slds-col slds-grow">
+                                                <span class="slds-form-element__label">Mandatory Fields (Always Show)</span>
+                                            </div>
+                                            <div class="slds-col slds-no-flex">
+                                                <lightning-button
+                                                    label="Import Required Fields"
+                                                    icon-name="utility:download"
+                                                    variant="base"
+                                                    onclick={handleImportRequiredFields}
+                                                    disabled={isLoadingFieldInfo}
+                                                    size="small">
+                                                </lightning-button>
+                                            </div>
+                                        </div>
+                                        <lightning-dual-listbox
+                                            source-label="Allowed Fields"
+                                            selected-label="Mandatory Fields"
+                                            options={allowedFieldOptionsForMandatory}
+                                            value={objectFormData.mandatoryFields}
+                                            onchange={handleMandatoryFieldsChange}>
+                                        </lightning-dual-listbox>
+                                        <p class="slds-form-element__help slds-text-color_weak">
+                                            These fields will always be displayed even if not mentioned in the transcript. 
+                                            Click "Import Required Fields" to auto-add fields that are required when creating this object.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    
+                    <!-- Modal Footer -->
+                    <footer class="slds-modal__footer">
+                        <lightning-button 
+                            label="Cancel" 
+                            onclick={handleCloseObjectModal}
+                            disabled={isSavingObjectConfig}>
+                        </lightning-button>
+                        <lightning-button 
+                            label="Save" 
+                            variant="brand" 
+                            onclick={handleSaveObjectConfig}
+                            disabled={isSavingObjectConfig}
+                            class="slds-m-left_x-small">
+                        </lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+        
+        <!-- Preview Prompt Data Modal -->
+        <template lwc:if={isPreviewModalOpen}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-modal="true">
+                <div class="slds-modal__container">
+                    <!-- Modal Header -->
+                    <header class="slds-modal__header">
+                        <lightning-button-icon
+                            icon-name="utility:close"
+                            alternative-text="Close"
+                            class="slds-modal__close"
+                            onclick={handleClosePreviewModal}>
+                        </lightning-button-icon>
+                        <h2 class="slds-modal__title slds-hyphenate">
+                            <lightning-icon icon-name="utility:preview" size="small" class="slds-m-right_small"></lightning-icon>
+                            Prompt Data Preview: {previewConfigName}
+                        </h2>
+                    </header>
+                    
+                    <!-- Modal Body -->
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <template lwc:if={isLoadingPreview}>
+                            <div class="slds-is-relative slds-p-around_large">
+                                <lightning-spinner alternative-text="Loading preview..." size="medium"></lightning-spinner>
+                            </div>
+                        </template>
+                        <template lwc:else>
+                            <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                                This is the configuration data that will be sent to the AI prompt template:
+                            </p>
+                            <div class="preview-content-box slds-box slds-theme_shade">
+                                <pre class="preview-content">{previewContent}</pre>
+                            </div>
+                        </template>
+                    </div>
+                    
+                    <!-- Modal Footer -->
+                    <footer class="slds-modal__footer">
+                        <lightning-button 
+                            label="Copy to Clipboard" 
+                            icon-name="utility:copy_to_clipboard"
+                            onclick={handleCopyPreviewContent}
+                            disabled={isLoadingPreview}>
+                        </lightning-button>
+                        <lightning-button 
+                            label="Close" 
+                            variant="brand"
+                            onclick={handleClosePreviewModal}
+                            class="slds-m-left_x-small">
+                        </lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </template>
+</template>

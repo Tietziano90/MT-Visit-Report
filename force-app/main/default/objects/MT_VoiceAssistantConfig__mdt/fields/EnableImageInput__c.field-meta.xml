@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!--
+    ================================================================================
+    MT RECORD SUGGESTION - Lightning Web Component
+    ================================================================================
+    Author: Michael Tietze, Principal AI Architect
+    Contact: mtietze@salesforce.com
+    Created: December 2025
+    Version: 1.5
+    
+    COPYRIGHT AND DISTRIBUTION
+    Copyright © 2025 Salesforce, Inc. All rights reserved.
+    
+    INTERNAL USE ONLY - This code may not be shared externally or distributed
+    outside of Salesforce without prior written approval from Michael Tietze
+    (mtietze@salesforce.com).
+    ================================================================================
+    -->
+
+    <fullName>EnableImageInput__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Enable multi-modal AI features - allows users to upload images and files alongside voice transcription. When enabled, users can attach business cards, whiteboard photos, handwritten notes, etc. for AI analysis.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Enable image/file upload for multi-modal AI processing</inlineHelpText>
+    <label>Enable Image Input</label>
+    <type>Checkbox</type>
+</CustomField>

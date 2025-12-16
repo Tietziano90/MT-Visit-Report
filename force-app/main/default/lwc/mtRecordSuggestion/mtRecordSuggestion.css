@@ -1,0 +1,2034 @@
+/*
+================================================================================
+MT RECORD SUGGESTION - Lightning Web Component
+================================================================================
+Author: Michael Tietze, Principal AI Architect
+Contact: mtietze@salesforce.com
+Created: December 2025
+Version: 1.5
+
+COPYRIGHT AND DISTRIBUTION
+Copyright © 2025 Salesforce, Inc. All rights reserved.
+
+INTERNAL USE ONLY - This code may not be shared externally or distributed
+outside of Salesforce without prior written approval from Michael Tietze
+(mtietze@salesforce.com).
+================================================================================
+ */
+
+/* Root Container with LDS2 Design Tokens */
+.ai-record-suggestions {
+    --lds2-spacing-xs: 0.25rem;
+    --lds2-spacing-sm: 0.5rem;
+    --lds2-spacing-md: 1rem;
+    --lds2-spacing-lg: 1.5rem;
+    --lds2-spacing-xl: 2rem;
+    --lds2-radius-sm: 0.375rem;
+    --lds2-radius-md: 0.5rem;
+    --lds2-radius-lg: 0.75rem;
+    --lds2-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --lds2-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --lds2-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --lds2-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    padding: var(--lds2-spacing-lg);
+    max-width: 100%;
+    font-family: var(--slds-g-font-family, 'Salesforce Sans', Arial, sans-serif);
+}
+
+/* Header & Settings */
+.header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: var(--lds2-spacing-md);
+    border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    margin-bottom: var(--lds2-spacing-lg);
+}
+
+.settings-btn {
+    color: var(--slds-g-color-neutral-base-50, #706e6b);
+    transition: var(--lds2-transition);
+    border-radius: var(--lds2-radius-sm);
+}
+
+.settings-btn:hover {
+    color: var(--slds-g-color-brand-base-50, #0176d3);
+    background-color: var(--slds-g-color-brand-base-95, #eef4ff);
+}
+
+/* Settings Modal */
+.slds-modal {
+    position: fixed;
+    z-index: 9001;
+}
+
+.slds-backdrop {
+    position: fixed;
+    z-index: 9000;
+}
+
+.slds-modal__header {
+    background: linear-gradient(180deg, var(--slds-g-color-neutral-base-100, #fff) 0%, var(--slds-g-color-neutral-base-95, #f8f8f8) 100%);
+    border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-radius: var(--lds2-radius-md) var(--lds2-radius-md) 0 0;
+}
+
+.slds-modal__content {
+    padding: var(--lds2-spacing-lg);
+}
+
+.slds-modal__footer {
+    background: var(--slds-g-color-neutral-base-95, #f8f8f8);
+    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-radius: 0 0 var(--lds2-radius-md) var(--lds2-radius-md);
+}
+
+/* Summary Section - LDS2 Card Style */
+.summary-section {
+    background: var(--slds-g-color-neutral-base-100, #fff);
+    border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-radius: var(--lds2-radius-lg);
+    padding: var(--lds2-spacing-lg);
+    margin-bottom: var(--lds2-spacing-xl);
+    box-shadow: var(--lds2-shadow-sm);
+    transition: var(--lds2-transition);
+}
+
+.summary-section:hover {
+    box-shadow: var(--lds2-shadow-md);
+}
+
+.summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--lds2-spacing-md);
+    padding-bottom: var(--lds2-spacing-md);
+    border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+}
+
+.summary-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--slds-g-color-neutral-base-10, #181818);
+    display: flex;
+    align-items: center;
+    gap: var(--lds2-spacing-sm);
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.summary-edit-btn {
+    margin-left: var(--lds2-spacing-sm);
+}
+
+.summary-content {
+    line-height: 1.75;
+    font-size: 0.9375rem;
+    color: var(--slds-g-color-neutral-base-20, #3e3e3c);
+}
+
+.summary-content ul {
+    margin: var(--lds2-spacing-md) 0;
+    padding-left: var(--lds2-spacing-lg);
+    list-style-type: disc;
+}
+
+.summary-content li {
+    margin-bottom: var(--lds2-spacing-sm);
+    padding-left: var(--lds2-spacing-xs);
+}
+
+.summary-textarea {
+    min-height: 150px;
+    font-size: 0.9375rem;
+}
+
+.summary-rich-text {
+    min-height: 200px;
+    border-radius: var(--lds2-radius-sm);
+}
+
+/* Loading State */
+.loading-container {
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--lds2-spacing-xl);
+    background: linear-gradient(180deg, var(--slds-g-color-neutral-base-100, #fff) 0%, var(--slds-g-color-neutral-base-95, #fafaf9) 100%);
+    border-radius: var(--lds2-radius-lg);
+}
+
+.loading-spinner-wrapper {
+    position: relative;
+    height: 64px;
+    width: 64px;
+    margin-bottom: var(--lds2-spacing-lg);
+}
+
+.loading-text {
+    font-size: 1rem;
+    color: var(--slds-g-color-neutral-base-50, #706e6b);
+    text-align: center;
+    margin-top: 0;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+}
+
+.empty-state {
+    background-color: var(--slds-g-color-neutral-base-95, #fafaf9);
+    border-radius: var(--lds2-radius-lg);
+    padding: var(--lds2-spacing-xl);
+    text-align: center;
+}
+
+/* Records Container & Grid */
+.records-container {
+    width: 100%;
+    padding: 0;
+}
+
+.records-grid {
+    width: 100%;
+    gap: var(--lds2-spacing-lg);
+}
+
+.record-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--lds2-spacing-lg);
+}
+
+
+/* Card Styling - LDS2 */
+.record-item lightning-card {
+    flex: 1;
+    width: 100%;
+    border-radius: var(--lds2-radius-md);
+}
+
+lightning-card {
+    --slds-c-card-radius-border: var(--lds2-radius-md);
+    --slds-c-card-shadow: var(--lds2-shadow-sm);
+    transition: var(--lds2-transition);
+    border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+}
+
+lightning-card:hover {
+    --slds-c-card-shadow: var(--lds2-shadow-md);
+    border-color: var(--slds-g-color-border-base-2, #c9c9c9);
+}
+
+
+lightning-card.true {
+    opacity: 0.85;
+    border-left: 4px solid var(--slds-g-color-success-base-40, #2e844a);
+}
+
+/* Error state for record card */
+.record-card-error {
+    border-left: 4px solid var(--slds-g-color-error-base-40, #ea001e);
+}
+
+/* Error box styling - consistent red */
+.error-box {
+    background-color: var(--slds-g-color-error-base-40, #ea001e);
+    border-radius: var(--lds2-radius-sm);
+    color: #ffffff;
+}
+
+.error-box p {
+    color: #ffffff;
+}
+
+/* White helptext icon on error background */
+.error-box lightning-helptext {
+    --slds-c-icon-color-foreground-default: #ffffff;
+    --lwc-colorTextIconDefault: #ffffff;
+}
+
+.error-box lightning-helptext button {
+    color: #ffffff !important;
+}
+
+.error-box lightning-helptext button svg,
+.error-box lightning-helptext lightning-primitive-icon svg {
+    fill: #ffffff !important;
+}
+
+/* Error box close buttons - SIMPLE WHITE X */
+.error-box lightning-button-icon,
+.warning-box lightning-button-icon {
+    --slds-c-icon-color-foreground: white !important;
+    --slds-c-icon-color-foreground-default: white !important;
+    filter: brightness(0) invert(1) !important; /* Force white */
+}
+
+.error-box lightning-button-icon svg,
+.warning-box lightning-button-icon svg,
+.error-box svg,
+.warning-box svg {
+    fill: white !important;
+    filter: brightness(0) invert(1) !important;
+}
+
+/* Warning box styling (for duplicates) - friendly blue color */
+.warning-box {
+    background-color: #0176d3;
+    border-radius: var(--lds2-radius-sm);
+    color: #ffffff;
+}
+
+.warning-box p {
+    color: #ffffff;
+}
+
+.warning-box lightning-icon svg {
+    fill: #ffffff !important;
+}
+
+/* Info tooltip container */
+.info-tooltip-container {
+    position: relative;
+    display: inline-block;
+}
+
+.info-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    z-index: 9999;
+}
+
+.info-tooltip .slds-popover {
+    min-width: 250px;
+    background: #16325c;
+    color: #ffffff;
+}
+
+.info-tooltip .slds-popover__body {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Field with error styling */
+.field-has-error {
+    border-left: 3px solid var(--slds-g-color-error-base-40, #ea001e);
+    background-color: var(--slds-g-color-error-base-95, #fef1ee);
+    padding-left: var(--lds2-spacing-sm);
+    border-radius: var(--lds2-radius-sm);
+}
+
+/* Existing Record Form */
+.existing-record-form {
+    border-radius: var(--lds2-radius-md);
+    padding: var(--lds2-spacing-md);
+    background: var(--slds-g-color-neutral-base-100, #fff);
+}
+
+.proposed-changes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--lds2-spacing-md) 0;
+    margin-top: var(--lds2-spacing-md);
+    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+}
+
+.proposed-changes-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--slds-g-color-neutral-base-30, #514f4d);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.slds-border_top {
+    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    margin-top: var(--lds2-spacing-sm);
+}
+
+/* Field Rows */
+.field-row {
+    padding: var(--lds2-spacing-md);
+    border-radius: var(--lds2-radius-sm);
+    background-color: var(--slds-g-color-neutral-base-100, #fff);
+    margin-bottom: var(--lds2-spacing-sm);
+    border: 1px solid transparent;
+    transition: var(--lds2-transition);
+}
+
+.field-row:hover {
+    background-color: var(--slds-g-color-neutral-base-95, #fafaf9);
+    border-color: var(--slds-g-color-border-base-1, #e5e5e5);
+}
+
+.field-comparison {
+    align-items: flex-start;
+}
+
+.field-comparison > .slds-col {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Old/New value styling */
+.old-value-field {
+    opacity: 0.65;
+}
+
+.new-value-field {
+    border-left: 3px solid var(--slds-g-color-success-base-40, #2e844a);
+    padding-left: var(--lds2-spacing-sm);
+    border-radius: 0 var(--lds2-radius-sm) var(--lds2-radius-sm) 0;
+    background-color: rgba(46, 132, 74, 0.04);
+}
+
+.field-hint {
+    display: inline-block;
+    margin-top: var(--lds2-spacing-xs);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: var(--lds2-radius-sm);
+}
+
+/* Button column alignment - align with input field (after label) */
+.field-comparison .accept-btn-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 1.25rem; /* Account for label height (~20px) */
+    min-height: 60px;
+}
+
+.slds-grid:not(.field-comparison) > .slds-col:last-child {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Accept/Action Buttons */
+.accept-btn {
+    transition: var(--lds2-transition);
+    border-radius: var(--lds2-radius-sm);
+}
+
+.accept-btn:hover {
+    transform: scale(1.05);
+}
+
+.accept-btn.accepted {
+    transform: scale(1.1);
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--lds2-spacing-xs);
+}
+
+/* Add Field Section */
+.add-field-section {
+    margin-top: var(--lds2-spacing-lg);
+    padding-top: var(--lds2-spacing-lg);
+    border-top: 2px dashed var(--slds-g-color-border-base-1, #e5e5e5);
+}
+
+.add-field-btn {
+    margin-bottom: var(--lds2-spacing-md);
+}
+
+/* Add Field Modal */
+.add-field-modal .slds-modal__container {
+    max-width: 500px;
+}
+
+.add-field-modal .slds-modal__content {
+    overflow: visible !important;
+}
+
+.add-field-modal .slds-form-element {
+    margin-bottom: var(--lds2-spacing-md);
+}
+
+/* Saved Fields Display (for non-UI API objects after save) */
+.saved-fields-container {
+    background-color: var(--slds-g-color-success-base-95, #e6f7e9);
+    border: 1px solid var(--slds-g-color-success-base-40, #2e844a);
+    border-radius: var(--lds2-radius-md);
+    padding: var(--lds2-spacing-md);
+}
+
+.saved-header {
+    color: var(--slds-g-color-success-base-30, #1e6339);
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+.saved-fields-container .slds-dl_horizontal__label {
+    width: 35%;
+    padding-right: var(--lds2-spacing-sm);
+}
+
+.saved-fields-container .slds-dl_horizontal__detail {
+    width: 65%;
+    font-weight: 500;
+}
+
+/* Duplicate Alert */
+.duplicate-alert {
+    border-radius: var(--lds2-radius-md);
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: var(--slds-g-color-warning-base-70, #fe9339);
+}
+
+.duplicate-alert h2 {
+    flex: 1;
+    font-size: 0.875rem;
+    color: #080707;
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Record Picker Modal - LDS2 Styling */
+.record-picker-modal .slds-modal__container {
+    max-width: 900px;
+    border-radius: var(--slds-g-radius-border-3, 0.75rem);
+    overflow: hidden;
+}
+
+.record-picker-modal .slds-modal__header {
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    text-align: center;
+}
+
+.record-picker-modal .slds-modal__title {
+    font-size: 1.25rem;
+}
+
+.record-picker-modal .slds-modal__content {
+    padding: 0;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.record-picker-modal .slds-modal__footer {
+    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    padding: 0.75rem 1rem;
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+/* Suggested Records List */
+.suggested-records-list {
+    border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+}
+
+.suggested-record-item {
+    border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    background: white;
+    transition: background-color 0.15s ease;
+}
+
+.suggested-record-item:hover {
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+/* Record Preview Panel */
+.record-preview-panel {
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    border-radius: var(--slds-g-radius-border-2, 0.5rem);
+    margin: 0 0.75rem;
+}
+
+/* Search Section */
+.search-section {
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+}
+
+/* Accordion Section Headers - More Prominent */
+lightning-accordion-section {
+    --slds-c-accordion-heading-font-size: 1.125rem;
+    --slds-c-accordion-heading-font-weight: 700;
+    --slds-c-accordion-section-summary-padding-block-start: 0.75rem;
+    --slds-c-accordion-section-summary-padding-block-end: 0.75rem;
+}
+
+lightning-accordion-section .slds-accordion__summary-heading {
+    font-size: 1.125rem !important;
+    font-weight: 700 !important;
+    color: var(--slds-g-color-neutral-base-10, #181818);
+}
+
+/* Summary Section Styling */
+.summary-section {
+    background: white;
+    border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-radius: var(--slds-g-radius-border-2, 0.5rem);
+    margin-bottom: 1.5rem;
+}
+
+.summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    border-radius: var(--slds-g-radius-border-2, 0.5rem) var(--slds-g-radius-border-2, 0.5rem) 0 0;
+}
+
+.summary-title {
+    display: flex;
+    align-items: center;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--slds-g-color-neutral-base-10, #181818);
+    margin: 0;
+}
+
+/* Required Fields Alert */
+.required-fields-alert {
+    border-radius: var(--lds2-radius-md);
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    position: relative;
+}
+
+.required-fields-alert h2 {
+    flex: 1;
+    font-size: 0.875rem;
+    color: white;
+    margin: 0;
+}
+
+.required-fields-alert strong {
+    color: white;
+    font-weight: 700;
+}
+
+.required-fields-alert .slds-notify__close {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin-left: auto;
+}
+
+.field-row.newly-added {
+    background-color: var(--slds-g-color-success-base-95, #e6f7e9);
+    border-left: 3px solid var(--slds-g-color-success-base-40, #2e844a);
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Desktop: Put Add Field (left) and Save (right) on the same row */
+.desktop-add-save-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Required Field Styling */
+.field-row.required-field {
+    position: relative;
+}
+
+.field-row.missing-required {
+    background-color: var(--slds-g-color-error-base-95, #fef1ee);
+    border-left: 3px solid var(--slds-g-color-error-base-40, #ea001e);
+    border-radius: var(--lds2-radius-sm);
+}
+
+.required-indicator {
+    color: var(--slds-g-color-error-base-40, #ea001e);
+    font-weight: bold;
+    margin-left: var(--lds2-spacing-xs);
+}
+
+.missing-required-warning {
+    background-color: var(--slds-g-color-warning-base-95, #fef3cd);
+    border: 1px solid var(--slds-g-color-warning-base-50, #ff9e2c);
+    border-radius: var(--lds2-radius-sm);
+    padding: var(--lds2-spacing-sm) var(--lds2-spacing-md);
+    margin-bottom: var(--lds2-spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--lds2-spacing-sm);
+    font-size: 0.875rem;
+}
+
+/* Reference/Lookup Field Styling */
+.reference-field-container {
+    margin-bottom: var(--lds2-spacing-sm);
+}
+
+.reference-field-container .slds-form-element__label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--slds-g-color-neutral-base-30, #706e6b);
+    margin-bottom: var(--lds2-spacing-xs);
+}
+
+.reference-display {
+    display: flex;
+    align-items: center;
+    gap: var(--lds2-spacing-sm);
+    padding: var(--lds2-spacing-sm) var(--lds2-spacing-md);
+    background-color: var(--slds-g-color-neutral-base-100, #fff);
+    border: 1px solid var(--slds-g-color-border-base-1, #c9c9c9);
+    border-radius: var(--lds2-radius-sm);
+    min-height: 2.25rem;
+    transition: var(--lds2-transition);
+}
+
+.reference-display:hover {
+    border-color: var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.reference-display.old-value-display {
+    opacity: 0.65;
+    background-color: var(--slds-g-color-neutral-base-95, #fafaf9);
+}
+
+.reference-display.old-value-display:hover {
+    border-color: var(--slds-g-color-border-base-1, #c9c9c9);
+}
+
+.reference-name {
+    color: var(--slds-g-color-brand-base-50, #0176d3);
+    font-weight: 500;
+}
+
+.reference-id {
+    font-family: var(--slds-g-font-mono, 'SF Mono', Consolas, Monaco, monospace);
+    font-size: 0.75rem;
+    color: var(--slds-g-color-neutral-base-50, #747474);
+}
+
+/* Polymorphic field picker */
+.polymorphic-field-container {
+    margin-bottom: var(--lds2-spacing-sm);
+}
+
+.polymorphic-field-container .slds-form-element__label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--slds-g-color-neutral-base-30, #706e6b);
+    margin-bottom: var(--lds2-spacing-xs);
+}
+
+.polymorphic-picker {
+    align-items: flex-end;
+    gap: 0;
+}
+
+.polymorphic-picker lightning-combobox {
+    --slds-c-input-radius-border: var(--lds2-radius-sm) 0 0 var(--lds2-radius-sm);
+}
+
+.polymorphic-picker lightning-record-picker {
+    flex: 1;
+}
+
+/* Reasoning Section */
+.reasoning-section {
+    border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-radius: var(--lds2-radius-sm);
+    overflow: hidden;
+    margin-top: var(--lds2-spacing-md);
+}
+
+.reasoning-section summary {
+    cursor: pointer;
+    background-color: var(--slds-g-color-neutral-base-95, #fafaf9);
+    padding: var(--lds2-spacing-sm) var(--lds2-spacing-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: var(--lds2-transition);
+}
+
+.reasoning-section summary:hover {
+    background-color: var(--slds-g-color-neutral-base-90, #e5e5e5);
+}
+
+/* Badge Styling */
+lightning-badge {
+    vertical-align: middle;
+    --slds-c-badge-radius-border: var(--lds2-radius-sm);
+}
+
+.layout-selector {
+    min-width: 150px;
+}
+
+/* Mobile Save Footer - Hidden on Desktop */
+.mobile-save-footer {
+    display: none;
+}
+
+/* ============================================================================
+   MOBILE RESPONSIVE DESIGN (Salesforce Mobile App Optimized)
+   ============================================================================ */
+@media (max-width: 768px) {
+    /* Root Container: Reduce padding for more screen real estate */
+    .ai-record-suggestions {
+        padding: var(--lds2-spacing-xs);
+    }
+    
+    /* ========== BUTTON SIZING - Extra Compact ========== */
+    lightning-button {
+        min-height: 24px;
+        font-size: 0.75rem;
+        padding: 0.125rem 0.375rem;
+    }
+    
+    lightning-button-icon {
+        min-height: 24px;
+        min-width: 24px;
+    }
+    
+    /* Blue tick boxes (accept buttons) - very small */
+    .accept-btn,
+    .accept-btn lightning-button-icon {
+        min-height: 20px !important;
+        min-width: 20px !important;
+        width: 20px !important;
+        height: 20px !important;
+        padding: 0 !important;
+    }
+    
+    /* Ensure accept button icons are centered */
+    .accept-btn-col lightning-button-icon {
+        margin: 0 auto;
+    }
+    
+    /* Card action buttons - very compact */
+    .action-buttons lightning-button,
+    .action-buttons lightning-button-icon {
+        min-height: 24px;
+        min-width: 24px;
+        font-size: 0.6875rem;
+    }
+    
+    /* Edit, Full, Compact, Refresh buttons - compact */
+    lightning-button-group lightning-button,
+    lightning-button-group lightning-button-stateful,
+    lightning-button-group lightning-button-icon {
+        min-height: 24px;
+        font-size: 0.6875rem;
+        padding: 0.125rem 0.25rem;
+    }
+    
+    /* Hide Save All button completely on mobile - we use card-level save buttons */
+    .section-header-right lightning-button[label*="Save"],
+    .section-header-right lightning-button[icon-name="utility:save"] {
+        display: none !important;
+    }
+    
+    /* Mobile save button at bottom - compact */
+    .mobile-save-btn {
+        min-height: 32px;
+        font-size: 0.75rem;
+    }
+    
+    /* Hide all button labels on mobile, show only icons */
+    .action-buttons-container lightning-button .slds-button__label,
+    lightning-card [slot="actions"] lightning-button .slds-button__label,
+    lightning-button[label="Save"] .slds-button__label,
+    lightning-button[label="Saving..."] .slds-button__label,
+    lightning-button[label="Saved"] .slds-button__label {
+        display: none !important;
+    }
+    
+    .action-buttons-container lightning-button,
+    lightning-card [slot="actions"] lightning-button,
+    lightning-card [slot="actions"] lightning-button-icon {
+        min-width: 32px;
+        min-height: 32px;
+        padding: 0.25rem;
+    }
+    
+    /* Move all card header actions to a dropdown menu */
+    lightning-card [slot="actions"] {
+        position: relative;
+    }
+    
+    /* Show only a menu icon in card header */
+    lightning-card [slot="actions"] lightning-button-icon:not(:first-child),
+    lightning-card [slot="actions"] lightning-button:not(:first-child) {
+        display: none !important;
+    }
+    
+    /* Keep save button at bottom of card */
+    .slds-card__footer lightning-button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* ========== ACCORDION HEADERS - Reduce Height by 50% ========== */
+    .section-header {
+        padding: 0.375rem 0.5rem;
+        min-height: auto;
+    }
+    
+    .section-header-left {
+        gap: 0.375rem;
+    }
+    
+    .section-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    
+    .chevron-icon {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .section-icon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    /* ========== CARD STRUCTURE - Move Save Button to Bottom ========== */
+    lightning-card {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Show actions in header on mobile but make them compact */
+    lightning-card [slot="actions"] {
+        display: flex !important;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        align-items: center;
+    }
+    
+    /* Hide only the Save button in header (we show it at bottom) */
+    lightning-card [slot="actions"] lightning-button[label="Save"],
+    lightning-card [slot="actions"] lightning-button[label="Saving..."],
+    lightning-card [slot="actions"] lightning-button[label="Saved"] {
+        display: none !important;
+    }
+    
+    /* Remove card styling on mobile - flatten hierarchy */
+    lightning-card {
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        margin-bottom: 1rem !important;
+        background: transparent !important;
+        /* Remove the blue border (big selection box) on mobile */
+        border-left: none !important;
+    }
+    
+    /* Ensure only field-row has the blue selection border */
+    .field-row[data-is-selected="true"] {
+        border: 1px solid var(--slds-g-color-brand-base-50, #0176d3);
+        box-shadow: 0 0 0 1px var(--slds-g-color-brand-base-50, #0176d3);
+    }
+    
+    .slds-card__header {
+        padding: 0.5rem 0 !important;
+        background: transparent !important;
+        border-bottom: 2px solid var(--slds-g-color-border-base-1, #e5e5e5) !important;
+        margin-bottom: 0.5rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+    }
+    
+    .slds-card__body,
+    lightning-card .slds-card__body {
+        padding: 0 !important;
+        background: transparent !important;
+    }
+    
+    .slds-card__footer {
+        padding: 0.5rem 0 !important;
+        background: transparent !important;
+        border-top: 2px solid var(--slds-g-color-border-base-1, #e5e5e5) !important;
+        margin-top: 0.5rem !important;
+    }
+    
+    /* Record card title - smaller */
+    .slds-card__header-title {
+        font-size: 0.875rem !important;
+        font-weight: 600 !important;
+        flex: 1 !important;
+    }
+    
+    /* Card header actions - keep them inline and compact */
+    lightning-card [slot="actions"] {
+        display: flex !important;
+        gap: 0.25rem !important;
+        flex-shrink: 0 !important;
+    }
+    
+    lightning-card [slot="actions"] lightning-button-icon {
+        width: 32px !important;
+        height: 32px !important;
+    }
+    
+    /* ========== FIELD ALIGNMENT FIXES ========== */
+    /* Force single column for record forms */
+    lightning-record-form[columns="2"],
+    lightning-record-form {
+        --slds-c-record-layout-columns: 1;
+    }
+    
+    /* Fix field overflow - ensure everything stays within bounds */
+    lightning-input,
+    lightning-combobox,
+    lightning-textarea,
+    lightning-input-field,
+    lightning-record-picker {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Prevent lookup button overflow */
+    .slds-form-element,
+    .slds-form-element__control,
+    .slds-input-has-icon {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: visible !important;
+    }
+    
+    /* Fix date picker alignment - COMPREHENSIVE */
+    lightning-input[type="date"],
+    lightning-input[type="datetime"] {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Fix record picker button alignment */
+    lightning-record-picker {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* CRITICAL: Force date input container to respect bounds */
+    lightning-input[type="date"] > *,
+    lightning-input[type="datetime"] > * {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* ========== FIELD ROWS - Mobile Selection Style ========== */
+    /* Field rows are clickable containers on mobile */
+    .field-row {
+        flex-direction: column !important;
+        align-items: stretch;
+        padding: 0.5rem 0.75rem; /* More horizontal padding */
+        margin-bottom: 0.25rem;
+        gap: 0.25rem;
+        border-radius: 0.25rem;
+        border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+        cursor: pointer;
+        transition: all 0.15s ease;
+        background-color: var(--slds-g-color-neutral-base-100, #ffffff);
+        position: static !important; /* CRITICAL - no clipping */
+        overflow: visible !important; /* Allow dropdowns to escape */
+        box-sizing: border-box;
+        width: 100% !important;
+        max-width: 100% !important;
+        z-index: 1 !important;
+        isolation: auto !important;
+    }
+
+    /* Mobile date rows use a custom SLDS date input component to avoid iOS Salesforce app date overflow/cutoff. */
+    .field-row.field-row-date {
+        overflow: visible !important;
+    }
+
+    .field-row.field-row-date c-mt-date-input {
+        display: block;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    /* SLDS grid contract: if a .field-row is inside an slds-grid (flex), force it to behave like slds-col slds-size_1-of-1 */
+    .slds-grid.slds-wrap > .field-row,
+    .slds-grid.slds-wrap > .field-row.slds-m-bottom_small {
+        flex: 0 0 100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+    
+    /* Remove all margins from form elements - let field-row padding handle spacing */
+    .field-row .slds-form-element {
+        margin: 0 !important;
+        width: 100% !important;
+    }
+    
+    .field-row .slds-form-element__label {
+        margin-bottom: 0.125rem !important;
+    }
+    
+    /* All inputs should be 100% of their container - no calc needed */
+    .field-row input,
+    .field-row select,
+    .field-row textarea,
+    .field-row .slds-input,
+    .field-row .slds-select,
+    .field-row .slds-textarea {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Selected field - colored border and background (SLDS style) */
+    .field-row[data-is-selected="true"] {
+        border-color: var(--slds-g-color-brand-base-50, #0176d3);
+        background-color: var(--slds-g-color-brand-base-95, #f3f9fc);
+        box-shadow: 0 0 0 1px var(--slds-g-color-brand-base-50, #0176d3);
+    }
+    
+    /* Unselected field - gray border (SLDS style) */
+    .field-row[data-is-selected="false"] {
+        border-color: var(--slds-g-color-border-base-3, #c9c9c9);
+        background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+        opacity: 0.7;
+    }
+    
+    /* Disabled state (when record is saved) */
+    .field-row[data-is-saved="true"] {
+        cursor: default;
+        opacity: 0.65;
+    }
+    
+    /* Ensure all form elements stay within the container BUT allow dropdowns */
+    .field-row .slds-form-element,
+    .field-row .slds-form-element__control,
+    .field-row .slds-form-element__control-wrapper {
+        width: 100%;
+        max-width: 100%;
+        overflow: visible !important; /* CRITICAL - allow dropdown escape */
+        box-sizing: border-box;
+        position: static !important;
+    }
+
+    /* CRITICAL (iOS/mobile): allow flex columns to shrink so date inputs don't overflow right */
+    .field-row .slds-grid > .slds-col,
+    .field-row .slds-gutters_x-small > .slds-col,
+    .field-comparison > .slds-col {
+        min-width: 0 !important;
+    }
+
+    .field-row lightning-input,
+    .field-row lightning-input-field,
+    .field-row lightning-record-picker,
+    .field-row lightning-combobox {
+        min-width: 0 !important;
+    }
+    
+    /* Date/DateTime (iOS): wrapper to HARD clip overflow from native date inputs */
+    .ios-date-wrapper {
+        overflow: hidden !important;
+        width: 100% !important;
+        display: block !important;
+        position: relative !important;
+        /* Ensure the input inside doesn't stretch the wrapper */
+        max-width: 100% !important;
+    }
+    
+    /* Make labels clickable for selection */
+    .field-row .slds-form-element__label,
+    .field-row label {
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+    
+    /* Ensure inputs don't capture pointer events for container clicks */
+    .field-row lightning-input,
+    .field-row lightning-combobox,
+    .field-row lightning-textarea,
+    .field-row lightning-input-field,
+    .field-row lightning-record-picker {
+        pointer-events: auto;
+    }
+    
+    /* But allow container to receive clicks */
+    .field-row {
+        pointer-events: auto;
+    }
+    
+    /* Field column takes full width on mobile */
+    .field-row .slds-size_10-of-12:not(.accept-btn-col),
+    .field-row .slds-col:not(.accept-btn-col):not(.slds-size_12-of-12) {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        padding: 0 0.5rem 0 0 !important; /* Ensure padding for alignment */
+        box-sizing: border-box !important;
+    }
+    
+    /* Remove grid gutters on mobile - they add unwanted spacing */
+    .field-row .slds-grid.slds-gutters_x-small,
+    .field-row .slds-gutters_x-small {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+    
+    .field-row .slds-grid.slds-gutters_x-small > .slds-col,
+    .field-row .slds-gutters_x-small > .slds-col {
+        padding-left: 0 !important; /* Force left alignment */
+        padding-right: 0 !important;
+    }
+    
+    /* Accept button column (was slds-size_2-of-12) now 20% */
+    /* Hide accept buttons on mobile - whole field row is clickable */
+    .accept-btn-col,
+    .field-row .slds-size_2-of-12.accept-btn-col,
+    .field-row .accept-btn,
+    .field-row lightning-button-icon.accept-btn {
+        display: none !important;
+    }
+
+    /* When accept column is hidden, make the content column truly full width */
+    .field-row .slds-size_10-of-12,
+    .field-row .slds-size_10-of-12:not(.accept-btn-col) {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        min-width: 0 !important;
+    }
+
+    .field-row .slds-grid {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    /* Field comparisons - full width on mobile */
+    .field-comparison {
+        flex-direction: column !important;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    
+    .field-comparison .slds-size_10-of-12:not(.accept-btn-col),
+    .field-comparison .slds-col:not(.accept-btn-col):not(.slds-size_12-of-12),
+    .field-comparison .slds-size_5-of-12 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+    
+    /* Hide accept buttons in comparisons too */
+    .field-comparison .accept-btn-col,
+    .field-comparison .slds-size_2-of-12.accept-btn-col {
+        display: none !important;
+    }
+    
+    /* Ensure fields don't overflow - 100% width, no margins */
+    .field-row lightning-input,
+    .field-row lightning-combobox,
+    .field-row lightning-textarea,
+    .field-row lightning-input-field,
+    .field-row lightning-record-picker {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        display: block !important;
+    }
+    
+    /* Make dropdowns work on mobile - CRITICAL FIX */
+    .slds-combobox-container,
+    .slds-dropdown-trigger {
+        position: relative !important;
+        overflow: visible !important;
+    }
+    
+    /* ========== ABSOLUTE FIX: DROPDOWNS MUST BE ON TOP ========== */
+    /* Remove position from field-row to prevent stacking context */
+    .field-row {
+        position: static !important; /* CRITICAL - no stacking context */
+        z-index: auto !important;
+        isolation: auto !important;
+        transform: none !important;
+    }
+    
+    /* ALL dropdowns with MAXIMUM z-index - including combobox dropdowns */
+    .slds-dropdown,
+    .slds-listbox,
+    .slds-combobox__dropdown,
+    .slds-listbox__list,
+    .slds-dropdown__list,
+    .slds-dropdown-trigger__dropdown,
+    [role="listbox"],
+    [role="menu"],
+    .slds-popover,
+    .slds-dropdown-trigger .slds-dropdown,
+    /* Specifically target ALL combobox dropdowns */
+    lightning-combobox .slds-dropdown,
+    lightning-combobox .slds-listbox,
+    lightning-combobox .slds-combobox__dropdown,
+    lightning-combobox [role="listbox"],
+    .slds-combobox-container .slds-dropdown,
+    .slds-combobox-container .slds-listbox,
+    .slds-combobox-container [role="listbox"],
+    .slds-combobox__form-element .slds-dropdown,
+    .slds-combobox__form-element .slds-listbox {
+        position: fixed !important;
+        left: 0.5rem !important;
+        right: 0.5rem !important;
+        top: auto !important;
+        bottom: auto !important;
+        width: auto !important;
+        max-width: calc(100vw - 1rem) !important;
+        z-index: 2147483647 !important; /* MAXIMUM POSSIBLE z-index */
+        max-height: 70vh !important;
+        overflow-y: scroll !important;
+        -webkit-overflow-scrolling: touch !important;
+        background: white !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+        border: 3px solid #0176d3 !important;
+        margin-top: 0.25rem !important;
+    }
+    
+    /* Dropdown items - fully visible */
+    .slds-listbox__option,
+    .slds-listbox__item,
+    [role="option"] {
+        min-height: 48px !important;
+        padding: 0.75rem !important;
+        display: flex !important;
+        align-items: center !important;
+        background: white !important;
+        border-bottom: 1px solid #e5e5e5 !important;
+    }
+    
+    /* FORCE all parent containers to static positioning */
+    lightning-card,
+    .slds-card,
+    .slds-card__body,
+    .record-item,
+    lightning-layout,
+    lightning-layout-item,
+    .records-container,
+    .ai-record-suggestions {
+        position: static !important;
+        overflow: visible !important;
+        z-index: auto !important;
+        isolation: auto !important;
+    }
+    
+    /* ========== ERROR MESSAGES AT BOTTOM NEAR SAVE ========== */
+    /* Move error messages to appear right above the save button */
+    .mobile-save-footer {
+        display: flex !important;
+        flex-direction: column-reverse !important; /* Errors above button */
+    }
+    
+    /* Errors should be in the footer area */
+    .error-box,
+    .warning-box {
+        position: relative !important;
+        z-index: 1 !important;
+        margin: 0.5rem 0 !important;
+    }
+    
+    /* ========== ADD FIELD & LINK EXISTING BUTTONS ========== */
+    /* Make these buttons visible and clickable on mobile */
+    .add-field-section,
+    .link-existing-section {
+        margin: 0.5rem 0;
+        padding: 0.5rem 0;
+        border-top: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    }
+    
+    .add-field-section lightning-button,
+    .link-existing-section lightning-button {
+        width: 100%;
+        min-height: 40px;
+        font-size: 0.875rem;
+    }
+    
+    /* Ensure buttons are clickable */
+    lightning-button[label="Add Field"],
+    lightning-button[label="Link Existing Record"] {
+        pointer-events: auto !important;
+        display: block !important;
+        width: 100% !important;
+    }
+    
+    /* ========== CRITICAL FIX: Date and Lookup Fields ========== */
+    /* Apply to ALL date/lookup fields, not just in field-row */
+    
+    /* Date picker - constrain EVERYTHING */
+    lightning-input[type="date"],
+    lightning-input[type="datetime"],
+    .field-row lightning-input[type="date"],
+    .field-row lightning-input[type="datetime"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Record picker - constrain the host element */
+    lightning-record-picker,
+    .field-row lightning-record-picker {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Use CSS custom properties to penetrate Shadow DOM - CRITICAL */
+    lightning-input[type="date"],
+    lightning-input[type="datetime"],
+    lightning-record-picker {
+        --slds-c-input-sizing-width: 100%;
+        --slds-c-input-sizing-max-width: 100%;
+        --slds-c-input-sizing-min-width: 0;
+    }
+    
+    /* Force ALL form controls to 100% width - no exceptions */
+    .field-row input,
+    .field-row select,
+    .field-row textarea,
+    .field-row .slds-input,
+    .field-row .slds-select,
+    .field-row .slds-textarea,
+    .field-row .slds-combobox,
+    .field-row .slds-combobox__input,
+    .field-row .slds-combobox__input-value,
+    .field-row .slds-form-element__control {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+    }
+    
+    /* Remove ALL padding/margin from grid columns containing date/lookup fields */
+    .field-row .slds-col:has(lightning-input[type="date"]),
+    .field-row .slds-col:has(lightning-input[type="datetime"]),
+    .field-row .slds-col:has(lightning-record-picker) {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important; /* Clip overflow */
+        box-sizing: border-box !important;
+    }
+    
+    /* Target the form element wrapper inside the column */
+    .field-row .slds-col lightning-input[type="date"],
+    .field-row .slds-col lightning-input[type="datetime"],
+    .field-row .slds-col lightning-record-picker {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+    
+    /* Ensure ALL nested elements inside date inputs respect width */
+    .field-row lightning-input[type="date"] *,
+    .field-row lightning-input[type="datetime"] * {
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* Fix combobox dropdown positioning on mobile */
+    .field-row .slds-combobox,
+    .field-row .slds-dropdown-trigger {
+        position: relative;
+    }
+    
+    .field-row .slds-dropdown {
+        position: fixed !important;
+        left: 1rem !important;
+        right: 1rem !important;
+        width: auto !important;
+        max-width: calc(100vw - 2rem) !important;
+        z-index: 9999 !important;
+    }
+    
+    /* Ensure dropdowns are scrollable on mobile */
+    .field-row .slds-dropdown__list,
+    .field-row .slds-listbox {
+        max-height: 50vh !important;
+        overflow-y: auto !important;
+    }
+    
+    /* Ensure form elements stay within their containers */
+    .field-row .slds-form-element,
+    .field-row .slds-form-element__control,
+    .field-row .slds-form-element__control-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: visible !important; /* Allow dropdowns */
+        box-sizing: border-box !important;
+    }
+    
+    /* Error messages - drastically smaller on mobile */
+    .slds-form-element__help,
+    .slds-has-error .slds-form-element__help {
+        font-size: 0.625rem !important; /* Very small */
+        line-height: 1.2 !important;
+        margin-top: 0.125rem !important;
+        padding: 0.125rem 0 !important;
+    }
+    
+    /* Error icons - smaller */
+    .slds-form-element__help lightning-icon,
+    .slds-has-error lightning-icon {
+        width: 0.75rem !important;
+        height: 0.75rem !important;
+    }
+    
+    /* Toast messages - smaller on mobile */
+    .slds-notify,
+    .slds-notify_toast {
+        font-size: 0.75rem !important;
+        padding: 0.5rem !important;
+    }
+    
+    .slds-notify__content {
+        font-size: 0.75rem !important;
+    }
+    
+    /* Alert messages - smaller */
+    .slds-notify_alert {
+        font-size: 0.75rem !important;
+        padding: 0.5rem !important;
+    }
+    
+    /* Prevent date picker calendar from breaking layout */
+    .field-row .slds-datepicker {
+        position: absolute !important;
+        z-index: 9999 !important;
+    }
+    
+    /* ========== PROPOSED CHANGES - Reduce Height by 50% ========== */
+    .proposed-changes-header {
+        padding: 0.25rem 0;
+        margin-top: 0.5rem;
+    }
+    
+    .proposed-changes-title {
+        font-size: 0.6875rem;
+        font-weight: 600;
+    }
+    
+    /* ========== CONSISTENT FONT SIZES ========== */
+    .summary-content {
+        font-size: 0.8125rem;
+        line-height: 1.5;
+    }
+    
+    .summary-title {
+        font-size: 0.9375rem;
+    }
+    
+    /* Form field labels and text */
+    lightning-input,
+    lightning-combobox,
+    lightning-textarea,
+    .slds-form-element__label {
+        font-size: 0.8125rem !important;
+    }
+    
+    /* Card titles */
+    lightning-card h3 {
+        font-size: 0.875rem !important;
+    }
+    
+    /* Badges */
+    lightning-badge {
+        font-size: 0.6875rem;
+    }
+    
+    /* ========== SPACING OPTIMIZATIONS ========== */
+    .record-item {
+        margin-bottom: 0.5rem;
+    }
+    
+    .summary-section {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    lightning-card {
+        margin-bottom: 0.375rem;
+    }
+    
+    /* ========== ACTION BUTTONS POSITIONING ========== */
+    /* Remove sticky positioning */
+    .action-buttons-container {
+        position: static;
+        background: transparent;
+        padding: 0.5rem 0;
+        border-top: none;
+        box-shadow: none;
+        z-index: auto;
+        margin: 0;
+    }
+    
+    .action-buttons {
+        flex-direction: row;
+        gap: 0.375rem;
+        flex-wrap: wrap;
+    }
+
+    /* Make the arrow (button-menu) ~20% smaller on mobile */
+    .action-buttons .mt-action-menu {
+        transform: scale(0.8);
+        transform-origin: right center;
+    }
+    
+    .action-buttons lightning-button {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    /* ========== MODALS ========== */
+    .slds-modal__container {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        margin: 0.5rem;
+    }
+    
+    .slds-modal__content {
+        padding: 0.5rem;
+        max-height: 70vh;
+    }
+    
+    .record-picker-modal .slds-modal__content {
+        max-height: 60vh;
+    }
+    
+    /* ========== PERFORMANCE ========== */
+    .record-item {
+        animation: none;
+    }
+    
+    * {
+        transition-duration: 0.1s !important;
+    }
+    
+    /* ========== ACCESSIBILITY ========== */
+    *:focus {
+        outline: 2px solid var(--slds-g-color-brand-base-50, #0176d3);
+        outline-offset: 1px;
+    }
+    
+    /* ========== ICONS ========== */
+    lightning-icon[size="small"] {
+        --slds-c-icon-sizing-width: 1rem;
+        --slds-c-icon-sizing-height: 1rem;
+    }
+    
+    lightning-icon[size="x-small"] {
+        --slds-c-icon-sizing-width: 0.875rem;
+        --slds-c-icon-sizing-height: 0.875rem;
+    }
+    
+    /* ========== MISC ========== */
+    .records-container {
+        padding: 0;
+    }
+    
+    .add-field-row {
+        flex-direction: column;
+    }
+    
+    .add-field-row > * {
+        min-width: 100%;
+    }
+    
+    .record-count-badge-subtle {
+        font-size: 0.625rem;
+        padding: 1px 4px;
+    }
+    
+    /* Fix polymorphic picker layout */
+    .polymorphic-picker {
+        flex-direction: column !important;
+        gap: 0.25rem !important;
+        position: static !important; /* Critical for dropdown escape */
+    }
+    
+    .polymorphic-picker .slds-col {
+        width: 100% !important;
+        max-width: 100% !important;
+        position: static !important;
+    }
+    
+    /* Polymorphic field container must allow dropdown escape */
+    .polymorphic-field-container {
+        position: static !important;
+        overflow: visible !important;
+        z-index: auto !important;
+    }
+    
+    /* Polymorphic dropdowns - FORCE on top and overlay everything */
+    .polymorphic-picker lightning-combobox .slds-dropdown,
+    .polymorphic-picker lightning-record-picker .slds-dropdown,
+    .polymorphic-field-container .slds-dropdown,
+    .polymorphic-picker .slds-dropdown,
+    .polymorphic-field-container .slds-listbox,
+    .polymorphic-picker .slds-listbox,
+    .polymorphic-picker lightning-combobox .slds-listbox,
+    .polymorphic-field-container lightning-combobox .slds-dropdown,
+    .polymorphic-field-container lightning-combobox .slds-listbox,
+    /* Also target the combobox container and all its dropdown variants */
+    .polymorphic-picker .slds-combobox__dropdown,
+    .polymorphic-field-container .slds-combobox__dropdown,
+    .polymorphic-picker lightning-combobox .slds-combobox__dropdown,
+    .polymorphic-field-container lightning-combobox .slds-combobox__dropdown,
+    .polymorphic-picker .slds-dropdown-trigger__dropdown,
+    .polymorphic-field-container .slds-dropdown-trigger__dropdown {
+        position: fixed !important;
+        z-index: 2147483647 !important; /* Absolute maximum */
+        left: 0.5rem !important;
+        right: 0.5rem !important;
+        width: auto !important;
+        max-width: calc(100vw - 1rem) !important;
+        max-height: 70vh !important;
+        overflow-y: auto !important;
+        background: white !important;
+        box-shadow: var(--slds-g-shadow-2, 0 2px 2px 0 rgba(0, 0, 0, 0.10)) !important;
+        border: 3px solid var(--slds-g-color-brand-base-50, #0176d3) !important;
+        border-radius: var(--lds2-radius-md) !important;
+    }
+    
+    /* Ensure combobox container doesn't clip dropdown */
+    .polymorphic-picker lightning-combobox,
+    .polymorphic-field-container lightning-combobox,
+    .polymorphic-picker .slds-combobox-container,
+    .polymorphic-field-container .slds-combobox-container {
+        position: static !important;
+        overflow: visible !important;
+        z-index: auto !important;
+        isolation: auto !important;
+    }
+    
+    /* Ensure combobox input wrapper doesn't create stacking context */
+    .polymorphic-picker .slds-combobox__input,
+    .polymorphic-field-container .slds-combobox__input,
+    .polymorphic-picker .slds-dropdown-trigger,
+    .polymorphic-field-container .slds-dropdown-trigger {
+        position: static !important;
+        overflow: visible !important;
+    }
+    
+    /* Ensure grid items don't cause overflow */
+    .slds-grid {
+        flex-wrap: wrap;
+    }
+    
+    .slds-gutters_x-small > .slds-col {
+        padding: 0.125rem;
+    }
+    
+    /* ========== MOBILE SAVE BUTTON AT BOTTOM ========== */
+    /* Hide on desktop */
+    .mobile-save-footer {
+        display: none;
+    }
+    
+    /* Mobile footer - buttons on same line */
+    .mobile-save-footer {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        padding: 0.75rem 0 !important;
+        margin-top: 0.5rem !important;
+    }
+    
+    .mobile-add-field-btn {
+        flex: 0 0 auto !important;
+    }
+    
+    .mobile-save-btn {
+        flex: 0 0 auto !important;
+        margin-left: auto !important;
+    }
+}
+
+/* Mobile-specific: Show save button at bottom */
+@media (max-width: 768px) {
+    /* Polymorphic dropdown modal - position at scroll position */
+    .polymorphic-dropdown-modal {
+        position: fixed !important;
+        top: 20px; /* Default, will be overridden by JavaScript */
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        width: 90% !important;
+        max-width: 500px !important;
+        bottom: auto !important;
+        margin: 0 !important;
+        max-height: calc(100vh - 40px) !important;
+        overflow-y: auto !important;
+        z-index: 9001 !important;
+        border-radius: var(--slds-c-modal-radius-border, 0.25rem) !important;
+        box-shadow: var(--slds-g-shadow-modal, 0 2px 3px 0 rgba(0, 0, 0, 0.16)) !important;
+    }
+    
+    .polymorphic-dropdown-modal .slds-modal__container {
+        max-height: calc(100vh - 40px) !important;
+        overflow-y: auto !important;
+        border-radius: var(--slds-c-modal-radius-border, 0.25rem) !important;
+    }
+    
+    .polymorphic-dropdown-modal .slds-modal__header {
+        padding: 1rem 1.5rem !important;
+        border-bottom: 1px solid var(--slds-g-color-border-base-4, #e5e5e5) !important;
+    }
+    
+    .polymorphic-dropdown-modal .slds-modal__title {
+        font-size: 1.125rem !important;
+        font-weight: 600 !important;
+        line-height: 1.5 !important;
+    }
+    
+    .polymorphic-dropdown-modal .slds-modal__content {
+        padding: 1.5rem !important;
+    }
+    
+    .polymorphic-dropdown-modal .slds-modal__footer {
+        padding: 0.75rem 1.5rem !important;
+        border-top: 1px solid var(--slds-g-color-border-base-4, #e5e5e5) !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+        gap: 0.5rem !important;
+    }
+    
+    .polymorphic-dropdown-modal .slds-backdrop {
+        background-color: rgba(0, 0, 0, 0.4) !important;
+    }
+    
+    /* Polymorphic combobox - fully enabled on mobile */
+    .polymorphic-combobox {
+        pointer-events: auto !important;
+        opacity: 1 !important;
+    }
+    
+    .mobile-save-footer {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 0.75rem 0 !important;
+        border-top: none !important;
+        background: transparent !important;
+        margin-top: 0.5rem !important;
+        gap: 0.5rem !important;
+        flex-direction: row !important;
+    }
+    
+    .mobile-add-field-btn {
+        flex: 0 0 auto !important;
+        margin-right: auto !important;
+    }
+    
+    .mobile-save-btn {
+        flex: 0 0 auto !important;
+        width: auto !important;
+        min-width: 7.5rem !important;
+        min-height: 32px !important;
+        font-size: 0.8125rem !important;
+        font-weight: 600 !important;
+        margin-left: auto !important;
+    }
+
+    /* Hide the non-mobile Add Field placement so Add+Save can share one row */
+    .add-field-section {
+        display: none !important;
+    }
+
+    .mobile-add-field-btn {
+        width: auto;
+        min-height: 32px;
+    }
+}
+
+@media (min-width: 769px) {
+    .record-item {
+        min-width: 0;
+    }
+    
+    .records-grid {
+        align-items: stretch;
+    }
+}
+
+/* Desktop-only: grey out deselected fields for faster scanning */
+@media (min-width: 769px) {
+    .field-row[data-is-selected="false"] {
+        opacity: 0.5;
+        filter: grayscale(0.25);
+    }
+    .field-row[data-is-selected="true"] {
+        opacity: 1;
+        filter: none;
+    }
+}
+
+@media (min-width: 1200px) {
+    .records-container {
+        padding: 0 var(--lds2-spacing-md);
+    }
+    
+    .ai-record-suggestions {
+        padding: var(--lds2-spacing-xl);
+    }
+}
+
+/* Animations */
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.record-item {
+    animation: slideIn 0.3s ease-out;
+    animation-fill-mode: both;
+}
+
+.record-item:nth-child(1) { animation-delay: 0.1s; }
+.record-item:nth-child(2) { animation-delay: 0.15s; }
+.record-item:nth-child(3) { animation-delay: 0.2s; }
+.record-item:nth-child(4) { animation-delay: 0.25s; }
+.record-item:nth-child(5) { animation-delay: 0.3s; }
+
+/* Subtle separator between multiple records in the same section */
+.record-item:not(:last-child) {
+    border-bottom: 1px solid var(--slds-g-color-border-base-2, #dddbda);
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Focus states - Accessibility */
+lightning-button:focus,
+lightning-button-icon:focus {
+    outline: 2px solid var(--slds-g-color-brand-base-50, #0176d3);
+    outline-offset: 2px;
+    border-radius: var(--lds2-radius-sm);
+}
+
+/* Exception: Keep loading spinner contained */
+.loading-container {
+    overflow: hidden !important;
+}
+
+/* ============================================================================
+   CUSTOM COLLAPSIBLE SECTION HEADERS
+   ============================================================================ */
+
+.record-groups-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lds2-spacing-sm);
+}
+
+.record-group-section {
+    border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-radius: var(--lds2-radius-md);
+    overflow: hidden;
+    background: #fff;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--lds2-spacing-md);
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.15s ease;
+}
+
+.section-header:hover {
+    background: var(--slds-g-color-neutral-base-90, #e5e5e5);
+}
+
+.section-header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--lds2-spacing-sm);
+}
+
+.chevron-icon {
+    color: var(--slds-g-color-neutral-base-50, #747474);
+    transition: transform 0.2s ease;
+}
+
+.section-icon {
+    flex-shrink: 0;
+}
+
+.section-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--slds-g-color-neutral-base-10, #181818);
+}
+
+/* Subtle record count badge - matches "New"/"Update" style */
+.record-count-badge-subtle {
+    --slds-c-badge-color-background: var(--slds-g-color-neutral-base-80, #c9c9c9);
+    --slds-c-badge-text-color: var(--slds-g-color-neutral-base-30, #444);
+    font-weight: 500;
+    font-size: 0.75rem;
+    margin-left: var(--lds2-spacing-xs);
+}
+
+/* Summary section specific styling */
+.summary-group-section {
+    margin-bottom: var(--lds2-spacing-md);
+}
+
+.summary-group-section .section-header {
+    background: linear-gradient(135deg, var(--slds-g-color-neutral-base-95, #f3f3f3) 0%, var(--slds-g-color-neutral-base-90, #e5e5e5) 100%);
+}
+
+.section-header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--lds2-spacing-sm);
+}
+
+.section-header-right lightning-button {
+    --slds-c-button-brand-color-background: var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.summary-content {
+    padding: var(--lds2-spacing-md);
+    background: #fff;
+}

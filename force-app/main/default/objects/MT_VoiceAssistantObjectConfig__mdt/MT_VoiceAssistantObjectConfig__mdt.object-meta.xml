@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!--
+    ================================================================================
+    MT RECORD SUGGESTION - Lightning Web Component
+    ================================================================================
+    Author: Michael Tietze, Principal AI Architect
+    Contact: mtietze@salesforce.com
+    Created: December 2025
+    Version: 1.5
+    
+    COPYRIGHT AND DISTRIBUTION
+    Copyright © 2025 Salesforce, Inc. All rights reserved.
+    
+    INTERNAL USE ONLY - This code may not be shared externally or distributed
+    outside of Salesforce without prior written approval from Michael Tietze
+    (mtietze@salesforce.com).
+    ================================================================================
+    -->
+
+    <description>Stores per-object field configuration for Voice Assistant. Each record defines allowed fields, mandatory fields, and permissions for a specific object within a configuration profile.</description>
+    <label>MT Voice Assistant Object Config</label>
+    <pluralLabel>MT Voice Assistant Object Configs</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

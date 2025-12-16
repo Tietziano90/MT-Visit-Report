@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MT Voice Assistant - Deployment Wizard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .wizard-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .wizard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .wizard-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .wizard-header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .wizard-body {
+            padding: 40px;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e0e0e0;
+            z-index: 0;
+        }
+
+        .step-indicator-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .step-indicator-item.active .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step-indicator-item.completed .step-number {
+            background: #4caf50;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-option label {
+            display: block;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            border-color: #667eea;
+            background: #f0f4ff;
+            color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .deployment-log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .log-line {
+            margin-bottom: 5px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .log-success {
+            color: #4caf50;
+        }
+
+        .log-error {
+            color: #f44336;
+        }
+
+        .log-warning {
+            color: #ff9800;
+        }
+
+        .log-info {
+            color: #2196f3;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: #4caf50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .info-box h3 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+        }
+
+        .info-box li {
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .component-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .component-item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .component-item h4 {
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .component-item p {
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="wizard-container">
+        <div class="wizard-header">
+            <h1>
+                <span>🚀</span>
+                MT Voice Assistant
+                <span>🎙️</span>
+            </h1>
+            <p>Automated Deployment Wizard</p>
+        </div>
+
+        <div class="wizard-body">
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step-indicator-item active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Welcome</div>
+                </div>
+                <div class="step-indicator-item" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Prerequisites</div>
+                </div>
+                <div class="step-indicator-item" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Connect Org</div>
+                </div>
+                <div class="step-indicator-item" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Deploy</div>
+                </div>
+                <div class="step-indicator-item" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-label">Complete</div>
+                </div>
+            </div>
+
+            <!-- Step 1: Welcome -->
+            <div class="step active" data-step="1">
+                <h2 style="margin-bottom: 20px;">Welcome to MT Voice Assistant! 👋</h2>
+                <p style="margin-bottom: 20px; color: #666;">
+                    This wizard will guide you through deploying the complete MT Voice Assistant solution to your Salesforce org.
+                </p>
+
+                <div class="info-box">
+                    <h3>✨ What You'll Get:</h3>
+                    <ul>
+                        <li>🎤 Voice-to-text transcription with Einstein AI</li>
+                        <li>🤖 AI-powered record suggestions</li>
+                        <li>🖼️ Image support for business cards and documents</li>
+                        <li>📱 Beautiful mobile-optimized UI</li>
+                        <li>⚙️ Easy configuration interface</li>
+                    </ul>
+                </div>
+
+                <div class="component-list">
+                    <div class="component-item">
+                        <h4>8 Apex Classes</h4>
+                        <p>Backend logic & services</p>
+                    </div>
+                    <div class="component-item">
+                        <h4>4 LWC Components</h4>
+                        <p>Modern UI components</p>
+                    </div>
+                    <div class="component-item">
+                        <h4>2 Flows</h4>
+                        <p>Automation & orchestration</p>
+                    </div>
+                    <div class="component-item">
+                        <h4>2 AI Prompts</h4>
+                        <p>GenAI prompt templates</p>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="nextStep()">Let's Get Started →</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Prerequisites -->
+            <div class="step" data-step="2">
+                <h2 style="margin-bottom: 20px;">Prerequisites Check ✅</h2>
+                
+                <div class="info-box">
+                    <h3>Before we begin, please ensure you have:</h3>
+                    <ul>
+                        <li><strong>Salesforce CLI installed</strong> - Download from <a href="https://developer.salesforce.com/tools/salesforcecli" target="_blank">salesforce.com</a></li>
+                        <li><strong>System Administrator access</strong> to your target Salesforce org</li>
+                        <li><strong>My Domain enabled</strong> in your Salesforce org</li>
+                        <li><strong>Einstein AI enabled</strong> (for GenAI features)</li>
+                    </ul>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>⚠️ Important:</strong> The deployment will take approximately 3-5 minutes. Please don't close this window during deployment.
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="prerequisitesCheck" style="width: auto; margin-right: 10px;">
+                        I confirm that I have all the prerequisites ready
+                    </label>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="prevStep()">← Back</button>
+                    <button class="btn-primary" onclick="nextStep()" id="prerequisitesBtn" disabled>Continue →</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Connect to Org -->
+            <div class="step" data-step="3">
+                <h2 style="margin-bottom: 20px;">Connect to Your Salesforce Org 🔗</h2>
+
+                <div class="form-group">
+                    <label>Do you have an existing org connection?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="orgConnection" id="existingOrg" value="existing">
+                            <label for="existingOrg">
+                                <div style="font-size: 24px; margin-bottom: 5px;">✅</div>
+                                <div>Use Existing</div>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="orgConnection" id="newOrg" value="new" checked>
+                            <label for="newOrg">
+                                <div style="font-size: 24px; margin-bottom: 5px;">🆕</div>
+                                <div>Connect New</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="existingOrgFields" class="hidden">
+                    <div class="form-group">
+                        <label for="orgAlias">Org Alias</label>
+                        <input type="text" id="orgAlias" placeholder="e.g., MyDevOrg">
+                    </div>
+                </div>
+
+                <div id="newOrgFields">
+                    <div class="form-group">
+                        <label for="orgType">Org Type</label>
+                        <select id="orgType">
+                            <option value="production">Production / Developer Org</option>
+                            <option value="sandbox">Sandbox</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newOrgAlias">Org Alias (for reference)</label>
+                        <input type="text" id="newOrgAlias" placeholder="e.g., MyVoiceAssistantOrg">
+                    </div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>📝 Note:</strong> When you click "Connect & Deploy", a browser window will open for you to log in to your Salesforce org.
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="prevStep()">← Back</button>
+                    <button class="btn-primary" onclick="startDeployment()">Show Deployment Instructions →</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Deployment -->
+            <div class="step" data-step="4">
+                <h2 style="margin-bottom: 20px;">Deploying... 🚀</h2>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div class="deployment-log" id="deploymentLog">
+                    <div class="log-line log-info">🚀 Starting deployment wizard...</div>
+                </div>
+
+                <div id="deploymentSpinner" class="spinner"></div>
+
+                <div class="button-group hidden" id="deploymentButtons">
+                    <button class="btn-primary" onclick="nextStep()">I've Run the Script - Next →</button>
+                </div>
+            </div>
+
+            <!-- Step 5: Complete -->
+            <div class="step" data-step="5">
+                <div class="text-center">
+                    <div class="success-icon">✓</div>
+                    <h2 style="margin-bottom: 20px;">Deployment Complete! 🎉</h2>
+                </div>
+
+                <div class="alert alert-success">
+                    <strong>Success!</strong> MT Voice Assistant has been deployed to your org.
+                </div>
+
+                <div class="info-box">
+                    <h3>📋 Next Steps:</h3>
+                    <ul>
+                        <li><strong>Configure Named Credentials:</strong> Setup → Named Credentials → mt_EinsteinTranscribe</li>
+                        <li><strong>Access Setup Page:</strong> App Launcher → MT Voice Assistant Settings</li>
+                        <li><strong>Assign Permission Sets:</strong> Setup → Users → Permission Set Assignments</li>
+                        <li><strong>Test the Installation:</strong> Navigate to an Account and run the flow</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h3>📚 Documentation:</h3>
+                    <ul>
+                        <li>Check <code>DEPLOYMENT_GUIDE.md</code> for detailed post-deployment steps</li>
+                        <li>Review <code>README.md</code> for feature overview</li>
+                        <li>Contact: <strong>mtietze@salesforce.com</strong> for support</li>
+                    </ul>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="window.close()">Close Wizard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+
+        // Prerequisites checkbox
+        document.getElementById('prerequisitesCheck')?.addEventListener('change', function() {
+            document.getElementById('prerequisitesBtn').disabled = !this.checked;
+        });
+
+        // Org connection type toggle
+        document.querySelectorAll('input[name="orgConnection"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.value === 'existing') {
+                    document.getElementById('existingOrgFields').classList.remove('hidden');
+                    document.getElementById('newOrgFields').classList.add('hidden');
+                } else {
+                    document.getElementById('existingOrgFields').classList.add('hidden');
+                    document.getElementById('newOrgFields').classList.remove('hidden');
+                }
+            });
+        });
+
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateStep();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStep();
+            }
+        }
+
+        function updateStep() {
+            // Hide all steps
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+
+            // Show current step
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+
+            // Update step indicators
+            document.querySelectorAll('.step-indicator-item').forEach((item, index) => {
+                item.classList.remove('active', 'completed');
+                if (index + 1 < currentStep) {
+                    item.classList.add('completed');
+                } else if (index + 1 === currentStep) {
+                    item.classList.add('active');
+                }
+            });
+        }
+
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('deploymentLog');
+            const line = document.createElement('div');
+            line.className = `log-line log-${type}`;
+            
+            const icons = {
+                info: 'ℹ️',
+                success: '✓',
+                error: '✗',
+                warning: '⚠️'
+            };
+            
+            line.textContent = `${icons[type]} ${message}`;
+            log.appendChild(line);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function updateProgress(percent) {
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+
+        async function startDeployment() {
+            // Move to deployment step
+            currentStep = 4;
+            updateStep();
+
+            // Get org details
+            const useExisting = document.querySelector('input[name="orgConnection"]:checked').value === 'existing';
+            const orgAlias = useExisting ? 
+                document.getElementById('orgAlias').value : 
+                document.getElementById('newOrgAlias').value;
+            const orgType = document.getElementById('orgType').value;
+
+            // Show instructions
+                // Determine OS
+            const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+            const isWindows = navigator.platform.toUpperCase().indexOf('WIN') >= 0;
+            
+            addLog('📋 Ready to Deploy!', 'success');
+            addLog('', 'info');
+            
+            if (isMac || navigator.platform.toUpperCase().indexOf('LINUX') >= 0) {
+                addLog('🍎 Mac/Linux Detected - Run this command:', 'info');
+                addLog('', 'info');
+                addLog('   ./deploy.sh', 'warning');
+                addLog('', 'info');
+                addLog('Or simply double-click: deploy.sh', 'info');
+            } else if (isWindows) {
+                addLog('🪟 Windows Detected - Run this command:', 'info');
+                addLog('', 'info');
+                addLog('   deploy.bat', 'warning');
+                addLog('', 'info');
+                addLog('Or simply double-click: deploy.bat', 'info');
+            } else {
+                addLog('Run the appropriate deployment script:', 'info');
+                addLog('   Mac/Linux: ./deploy.sh', 'warning');
+                addLog('   Windows: deploy.bat', 'warning');
+            }
+            
+            addLog('', 'info');
+            addLog('📝 The script will:', 'info');
+            addLog('   ✓ Check if Salesforce CLI is installed', 'success');
+            addLog('   ✓ Open a browser to connect to your org', 'success');
+            addLog('   ✓ Deploy all 40+ components automatically', 'success');
+            addLog('   ✓ Assign permission sets to admins', 'success');
+            addLog('   ✓ Show you what to do next', 'success');
+            addLog('', 'info');
+            addLog('⏱️  Estimated time: 3-5 minutes', 'info');
+            addLog('', 'info');
+            addLog('🚀 Close this window and run the script now!', 'warning');
+
+            // Hide spinner, show button
+            document.getElementById('deploymentSpinner').classList.add('hidden');
+            document.getElementById('deploymentButtons').classList.remove('hidden');
+            updateProgress(100);
+        }
+    </script>
+</body>
+</html>
+

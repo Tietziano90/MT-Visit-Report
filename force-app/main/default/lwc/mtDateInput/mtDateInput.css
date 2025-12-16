@@ -1,0 +1,35 @@
+/*
+================================================================================
+MT RECORD SUGGESTION - Lightning Web Component
+================================================================================
+Author: Michael Tietze, Principal AI Architect
+Contact: mtietze@salesforce.com
+Created: December 2025
+Version: 1.5
+
+COPYRIGHT AND DISTRIBUTION
+Copyright © 2025 Salesforce, Inc. All rights reserved.
+
+INTERNAL USE ONLY - This code may not be shared externally or distributed
+outside of Salesforce without prior written approval from Michael Tietze
+(mtietze@salesforce.com).
+================================================================================
+*/
+
+.mt-date-input {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    display: block;
+    min-width: 0;
+}
+
+/* iOS/WKWebView: encourage the control to respect width without overflow */
+.mt-date-input {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+
+
+
