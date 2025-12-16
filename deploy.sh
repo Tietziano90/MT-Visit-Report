@@ -68,14 +68,68 @@ print_info() {
 deploy_component() {
     local component_name=$1
     local source_path=$2
+    local log_file="/tmp/sf-deploy-$$-$(echo "$component_name" | tr ' ' '_').log"
     
     print_step "Deploying: $component_name"
     
-    if sf project deploy start --target-org "$ORG_ALIAS" --source-dir "$source_path" > /dev/null 2>&1; then
+    # Deploy and capture output with JSON for better parsing
+    if sf project deploy start --target-org "$ORG_ALIAS" --source-dir "$source_path" --json > "$log_file" 2>&1; then
         print_success "$component_name deployed successfully"
+        rm -f "$log_file"
         return 0
     else
         print_error "$component_name deployment failed"
+        echo ""
+        echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e "${YELLOW}Error Details for: ${WHITE}$component_name${NC}"
+        echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        
+        # Try to parse JSON errors
+        if grep -q '"status":' "$log_file"; then
+            # Extract error messages from JSON
+            if grep -q '"message":' "$log_file"; then
+                echo -e "${RED}Error Message:${NC}"
+                grep -o '"message":"[^"]*"' "$log_file" | cut -d'"' -f4 | sed 's/^/  /' | head -10
+                echo ""
+            fi
+            
+            # Extract component failures
+            if grep -q '"componentFailures":' "$log_file"; then
+                echo -e "${RED}Component Failures:${NC}"
+                grep -A 20 '"componentFailures":' "$log_file" | grep -E '(fileName|fullName|problemType|problem)' | sed 's/^/  /' | head -20
+                echo ""
+            fi
+            
+            # Extract line/column numbers
+            if grep -q '"lineNumber":' "$log_file"; then
+                echo -e "${RED}Error Location:${NC}"
+                grep -E '(fileName|lineNumber|columnNumber)' "$log_file" | sed 's/^/  /' | head -10
+                echo ""
+            fi
+        else
+            # Fallback to text parsing
+            if grep -qi "error" "$log_file"; then
+                echo -e "${RED}Error Output:${NC}"
+                grep -i "error" "$log_file" | sed 's/^/  /' | head -10
+                echo ""
+            fi
+            
+            # Show last 15 lines if no specific error found
+            if ! grep -qi "error" "$log_file"; then
+                echo -e "${RED}Deployment Output:${NC}"
+                tail -15 "$log_file" | sed 's/^/  /'
+                echo ""
+            fi
+        fi
+        
+        echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e "${CYAN}Full log saved to: ${WHITE}$log_file${NC}"
+        echo -e "${CYAN}View with: ${WHITE}cat $log_file${NC}"
+        echo ""
+        
+        # Get detailed deployment status
+        get_deployment_status "$component_name"
+        
         return 1
     fi
 }
@@ -92,6 +146,40 @@ check_salesforce_cli() {
         exit 1
     fi
     print_success "Salesforce CLI detected"
+}
+
+get_deployment_status() {
+    local component_name=$1
+    local log_file="/tmp/sf-deploy-status-$$.log"
+    
+    echo ""
+    print_step "Retrieving deployment status for $component_name..."
+    
+    # Get recent deployment status
+    sf project deploy report --target-org "$ORG_ALIAS" > "$log_file" 2>&1
+    
+    if [ -f "$log_file" ]; then
+        echo ""
+        echo -e "${CYAN}Deployment Status:${NC}"
+        echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        
+        # Show status details
+        if grep -q "Status:" "$log_file"; then
+            grep -E "(Status:|Component Failures:|Error Message:)" "$log_file" | sed 's/^/  /'
+        fi
+        
+        # Show component failures
+        if grep -q "Component Failures" "$log_file"; then
+            echo ""
+            echo -e "${YELLOW}Failed Components:${NC}"
+            grep -A 10 "Component Failures" "$log_file" | sed 's/^/  /'
+        fi
+        
+        echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo ""
+        echo -e "${CYAN}Full status report saved to: ${WHITE}$log_file${NC}"
+        echo ""
+    fi
 }
 
 ################################################################################
@@ -486,10 +574,29 @@ echo ""
 if [ ${#FAILED_COMPONENTS[@]} -eq 0 ]; then
     print_success "All components deployed successfully!"
 else
-    print_warning "Some components failed to deploy:"
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    print_error "DEPLOYMENT FAILURES DETECTED"
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${YELLOW}The following components failed to deploy:${NC}"
+    echo ""
     for component in "${FAILED_COMPONENTS[@]}"; do
         echo -e "  ${RED}${CROSS_MARK} $component${NC}"
     done
+    echo ""
+    echo -e "${CYAN}Troubleshooting:${NC}"
+    echo -e "  ${WHITE}1. Check the error logs above for each failed component${NC}"
+    echo -e "  ${WHITE}2. Review deployment logs in /tmp/sf-deploy-*.log${NC}"
+    echo -e "  ${WHITE}3. Common issues:${NC}"
+    echo -e "     ${CYAN}• Missing dependencies (deploy in correct order)${NC}"
+    echo -e "     ${CYAN}• Einstein AI not enabled (for Prompt Templates)${NC}"
+    echo -e "     ${CYAN}• Insufficient permissions${NC}"
+    echo -e "     ${CYAN}• Org limits reached${NC}"
+    echo ""
+    echo -e "${YELLOW}To retry failed components:${NC}"
+    echo -e "  ${WHITE}sf project deploy start --source-dir force-app/main/default/<component-path> --target-org $ORG_ALIAS${NC}"
+    echo ""
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 fi
 
 ################################################################################
