@@ -88,9 +88,100 @@ print_header "${GEAR} CHECKING PREREQUISITES"
 if ! command -v sf &> /dev/null; then
     print_error "Salesforce CLI not found!"
     echo ""
-    echo "Please install Salesforce CLI first:"
+    echo -e "${YELLOW}The Salesforce CLI is required to deploy this app.${NC}"
+    echo ""
+    echo "Would you like to install it now?"
+    echo ""
+    echo -e "${CYAN}Installation options:${NC}"
+    echo ""
+    echo -e "${WHITE}macOS:${NC}"
+    echo "  brew install sf"
+    echo ""
+    echo -e "${WHITE}Windows:${NC}"
+    echo "  Download installer from:"
     echo "  https://developer.salesforce.com/tools/salesforcecli"
-    exit 1
+    echo ""
+    echo -e "${WHITE}Linux:${NC}"
+    echo "  npm install -g @salesforce/cli"
+    echo "  OR download from:"
+    echo "  https://developer.salesforce.com/tools/salesforcecli"
+    echo ""
+    echo -e "${CYAN}Quick install (macOS/Linux with npm):${NC}"
+    echo "  npm install -g @salesforce/cli"
+    echo ""
+    
+    # Detect OS and offer auto-install
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        if command -v brew &> /dev/null; then
+            echo -e "${GREEN}✓ Homebrew detected!${NC}"
+            echo ""
+            if [ -t 0 ]; then
+                read -p "Install Salesforce CLI via Homebrew now? (yes/no): " INSTALL_CLI
+            else
+                read -p "Install Salesforce CLI via Homebrew now? (yes/no): " INSTALL_CLI </dev/tty
+            fi
+            
+            INSTALL_CLI=$(echo "$INSTALL_CLI" | tr '[:upper:]' '[:lower:]' | xargs)
+            
+            if [ "$INSTALL_CLI" = "yes" ] || [ "$INSTALL_CLI" = "y" ]; then
+                echo ""
+                print_step "Installing Salesforce CLI..."
+                brew install sf
+                
+                if command -v sf &> /dev/null; then
+                    print_success "Salesforce CLI installed successfully!"
+                    echo ""
+                else
+                    print_error "Installation failed. Please install manually."
+                    exit 1
+                fi
+            else
+                echo ""
+                echo "Please install Salesforce CLI and run this script again."
+                exit 1
+            fi
+        else
+            echo -e "${YELLOW}Homebrew not found. Install Homebrew first:${NC}"
+            echo "  /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+            echo ""
+            echo "Then run: brew install sf"
+            exit 1
+        fi
+    elif command -v npm &> /dev/null; then
+        # Has npm (Linux/Windows)
+        echo -e "${GREEN}✓ npm detected!${NC}"
+        echo ""
+        if [ -t 0 ]; then
+            read -p "Install Salesforce CLI via npm now? (yes/no): " INSTALL_CLI
+        else
+            read -p "Install Salesforce CLI via npm now? (yes/no): " INSTALL_CLI </dev/tty
+        fi
+        
+        INSTALL_CLI=$(echo "$INSTALL_CLI" | tr '[:upper:]' '[:lower:]' | xargs)
+        
+        if [ "$INSTALL_CLI" = "yes" ] || [ "$INSTALL_CLI" = "y" ]; then
+            echo ""
+            print_step "Installing Salesforce CLI..."
+            npm install -g @salesforce/cli
+            
+            if command -v sf &> /dev/null; then
+                print_success "Salesforce CLI installed successfully!"
+                echo ""
+            else
+                print_error "Installation failed. Please install manually."
+                exit 1
+            fi
+        else
+            echo ""
+            echo "Please install Salesforce CLI and run this script again."
+            exit 1
+        fi
+    else
+        echo ""
+        echo "Please install Salesforce CLI manually and run this script again."
+        exit 1
+    fi
 fi
 print_success "Salesforce CLI detected"
 
@@ -98,9 +189,75 @@ print_success "Salesforce CLI detected"
 if ! command -v git &> /dev/null; then
     print_error "Git not found!"
     echo ""
-    echo "Please install Git first:"
+    echo -e "${YELLOW}Git is required to download the deployment code.${NC}"
+    echo ""
+    echo -e "${CYAN}Installation options:${NC}"
+    echo ""
+    echo -e "${WHITE}macOS:${NC}"
+    echo "  brew install git"
+    echo "  OR install Xcode Command Line Tools:"
+    echo "  xcode-select --install"
+    echo ""
+    echo -e "${WHITE}Windows:${NC}"
+    echo "  Download installer from:"
     echo "  https://git-scm.com/downloads"
-    exit 1
+    echo ""
+    echo -e "${WHITE}Linux:${NC}"
+    echo "  sudo apt-get install git  (Ubuntu/Debian)"
+    echo "  sudo yum install git       (CentOS/RHEL)"
+    echo ""
+    
+    # Detect OS and offer auto-install
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS
+        if command -v brew &> /dev/null; then
+            echo -e "${GREEN}✓ Homebrew detected!${NC}"
+            echo ""
+            if [ -t 0 ]; then
+                read -p "Install Git via Homebrew now? (yes/no): " INSTALL_GIT
+            else
+                read -p "Install Git via Homebrew now? (yes/no): " INSTALL_GIT </dev/tty
+            fi
+            
+            INSTALL_GIT=$(echo "$INSTALL_GIT" | tr '[:upper:]' '[:lower:]' | xargs)
+            
+            if [ "$INSTALL_GIT" = "yes" ] || [ "$INSTALL_GIT" = "y" ]; then
+                echo ""
+                print_step "Installing Git..."
+                brew install git
+                
+                if command -v git &> /dev/null; then
+                    print_success "Git installed successfully!"
+                    echo ""
+                else
+                    print_error "Installation failed. Please install manually."
+                    exit 1
+                fi
+            else
+                echo ""
+                echo "Please install Git and run this script again."
+                exit 1
+            fi
+        else
+            echo ""
+            echo "Please install Git manually and run this script again."
+            exit 1
+        fi
+    elif command -v apt-get &> /dev/null; then
+        # Ubuntu/Debian
+        echo -e "${YELLOW}Run this command to install Git:${NC}"
+        echo "  sudo apt-get update && sudo apt-get install -y git"
+        exit 1
+    elif command -v yum &> /dev/null; then
+        # CentOS/RHEL
+        echo -e "${YELLOW}Run this command to install Git:${NC}"
+        echo "  sudo yum install -y git"
+        exit 1
+    else
+        echo ""
+        echo "Please install Git manually and run this script again."
+        exit 1
+    fi
 fi
 print_success "Git detected"
 
