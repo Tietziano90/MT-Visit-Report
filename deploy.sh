@@ -140,7 +140,11 @@ check_salesforce_cli
 # Get org alias
 echo ""
 print_info "Enter your Salesforce org alias (or press Enter to create a new connection):"
-read -p "Org Alias: " ORG_ALIAS
+if [ -t 0 ]; then
+    read -p "Org Alias: " ORG_ALIAS
+else
+    read -p "Org Alias: " ORG_ALIAS </dev/tty
+fi
 
 if [ -z "$ORG_ALIAS" ]; then
     print_warning "No alias provided. Let's connect to your org..."
@@ -149,9 +153,19 @@ if [ -z "$ORG_ALIAS" ]; then
     echo -e "${WHITE}  1) Production/Developer Org${NC}"
     echo -e "${WHITE}  2) Sandbox${NC}"
     echo -e "${WHITE}  3) Scratch Org${NC}"
-    read -p "Enter choice (1-3): " ORG_TYPE
     
-    read -p "Enter alias for this org: " ORG_ALIAS
+    # Read from terminal even if stdin is piped
+    if [ -t 0 ]; then
+        read -p "Enter choice (1-3): " ORG_TYPE
+    else
+        read -p "Enter choice (1-3): " ORG_TYPE </dev/tty
+    fi
+    
+    if [ -t 0 ]; then
+        read -p "Enter alias for this org: " ORG_ALIAS
+    else
+        read -p "Enter alias for this org: " ORG_ALIAS </dev/tty
+    fi
     
     case $ORG_TYPE in
         1)
@@ -211,7 +225,11 @@ echo ""
 print_warning "This will deploy MT Voice Assistant to: $ORG_ALIAS"
 echo ""
 print_info "Type 'yes' to continue or 'no' to cancel"
-read -p "Continue? (yes/no): " CONFIRM
+if [ -t 0 ]; then
+    read -p "Continue? (yes/no): " CONFIRM
+else
+    read -p "Continue? (yes/no): " CONFIRM </dev/tty
+fi
 
 # Convert to lowercase and trim whitespace
 CONFIRM=$(echo "$CONFIRM" | tr '[:upper:]' '[:lower:]' | xargs)
