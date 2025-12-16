@@ -137,8 +137,6 @@ echo "  • Deploy all components (~3-5 minutes)"
 echo "  • Assign permissions to admins"
 echo ""
 
-read -p "Press Enter to continue or Ctrl+C to cancel..."
-
 # Run the deployment script
 chmod +x "$TEMP_DIR/deploy.sh"
 "$TEMP_DIR/deploy.sh"

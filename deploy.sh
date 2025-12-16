@@ -510,7 +510,12 @@ ORG_INSTANCE_URL=$(sf org display --target-org "$ORG_ALIAS" --json 2>/dev/null |
 
 if [ -z "$ORG_INSTANCE_URL" ]; then
     # Fallback: try without JSON
-    ORG_INSTANCE_URL=$(sf org display --target-org "$ORG_ALIAS" 2>/dev/null | grep "Instance Url" | awk '{print $3}')
+    ORG_INSTANCE_URL=$(sf org display --target-org "$ORG_ALIAS" 2>/dev/null | grep "Instance Url" | awk '{print $NF}')
+fi
+
+if [ -z "$ORG_INSTANCE_URL" ]; then
+    # Fallback: try with different grep pattern
+    ORG_INSTANCE_URL=$(sf org display --target-org "$ORG_ALIAS" 2>/dev/null | grep -i "instance" | grep -o 'https://[^[:space:]]*' | head -1)
 fi
 
 if [ ! -z "$ORG_INSTANCE_URL" ]; then
