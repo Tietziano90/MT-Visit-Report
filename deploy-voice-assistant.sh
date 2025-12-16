@@ -159,6 +159,32 @@ if [ $DEPLOY_STATUS -eq 0 ]; then
     echo "  2. Access 'Voice Assistant Setup' from App Launcher"
     echo "  3. Test on an Account record"
     echo ""
+    
+    # Open the setup page automatically
+    echo -e "${CYAN}Opening Voice Assistant Setup page...${NC}"
+    
+    # Get the org's instance URL
+    ORG_URL=$(sf org display --json 2>/dev/null | grep -o '"instanceUrl":"[^"]*"' | cut -d'"' -f4)
+    
+    if [ ! -z "$ORG_URL" ]; then
+        # Open the Lightning page for MT Voice Assistant Admin
+        SETUP_URL="${ORG_URL}/lightning/n/MT_Voice_Assistant_Settings"
+        
+        # Open in default browser
+        if command -v open &> /dev/null; then
+            # macOS
+            open "$SETUP_URL" &> /dev/null
+        elif command -v xdg-open &> /dev/null; then
+            # Linux
+            xdg-open "$SETUP_URL" &> /dev/null
+        elif command -v start &> /dev/null; then
+            # Windows (Git Bash)
+            start "$SETUP_URL" &> /dev/null
+        fi
+        
+        print_success "Setup page opened in your browser"
+        echo ""
+    fi
 else
     echo -e "${YELLOW}⚠️  Deployment completed with warnings${NC}"
     echo ""

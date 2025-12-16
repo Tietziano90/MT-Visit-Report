@@ -464,6 +464,36 @@ echo -e "   ${CYAN}• Navigate to an Account record${NC}"
 echo -e "   ${CYAN}• Run the MT_Visit_Report_MultiModal flow${NC}"
 echo ""
 
+################################################################################
+# OPEN SETUP PAGE AUTOMATICALLY
+################################################################################
+
+echo -e "${CYAN}Opening Voice Assistant Setup page in your browser...${NC}"
+echo ""
+
+# Get the org's instance URL
+ORG_INSTANCE_URL=$(sf org display --target-org "$ORG_ALIAS" --json 2>/dev/null | grep -o '"instanceUrl":"[^"]*"' | cut -d'"' -f4)
+
+if [ ! -z "$ORG_INSTANCE_URL" ]; then
+    # Open the Lightning page for MT Voice Assistant Admin
+    SETUP_PAGE_URL="${ORG_INSTANCE_URL}/lightning/n/MT_Voice_Assistant_Settings"
+    
+    # Open in default browser (cross-platform)
+    if command -v open &> /dev/null; then
+        # macOS
+        open "$SETUP_PAGE_URL" &> /dev/null &
+    elif command -v xdg-open &> /dev/null; then
+        # Linux
+        xdg-open "$SETUP_PAGE_URL" &> /dev/null &
+    elif command -v start &> /dev/null; then
+        # Windows (Git Bash)
+        start "$SETUP_PAGE_URL" &> /dev/null &
+    fi
+    
+    print_success "Setup page opened in your browser!"
+    echo ""
+fi
+
 print_header "${ROCKET} DEPLOYMENT WIZARD COMPLETE"
 
 echo -e "${GREEN}Thank you for using MT Voice Assistant!${NC}"
