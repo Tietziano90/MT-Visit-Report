@@ -16,7 +16,7 @@
  * ============================================================================
  */
 @isTest
-public class mt_GetObjectConfigForPromptTest {
+private class mt_GetObjectConfigForPromptTest {
 
     /**
      * @description Test successful config retrieval with existing config
@@ -29,9 +29,9 @@ public class mt_GetObjectConfigForPromptTest {
         
         List<mt_GetObjectConfigForPrompt.ConfigInput> inputs = new List<mt_GetObjectConfigForPrompt.ConfigInput>{ input };
         
-        Test.startTest();
+        System.Test.startTest();
         List<mt_GetObjectConfigForPrompt.ConfigOutput> outputs = mt_GetObjectConfigForPrompt.getObjectConfigForPrompt(inputs);
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(1, outputs.size(), 'Should return one output');
         System.assertEquals(true, outputs[0].success, 'Should be successful');
@@ -48,9 +48,9 @@ public class mt_GetObjectConfigForPromptTest {
         
         List<mt_GetObjectConfigForPrompt.ConfigInput> inputs = new List<mt_GetObjectConfigForPrompt.ConfigInput>{ input };
         
-        Test.startTest();
+        System.Test.startTest();
         List<mt_GetObjectConfigForPrompt.ConfigOutput> outputs = mt_GetObjectConfigForPrompt.getObjectConfigForPrompt(inputs);
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(1, outputs.size(), 'Should return one output');
         System.assertEquals(true, outputs[0].success, 'Should be successful with default config');
@@ -70,9 +70,9 @@ public class mt_GetObjectConfigForPromptTest {
         
         List<mt_GetObjectConfigForPrompt.ConfigInput> inputs = new List<mt_GetObjectConfigForPrompt.ConfigInput>{ input1, input2 };
         
-        Test.startTest();
+        System.Test.startTest();
         List<mt_GetObjectConfigForPrompt.ConfigOutput> outputs = mt_GetObjectConfigForPrompt.getObjectConfigForPrompt(inputs);
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(2, outputs.size(), 'Should return two outputs');
     }
@@ -87,9 +87,9 @@ public class mt_GetObjectConfigForPromptTest {
         
         List<mt_GetObjectConfigForPrompt.ConfigInput> inputs = new List<mt_GetObjectConfigForPrompt.ConfigInput>{ input };
         
-        Test.startTest();
+        System.Test.startTest();
         List<mt_GetObjectConfigForPrompt.ConfigOutput> outputs = mt_GetObjectConfigForPrompt.getObjectConfigForPrompt(inputs);
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(1, outputs.size(), 'Should return one output');
         // Should still succeed with default config
@@ -101,9 +101,9 @@ public class mt_GetObjectConfigForPromptTest {
      */
     @isTest
     static void testGetConfig_WithValidConfig() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_GetObjectConfigForPrompt.getConfig('Default');
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, result, 'Result should not be null');
         System.assertEquals(true, result.get('success'), 'Should be successful');
@@ -115,9 +115,9 @@ public class mt_GetObjectConfigForPromptTest {
      */
     @isTest
     static void testGetConfig_WithNullConfig() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_GetObjectConfigForPrompt.getConfig(null);
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, result, 'Result should not be null');
         // Should default to 'Default' config
@@ -129,9 +129,9 @@ public class mt_GetObjectConfigForPromptTest {
      */
     @isTest
     static void testGetConfig_WithEmptyConfig() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_GetObjectConfigForPrompt.getConfig('');
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, result, 'Result should not be null');
         // Should default to 'Default' config
@@ -143,9 +143,9 @@ public class mt_GetObjectConfigForPromptTest {
      */
     @isTest
     static void testGetConfig_WithNonExistentConfig() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_GetObjectConfigForPrompt.getConfig('NonExistent_' + System.now().getTime());
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, result, 'Result should not be null');
         // Should still succeed with default/fallback config

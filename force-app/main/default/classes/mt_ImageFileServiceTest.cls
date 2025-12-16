@@ -19,7 +19,7 @@ private class mt_ImageFileServiceTest {
     
     @isTest
     static void testCreateImageDocument() {
-        Test.startTest();
+        System.Test.startTest();
         
         ContentDocument doc = mt_ImageFileService.createImageDocument(
             TEST_IMAGE_BASE64,
@@ -27,7 +27,7 @@ private class mt_ImageFileServiceTest {
             'image/png'
         );
         
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, doc, 'ContentDocument should be created');
         System.assertNotEquals(null, doc.Id, 'ContentDocument should have an Id');
@@ -36,7 +36,7 @@ private class mt_ImageFileServiceTest {
     
     @isTest
     static void testCreateImageDocumentWithNullData() {
-        Test.startTest();
+        System.Test.startTest();
         
         ContentDocument doc = mt_ImageFileService.createImageDocument(
             null,
@@ -44,14 +44,14 @@ private class mt_ImageFileServiceTest {
             'image/png'
         );
         
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(null, doc, 'Should return null for null data');
     }
     
     @isTest
     static void testCreateImageDocumentWithEmptyData() {
-        Test.startTest();
+        System.Test.startTest();
         
         ContentDocument doc = mt_ImageFileService.createImageDocument(
             '',
@@ -59,7 +59,7 @@ private class mt_ImageFileServiceTest {
             'image/png'
         );
         
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(null, doc, 'Should return null for empty data');
     }
@@ -73,11 +73,11 @@ private class mt_ImageFileServiceTest {
         
         List<mt_ImageFileService.ImageDocumentRequest> requests = new List<mt_ImageFileService.ImageDocumentRequest>{ request };
         
-        Test.startTest();
+        System.Test.startTest();
         
         List<mt_ImageFileService.ImageDocumentResult> results = mt_ImageFileService.createImageDocuments(requests);
         
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(1, results.size(), 'Should return one result');
         System.assertEquals(true, results[0].success, 'Should be successful');
@@ -93,11 +93,11 @@ private class mt_ImageFileServiceTest {
         
         List<mt_ImageFileService.ImageDocumentRequest> requests = new List<mt_ImageFileService.ImageDocumentRequest>{ request };
         
-        Test.startTest();
+        System.Test.startTest();
         
         List<mt_ImageFileService.ImageDocumentResult> results = mt_ImageFileService.createImageDocuments(requests);
         
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(1, results.size(), 'Should return one result');
         System.assertEquals(true, results[0].success, 'Should be successful (no image is OK)');
@@ -114,11 +114,11 @@ private class mt_ImageFileServiceTest {
         
         Id docId = doc.Id;
         
-        Test.startTest();
+        System.Test.startTest();
         
         mt_ImageFileService.deleteImageDocument(docId);
         
-        Test.stopTest();
+        System.Test.stopTest();
         
         List<ContentDocument> remaining = [SELECT Id FROM ContentDocument WHERE Id = :docId];
         System.assertEquals(0, remaining.size(), 'Document should be deleted');
@@ -126,12 +126,12 @@ private class mt_ImageFileServiceTest {
     
     @isTest
     static void testDeleteImageDocumentWithNull() {
-        Test.startTest();
+        System.Test.startTest();
         
         // Should not throw exception
         mt_ImageFileService.deleteImageDocument(null);
         
-        Test.stopTest();
+        System.Test.stopTest();
         
         // If we get here, test passed
         System.assert(true, 'Should handle null without exception');
@@ -142,7 +142,7 @@ private class mt_ImageFileServiceTest {
         // Test multi-file JSON format (backwards compatibility)
         String multiFileJson = '[{"base64":"' + TEST_IMAGE_BASE64 + '","fileName":"multi_test.png","mimeType":"image/png"}]';
         
-        Test.startTest();
+        System.Test.startTest();
         
         ContentDocument doc = mt_ImageFileService.createImageDocument(
             multiFileJson,
@@ -150,7 +150,7 @@ private class mt_ImageFileServiceTest {
             'application/json+multifile'
         );
         
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals(null, doc, 'ContentDocument should be created from multi-file format');
         System.assertEquals('multi_test.png', doc.Title, 'Should use filename from JSON');
@@ -161,7 +161,7 @@ private class mt_ImageFileServiceTest {
         // Test empty multi-file array
         String emptyMultiFileJson = '[]';
         
-        Test.startTest();
+        System.Test.startTest();
         
         ContentDocument doc = mt_ImageFileService.createImageDocument(
             emptyMultiFileJson,
@@ -169,7 +169,7 @@ private class mt_ImageFileServiceTest {
             'application/json+multifile'
         );
         
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(null, doc, 'Should return null for empty multi-file array');
     }
@@ -179,7 +179,7 @@ private class mt_ImageFileServiceTest {
         // Test invalid JSON format
         String invalidJson = 'not valid json';
         
-        Test.startTest();
+        System.Test.startTest();
         
         try {
             ContentDocument doc = mt_ImageFileService.createImageDocument(
@@ -192,7 +192,7 @@ private class mt_ImageFileServiceTest {
             System.assert(e.getMessage().contains('Invalid multi-file format'), 'Should throw proper error');
         }
         
-        Test.stopTest();
+        System.Test.stopTest();
     }
     
     @isTest
@@ -205,11 +205,11 @@ private class mt_ImageFileServiceTest {
         
         List<mt_ImageFileService.ImageDocumentRequest> requests = new List<mt_ImageFileService.ImageDocumentRequest>{ request };
         
-        Test.startTest();
+        System.Test.startTest();
         
         List<mt_ImageFileService.ImageDocumentResult> results = mt_ImageFileService.createImageDocuments(requests);
         
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(1, results.size(), 'Should return one result');
         System.assertEquals(false, results[0].success, 'Should be unsuccessful');
@@ -219,7 +219,7 @@ private class mt_ImageFileServiceTest {
     @isTest
     static void testCreateImageDocumentWithInvalidBase64() {
         // Test invalid base64 data
-        Test.startTest();
+        System.Test.startTest();
         
         try {
             ContentDocument doc = mt_ImageFileService.createImageDocument(
@@ -232,6 +232,6 @@ private class mt_ImageFileServiceTest {
             System.assert(e.getMessage().contains('Failed to process image'), 'Should throw proper error');
         }
         
-        Test.stopTest();
+        System.Test.stopTest();
     }
 }

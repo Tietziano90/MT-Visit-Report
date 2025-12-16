@@ -32,10 +32,10 @@ private class mt_FileCombinerServiceTest {
         input.filesJson = JSON.serialize(files);
         input.combinationType = 'IMAGE_GRID';
         
-        Test.startTest();
+        System.Test.startTest();
         List<mt_FileCombinerService.CombineFilesOutput> outputs = 
             mt_FileCombinerService.combineFiles(new List<mt_FileCombinerService.CombineFilesInput>{ input });
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(1, outputs.size(), 'Should return one output');
         System.assertEquals(true, outputs[0].success, 'Should succeed');
@@ -58,10 +58,10 @@ private class mt_FileCombinerServiceTest {
         
         input.filesJson = JSON.serialize(files);
         
-        Test.startTest();
+        System.Test.startTest();
         List<mt_FileCombinerService.CombineFilesOutput> outputs = 
             mt_FileCombinerService.combineFiles(new List<mt_FileCombinerService.CombineFilesInput>{ input });
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, outputs[0].success, 'Should succeed');
         System.assertEquals(3, outputs[0].fileCount, 'Should have 3 files');
@@ -72,10 +72,10 @@ private class mt_FileCombinerServiceTest {
         mt_FileCombinerService.CombineFilesInput input = new mt_FileCombinerService.CombineFilesInput();
         input.filesJson = '';
         
-        Test.startTest();
+        System.Test.startTest();
         List<mt_FileCombinerService.CombineFilesOutput> outputs = 
             mt_FileCombinerService.combineFiles(new List<mt_FileCombinerService.CombineFilesInput>{ input });
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, outputs[0].success, 'Should fail with empty input');
         System.assertNotEquals(null, outputs[0].errorMessage, 'Should have error message');
@@ -96,10 +96,10 @@ private class mt_FileCombinerServiceTest {
         
         input.filesJson = JSON.serialize(files);
         
-        Test.startTest();
+        System.Test.startTest();
         List<mt_FileCombinerService.CombineFilesOutput> outputs = 
             mt_FileCombinerService.combineFiles(new List<mt_FileCombinerService.CombineFilesInput>{ input });
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(false, outputs[0].success, 'Should fail with too many files');
         System.assert(outputs[0].errorMessage.contains('Maximum'), 'Should mention maximum limit');
@@ -116,9 +116,9 @@ private class mt_FileCombinerServiceTest {
         
         String filesJson = JSON.serialize(files);
         
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_FileCombinerService.validateFiles(filesJson);
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, result.get('success'), 'Validation should succeed');
         System.assertEquals(1, result.get('fileCount'), 'Should count 1 file');
@@ -148,10 +148,10 @@ private class mt_FileCombinerServiceTest {
         input.filesJson = JSON.serialize(files);
         input.combinationType = 'PDF_MERGE';
         
-        Test.startTest();
+        System.Test.startTest();
         List<mt_FileCombinerService.CombineFilesOutput> outputs = 
             mt_FileCombinerService.combineFiles(new List<mt_FileCombinerService.CombineFilesInput>{ input });
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals(true, outputs[0].success, 'Should succeed');
         System.assertEquals(2, outputs[0].fileCount, 'Should have 2 files');

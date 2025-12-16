@@ -19,7 +19,7 @@
  * ============================================================================
  */
 @isTest
-public class mt_TranscribeControllerTest {
+private class mt_TranscribeControllerTest {
 
     @TestSetup
     static void setupTestData() {
@@ -75,9 +75,9 @@ public class mt_TranscribeControllerTest {
         String mockResponse = JSON.serialize(mockResponseMap);
         Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
         
-        Test.startTest();
+        System.Test.startTest();
         String accessToken = mt_TranscribeController.getAccessToken();
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertEquals('mockResponseToken', accessToken, 'Access token should match');
     }
@@ -87,9 +87,9 @@ public class mt_TranscribeControllerTest {
         String mockResponse = JSON.serialize(new Map<String,Object>{});
         Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
         
-        Test.startTest();
+        System.Test.startTest();
         String accessToken = mt_TranscribeController.getAccessToken();
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.assertNotEquals('mockResponseToken', accessToken);
     }
@@ -102,9 +102,9 @@ public class mt_TranscribeControllerTest {
         });
         Test.setMock(HttpCalloutMock.class, new MockHttpResponse(401, mockResponse));
         
-        Test.startTest();
+        System.Test.startTest();
         String accessToken = mt_TranscribeController.getAccessToken();
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNull(accessToken, 'Should return null on failure');
     }
@@ -114,9 +114,9 @@ public class mt_TranscribeControllerTest {
         String mockResponse = JSON.serialize(new Map<String,Object>{ 'access_token' => 1234 });
         Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
         
-        Test.startTest();
+        System.Test.startTest();
         String accessToken = mt_TranscribeController.getAccessToken();
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNull(accessToken, 'Should return null on exception');
     }
@@ -125,18 +125,18 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetBaseUrl() {
-        Test.startTest();
+        System.Test.startTest();
         String baseUrl = mt_TranscribeController.getBaseUrl();
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(baseUrl, 'Base URL should not be null');
     }
 
     @isTest
     static void testGetOrgDomainUrl() {
-        Test.startTest();
+        System.Test.startTest();
         String domainUrl = mt_TranscribeController.getOrgDomainUrl();
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(domainUrl, 'Domain URL should not be null');
     }
@@ -145,19 +145,19 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetConfig_Default() {
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.VoiceAssistantConfigResult config = mt_TranscribeController.getConfig('Default');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(config, 'Config result should not be null');
     }
 
     @isTest
     static void testGetConfig_NotFound() {
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.VoiceAssistantConfigResult config = 
             mt_TranscribeController.getConfig('NonExistent_' + System.now().getTime());
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(config, 'Config result should not be null');
         // Method may return a default config or error - just verify it handles gracefully
@@ -166,55 +166,55 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetConfig_Null() {
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.VoiceAssistantConfigResult config = mt_TranscribeController.getConfig(null);
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(config, 'Config result should not be null');
     }
 
     @isTest
     static void testGetConfig_Empty() {
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.VoiceAssistantConfigResult config = mt_TranscribeController.getConfig('');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(config, 'Config result should not be null');
     }
 
     @isTest
     static void testGetAllConfigs() {
-        Test.startTest();
+        System.Test.startTest();
         List<mt_TranscribeController.VoiceAssistantConfigResult> configs = mt_TranscribeController.getAllConfigs();
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(configs, 'Configs list should not be null');
     }
 
     @isTest
     static void testGetObjectConfigs() {
-        Test.startTest();
+        System.Test.startTest();
         List<mt_TranscribeController.ObjectConfigResult> configs = mt_TranscribeController.getObjectConfigs('Default');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(configs, 'Object configs should not be null');
     }
 
     @isTest
     static void testGetObjectConfigs_Empty() {
-        Test.startTest();
+        System.Test.startTest();
         List<mt_TranscribeController.ObjectConfigResult> configs = mt_TranscribeController.getObjectConfigs('');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(configs, 'Object configs should not be null');
     }
 
     @isTest
     static void testGetObjectConfig() {
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.ObjectConfigResult config = 
             mt_TranscribeController.getObjectConfig('Default', 'Opportunity');
-        Test.stopTest();
+        System.Test.stopTest();
         
         // May or may not exist - just verify no exception
         System.debug('Config: ' + config);
@@ -222,10 +222,10 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetObjectConfig_NullParams() {
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.ObjectConfigResult config = 
             mt_TranscribeController.getObjectConfig(null, null);
-        Test.stopTest();
+        System.Test.stopTest();
         
         // Should handle nulls gracefully
         System.debug('Config: ' + config);
@@ -235,9 +235,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetAvailableObjects() {
-        Test.startTest();
+        System.Test.startTest();
         List<Map<String, String>> objects = mt_TranscribeController.getAvailableObjects();
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(objects, 'Objects list should not be null');
         Assert.isTrue(objects.size() > 0, 'Should have objects');
@@ -251,9 +251,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetObjectDescribe_Account() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getObjectDescribe('Account');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isTrue((Boolean)result.get('success'), 'Should be successful');
@@ -262,9 +262,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetObjectDescribe_Contact() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getObjectDescribe('Contact');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isTrue((Boolean)result.get('success'), 'Should be successful');
@@ -272,9 +272,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetObjectDescribe_Opportunity() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getObjectDescribe('Opportunity');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isTrue((Boolean)result.get('success'), 'Should be successful');
@@ -282,18 +282,18 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetObjectDescribe_Task() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getObjectDescribe('Task');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
     }
 
     @isTest
     static void testGetObjectDescribe_Invalid() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getObjectDescribe('InvalidObject__xyz');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isFalse((Boolean)result.get('success'), 'Should not be successful');
@@ -301,9 +301,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetObjectDescribe_Null() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getObjectDescribe(null);
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isFalse((Boolean)result.get('success'), 'Should not be successful');
@@ -315,9 +315,9 @@ public class mt_TranscribeControllerTest {
     static void testGetRelatedAccount_FromAccount() {
         Account acc = [SELECT Id FROM Account LIMIT 1];
         
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.RelatedAccountResult result = mt_TranscribeController.getRelatedAccount(acc.Id);
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isTrue(result.success, 'Should find account');
@@ -329,9 +329,9 @@ public class mt_TranscribeControllerTest {
     static void testGetRelatedAccount_FromContact() {
         Contact con = [SELECT Id, AccountId FROM Contact LIMIT 1];
         
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.RelatedAccountResult result = mt_TranscribeController.getRelatedAccount(con.Id);
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isTrue(result.success, 'Should find account');
@@ -342,9 +342,9 @@ public class mt_TranscribeControllerTest {
     static void testGetRelatedAccount_FromOpportunity() {
         Opportunity opp = [SELECT Id, AccountId FROM Opportunity LIMIT 1];
         
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.RelatedAccountResult result = mt_TranscribeController.getRelatedAccount(opp.Id);
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isTrue(result.success, 'Should find account');
@@ -357,9 +357,9 @@ public class mt_TranscribeControllerTest {
     static void testGetRelatedAccount_FromLead() {
         Lead l = [SELECT Id FROM Lead LIMIT 1];
         
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.RelatedAccountResult result = mt_TranscribeController.getRelatedAccount(l.Id);
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         // Lead may not have account
@@ -369,18 +369,18 @@ public class mt_TranscribeControllerTest {
     static void testGetRelatedAccount_FromTask() {
         Task t = [SELECT Id, WhatId FROM Task LIMIT 1];
         
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.RelatedAccountResult result = mt_TranscribeController.getRelatedAccount(t.Id);
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
     }
 
     @isTest
     static void testGetRelatedAccount_InvalidId() {
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.RelatedAccountResult result = mt_TranscribeController.getRelatedAccount('invalid');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isFalse(result.success, 'Should not find account');
@@ -388,9 +388,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetRelatedAccount_NullId() {
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.RelatedAccountResult result = mt_TranscribeController.getRelatedAccount(null);
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isFalse(result.success, 'Should not find account');
@@ -400,9 +400,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testIsAdminUser() {
-        Test.startTest();
+        System.Test.startTest();
         Boolean isAdmin = mt_TranscribeController.isAdminUser();
-        Test.stopTest();
+        System.Test.stopTest();
         
         // Just verify it doesn't throw
         System.debug('Is admin: ' + isAdmin);
@@ -413,9 +413,9 @@ public class mt_TranscribeControllerTest {
         String mockResponse = JSON.serialize(new Map<String,Object>{ 'access_token' => 'mockToken' });
         Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
         
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.ConnectionTestResult result = mt_TranscribeController.testEinsteinConnection();
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
     }
@@ -425,18 +425,18 @@ public class mt_TranscribeControllerTest {
         String mockResponse = JSON.serialize(new Map<String,Object>{ 'error' => 'failed' });
         Test.setMock(HttpCalloutMock.class, new MockHttpResponse(401, mockResponse));
         
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.ConnectionTestResult result = mt_TranscribeController.testEinsteinConnection();
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
     }
 
     @isTest
     static void testSaveOpenAIApiKey() {
-        Test.startTest();
+        System.Test.startTest();
         Boolean result = mt_TranscribeController.saveOpenAIApiKey('test-api-key-12345');
-        Test.stopTest();
+        System.Test.stopTest();
         
         // May succeed or fail depending on permissions
         System.debug('Save result: ' + result);
@@ -444,18 +444,18 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testSaveOpenAIApiKey_Empty() {
-        Test.startTest();
+        System.Test.startTest();
         Boolean result = mt_TranscribeController.saveOpenAIApiKey('');
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.debug('Save result: ' + result);
     }
 
     @isTest
     static void testSaveOpenAIApiKey_Null() {
-        Test.startTest();
+        System.Test.startTest();
         Boolean result = mt_TranscribeController.saveOpenAIApiKey(null);
-        Test.stopTest();
+        System.Test.stopTest();
         
         System.debug('Save result: ' + result);
     }
@@ -467,10 +467,10 @@ public class mt_TranscribeControllerTest {
         String mockResponse = JSON.serialize(new Map<String,Object>{ 'text' => 'Test transcription' });
         Test.setMock(HttpCalloutMock.class, new MockHttpResponse(200, mockResponse));
         
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.TranscriptionResult result = 
             mt_TranscribeController.transcribeWithWhisper('base64audiodata', 'Default');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
     }
@@ -480,20 +480,20 @@ public class mt_TranscribeControllerTest {
         String mockResponse = JSON.serialize(new Map<String,Object>{ 'error' => 'API Error' });
         Test.setMock(HttpCalloutMock.class, new MockHttpResponse(500, mockResponse));
         
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.TranscriptionResult result = 
             mt_TranscribeController.transcribeWithWhisper('base64audiodata', 'Default');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
     }
 
     @isTest
     static void testTranscribeWithWhisper_NullAudio() {
-        Test.startTest();
+        System.Test.startTest();
         mt_TranscribeController.TranscriptionResult result = 
             mt_TranscribeController.transcribeWithWhisper(null, 'Default');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isFalse(result.success, 'Should fail for null audio');
@@ -503,9 +503,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetObjectLayouts_Account() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getObjectLayouts('Account');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isTrue((Boolean)result.get('success'), 'Should be successful');
@@ -514,9 +514,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetObjectLayouts_Contact() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getObjectLayouts('Contact');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isTrue((Boolean)result.get('success'), 'Should be successful');
@@ -524,9 +524,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetObjectLayouts_Invalid() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getObjectLayouts('InvalidObject__xyz');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isFalse((Boolean)result.get('success'), 'Should not be successful');
@@ -534,9 +534,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetObjectLayouts_Null() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getObjectLayouts(null);
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isFalse((Boolean)result.get('success'), 'Should not be successful');
@@ -544,9 +544,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetFieldsForLayout_AllCreateable() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getFieldsForLayout('Account', 'ALL_CREATEABLE');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isTrue((Boolean)result.get('success'), 'Should be successful');
@@ -558,9 +558,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetFieldsForLayout_AllUpdateable() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getFieldsForLayout('Contact', 'ALL_UPDATEABLE');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isTrue((Boolean)result.get('success'), 'Should be successful');
@@ -568,9 +568,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetFieldsForLayout_RequiredOnly() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getFieldsForLayout('Opportunity', 'REQUIRED_ONLY');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isTrue((Boolean)result.get('success'), 'Should be successful');
@@ -579,9 +579,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetFieldsForLayout_CommonFields() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getFieldsForLayout('Lead', 'COMMON_FIELDS');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isTrue((Boolean)result.get('success'), 'Should be successful');
@@ -589,9 +589,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetFieldsForLayout_InvalidObject() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getFieldsForLayout('InvalidObject__xyz', 'ALL_CREATEABLE');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isFalse((Boolean)result.get('success'), 'Should not be successful');
@@ -599,9 +599,9 @@ public class mt_TranscribeControllerTest {
 
     @isTest
     static void testGetFieldsForLayout_NullObject() {
-        Test.startTest();
+        System.Test.startTest();
         Map<String, Object> result = mt_TranscribeController.getFieldsForLayout(null, 'ALL_CREATEABLE');
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
         Assert.isFalse((Boolean)result.get('success'), 'Should not be successful');

@@ -17,7 +17,7 @@
  * ============================================================================
  */
 @isTest
-public class mt_ConfigMetadataServiceTest {
+private class mt_ConfigMetadataServiceTest {
 
     /**
      * @description Test saving a new config via Metadata API
@@ -38,9 +38,9 @@ public class mt_ConfigMetadataServiceTest {
         };
         String configJson = JSON.serialize(configData);
         
-        Test.startTest();
+        System.Test.startTest();
         String result = mt_ConfigMetadataService.saveConfiguration(configJson);
-        Test.stopTest();
+        System.Test.stopTest();
         
         // Metadata API is async, so we just verify the method doesn't throw
         Assert.isNotNull(result, 'Should return a result');
@@ -59,9 +59,9 @@ public class mt_ConfigMetadataServiceTest {
         };
         String configJson = JSON.serialize(configData);
         
-        Test.startTest();
+        System.Test.startTest();
         String result = mt_ConfigMetadataService.saveConfiguration(configJson);
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Should return a result');
     }
@@ -71,9 +71,9 @@ public class mt_ConfigMetadataServiceTest {
      */
     @isTest
     static void testSaveConfiguration_EmptyJson() {
-        Test.startTest();
+        System.Test.startTest();
         String result = mt_ConfigMetadataService.saveConfiguration('{}');
-        Test.stopTest();
+        System.Test.stopTest();
         
         // Should handle gracefully
         Assert.isNotNull(result, 'Should return a result even for empty JSON');
@@ -96,9 +96,9 @@ public class mt_ConfigMetadataServiceTest {
         };
         String configJson = JSON.serialize(objectConfigData);
         
-        Test.startTest();
+        System.Test.startTest();
         String result = mt_ConfigMetadataService.saveObjectConfiguration(configJson);
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Should return a result');
     }
@@ -120,9 +120,9 @@ public class mt_ConfigMetadataServiceTest {
         };
         String configJson = JSON.serialize(objectConfigData);
         
-        Test.startTest();
+        System.Test.startTest();
         String result = mt_ConfigMetadataService.saveObjectConfiguration(configJson);
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Should return a result');
     }
@@ -144,9 +144,9 @@ public class mt_ConfigMetadataServiceTest {
         };
         String configJson = JSON.serialize(objectConfigData);
         
-        Test.startTest();
+        System.Test.startTest();
         String result = mt_ConfigMetadataService.saveObjectConfiguration(configJson);
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Should return a result');
     }
@@ -169,9 +169,9 @@ public class mt_ConfigMetadataServiceTest {
         };
         String configJson = JSON.serialize(configData);
         
-        Test.startTest();
+        System.Test.startTest();
         String result = mt_ConfigMetadataService.saveConfiguration(configJson);
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Should return a result');
     }
@@ -188,14 +188,14 @@ public class mt_ConfigMetadataServiceTest {
         };
         String configJson = JSON.serialize(configData);
         
-        Test.startTest();
+        System.Test.startTest();
         try {
             String result = mt_ConfigMetadataService.saveConfiguration(configJson);
             Assert.fail('Should have thrown exception');
         } catch (Exception e) {
             Assert.isTrue(e.getMessage().contains('Developer Name is required'), 'Should throw proper error');
         }
-        Test.stopTest();
+        System.Test.stopTest();
     }
     
     /**
@@ -210,14 +210,14 @@ public class mt_ConfigMetadataServiceTest {
         };
         String configJson = JSON.serialize(objectConfigData);
         
-        Test.startTest();
+        System.Test.startTest();
         try {
             String result = mt_ConfigMetadataService.saveObjectConfiguration(configJson);
             Assert.fail('Should have thrown exception');
         } catch (Exception e) {
             Assert.isTrue(e.getMessage().contains('Configuration Profile is required'), 'Should throw proper error');
         }
-        Test.stopTest();
+        System.Test.stopTest();
     }
     
     /**
@@ -232,14 +232,14 @@ public class mt_ConfigMetadataServiceTest {
         };
         String configJson = JSON.serialize(objectConfigData);
         
-        Test.startTest();
+        System.Test.startTest();
         try {
             String result = mt_ConfigMetadataService.saveObjectConfiguration(configJson);
             Assert.fail('Should have thrown exception');
         } catch (Exception e) {
             Assert.isTrue(e.getMessage().contains('Object API Name is required'), 'Should throw proper error');
         }
-        Test.stopTest();
+        System.Test.stopTest();
     }
     
     /**
@@ -247,7 +247,7 @@ public class mt_ConfigMetadataServiceTest {
      */
     @isTest
     static void testCloneFlowAndPrompt() {
-        Test.startTest();
+        System.Test.startTest();
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         
         Map<String, Object> result = mt_ConfigMetadataService.cloneFlowAndPrompt(
@@ -259,7 +259,7 @@ public class mt_ConfigMetadataServiceTest {
             'Custom Voice Prompt'
         );
         
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Should return a result');
         Assert.isTrue(result.containsKey('success'), 'Should contain success key');
@@ -270,7 +270,7 @@ public class mt_ConfigMetadataServiceTest {
      */
     @isTest
     static void testCloneFlowAndPrompt_BlankNames() {
-        Test.startTest();
+        System.Test.startTest();
         
         Map<String, Object> result = mt_ConfigMetadataService.cloneFlowAndPrompt(
             'MT_Visit_Report_MultiModal',
@@ -281,7 +281,7 @@ public class mt_ConfigMetadataServiceTest {
             'Custom Voice Prompt'
         );
         
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Should return a result');
         Assert.isFalse((Boolean)result.get('success'), 'Should fail with blank names');
@@ -293,11 +293,11 @@ public class mt_ConfigMetadataServiceTest {
      */
     @isTest
     static void testCheckDeploymentStatus_Manual() {
-        Test.startTest();
+        System.Test.startTest();
         
         Map<String, Object> result = mt_ConfigMetadataService.checkDeploymentStatus('PENDING_MANUAL_DEPLOYMENT');
         
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Should return a result');
         Assert.areEqual('manual', result.get('status'), 'Should be manual status');
@@ -308,12 +308,12 @@ public class mt_ConfigMetadataServiceTest {
      */
     @isTest
     static void testCheckDeploymentStatus_WithId() {
-        Test.startTest();
+        System.Test.startTest();
         Test.setMock(HttpCalloutMock.class, new MockHttpResponseGenerator());
         
         Map<String, Object> result = mt_ConfigMetadataService.checkDeploymentStatus('0Af000000000000AAA');
         
-        Test.stopTest();
+        System.Test.stopTest();
         
         Assert.isNotNull(result, 'Should return a result');
     }
