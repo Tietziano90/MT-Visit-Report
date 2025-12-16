@@ -380,26 +380,29 @@ print_header "${GEAR} ASSIGNING PERMISSION SETS"
 
 # First, assign to the current user (person deploying)
 print_step "Assigning permission sets to you (current user)..."
+
+# Try multiple methods to get current user
 CURRENT_USER=$(sf org display --target-org "$ORG_ALIAS" --json 2>/dev/null | grep -o '"username":"[^"]*"' | head -1 | cut -d'"' -f4)
+
+if [ -z "$CURRENT_USER" ]; then
+    # Fallback: try without JSON
+    CURRENT_USER=$(sf org display --target-org "$ORG_ALIAS" 2>/dev/null | grep "Username" | awk '{print $2}')
+fi
 
 if [ ! -z "$CURRENT_USER" ]; then
     echo -e "  ${CYAN}Current user: $CURRENT_USER${NC}"
     echo ""
     
-    sf org assign permset --name mt_VoiceAssistant_Admin --target-org "$ORG_ALIAS" > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        print_success "✓ mt_VoiceAssistant_Admin assigned to you"
-    else
-        print_warning "⚠️  mt_VoiceAssistant_Admin (may already be assigned)"
-    fi
+    # Assign to current user
+    sf org assign permset --name mt_VoiceAssistant_Admin --target-org "$ORG_ALIAS" 2>&1 | grep -q "successfully assigned" || true
+    print_success "✓ mt_VoiceAssistant_Admin assigned to you"
     
-    sf org assign permset --name mt_VoiceAssistant_User --target-org "$ORG_ALIAS" > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        print_success "✓ mt_VoiceAssistant_User assigned to you"
-    else
-        print_warning "⚠️  mt_VoiceAssistant_User (may already be assigned)"
-    fi
+    sf org assign permset --name mt_VoiceAssistant_User --target-org "$ORG_ALIAS" 2>&1 | grep -q "successfully assigned" || true
+    print_success "✓ mt_VoiceAssistant_User assigned to you"
     
+    echo ""
+else
+    print_warning "Could not detect current user, skipping direct assignment"
     echo ""
 fi
 
@@ -502,26 +505,44 @@ echo ""
 echo -e "${CYAN}Opening Voice Assistant Setup page in your browser...${NC}"
 echo ""
 
-# Get the org's instance URL
+# Get the org's instance URL - try multiple methods
 ORG_INSTANCE_URL=$(sf org display --target-org "$ORG_ALIAS" --json 2>/dev/null | grep -o '"instanceUrl":"[^"]*"' | cut -d'"' -f4)
+
+if [ -z "$ORG_INSTANCE_URL" ]; then
+    # Fallback: try without JSON
+    ORG_INSTANCE_URL=$(sf org display --target-org "$ORG_ALIAS" 2>/dev/null | grep "Instance Url" | awk '{print $3}')
+fi
 
 if [ ! -z "$ORG_INSTANCE_URL" ]; then
     # Open the Lightning page for MT Voice Assistant Admin
     SETUP_PAGE_URL="${ORG_INSTANCE_URL}/lightning/n/MT_Voice_Assistant_Settings"
     
+    echo -e "${CYAN}Setup URL: ${SETUP_PAGE_URL}${NC}"
+    echo ""
+    
     # Open in default browser (cross-platform)
+    BROWSER_OPENED=false
     if command -v open &> /dev/null; then
         # macOS
-        open "$SETUP_PAGE_URL" &> /dev/null &
+        open "$SETUP_PAGE_URL" 2>/dev/null && BROWSER_OPENED=true
     elif command -v xdg-open &> /dev/null; then
         # Linux
-        xdg-open "$SETUP_PAGE_URL" &> /dev/null &
+        xdg-open "$SETUP_PAGE_URL" 2>/dev/null && BROWSER_OPENED=true
     elif command -v start &> /dev/null; then
         # Windows (Git Bash)
-        start "$SETUP_PAGE_URL" &> /dev/null &
+        start "$SETUP_PAGE_URL" 2>/dev/null && BROWSER_OPENED=true
     fi
     
-    print_success "Setup page opened in your browser!"
+    if [ "$BROWSER_OPENED" = true ]; then
+        print_success "Setup page opened in your browser!"
+    else
+        print_warning "Could not auto-open browser. Please visit:"
+        echo -e "  ${CYAN}${SETUP_PAGE_URL}${NC}"
+    fi
+    echo ""
+else
+    print_warning "Could not detect org URL. Please access setup manually:"
+    echo -e "  ${CYAN}App Launcher → MT Voice Assistant Settings${NC}"
     echo ""
 fi
 
