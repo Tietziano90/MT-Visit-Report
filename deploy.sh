@@ -378,7 +378,33 @@ fi
 
 print_header "${GEAR} ASSIGNING PERMISSION SETS"
 
-print_step "Fetching System Administrator users..."
+# First, assign to the current user (person deploying)
+print_step "Assigning permission sets to you (current user)..."
+CURRENT_USER=$(sf org display --target-org "$ORG_ALIAS" --json 2>/dev/null | grep -o '"username":"[^"]*"' | head -1 | cut -d'"' -f4)
+
+if [ ! -z "$CURRENT_USER" ]; then
+    echo -e "  ${CYAN}Current user: $CURRENT_USER${NC}"
+    echo ""
+    
+    sf org assign permset --name mt_VoiceAssistant_Admin --target-org "$ORG_ALIAS" > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        print_success "✓ mt_VoiceAssistant_Admin assigned to you"
+    else
+        print_warning "⚠️  mt_VoiceAssistant_Admin (may already be assigned)"
+    fi
+    
+    sf org assign permset --name mt_VoiceAssistant_User --target-org "$ORG_ALIAS" > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        print_success "✓ mt_VoiceAssistant_User assigned to you"
+    else
+        print_warning "⚠️  mt_VoiceAssistant_User (may already be assigned)"
+    fi
+    
+    echo ""
+fi
+
+# Then, assign to all System Administrators
+print_step "Fetching other System Administrator users..."
 ADMIN_USERS=$(sf data query --query "SELECT Id, Username FROM User WHERE Profile.Name = 'System Administrator' AND IsActive = true" --target-org "$ORG_ALIAS" --json | grep -o '"Username":"[^"]*"' | cut -d'"' -f4)
 
 if [ -z "$ADMIN_USERS" ]; then
@@ -396,6 +422,11 @@ else
     
     ASSIGNED_COUNT=0
     echo "$ADMIN_USERS" | while read -r username; do
+        # Skip current user (already assigned above)
+        if [ "$username" = "$CURRENT_USER" ]; then
+            continue
+        fi
+        
         print_step "Assigning to: $username"
         
         sf org assign permset --name mt_VoiceAssistant_Admin --target-org "$ORG_ALIAS" --on-behalf-of "$username" > /dev/null 2>&1
