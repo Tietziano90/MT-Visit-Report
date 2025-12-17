@@ -494,8 +494,10 @@ print_header "${GEAR} CHECKING PREREQUISITES"
 if [ -z "$ORG_ALIAS" ]; then
     echo ""
     
-    # Get list of existing orgs
-    EXISTING_ORGS=$(sf org list --json 2>/dev/null | grep -o '"alias":"[^"]*"' | cut -d'"' -f4 | grep -v "^$" | sort -u)
+    # Get list of existing orgs with timeout
+    print_step "Checking for existing org connections..."
+    EXISTING_ORGS=$(timeout 5 sf org list --json 2>/dev/null | grep -o '"alias":"[^"]*"' | cut -d'"' -f4 | grep -v "^$" | sort -u)
+    echo ""
     
     if [ ! -z "$EXISTING_ORGS" ]; then
         # Show existing orgs as options
