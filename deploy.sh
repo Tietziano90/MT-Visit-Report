@@ -536,7 +536,7 @@ if [ -z "$ORG_ALIAS" ]; then
     print_warning "No alias provided. Let's connect to your org..."
     echo ""
     echo -e "${CYAN}Choose connection type:${NC}"
-    echo -e "${WHITE}  1) Production/Developer Org${NC}"
+    echo -e "${WHITE}  1) SDO/IDO/Production/Developer Org${NC}"
     echo -e "${WHITE}  2) Sandbox${NC}"
     echo -e "${WHITE}  3) Scratch Org${NC}"
     
@@ -555,7 +555,7 @@ if [ -z "$ORG_ALIAS" ]; then
     
     case $ORG_TYPE in
         1)
-            print_step "Connecting to Production/Developer org..."
+            print_step "Connecting to SDO/IDO/Production/Developer org..."
             echo ""
             print_info "🌐 A browser window will open for you to log in to Salesforce..."
             print_info "⏳ Please complete the login in your browser"
