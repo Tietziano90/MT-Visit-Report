@@ -275,12 +275,28 @@ manual_component_deployment() {
 # MAIN DEPLOYMENT SCRIPT
 ################################################################################
 
-# Check prerequisites first
-check_salesforce_cli
+# Check prerequisites first (silent check, already shown by wrapper script)
+if ! command -v sf &> /dev/null; then
+    print_error "Salesforce CLI (sf) is not installed!"
+    echo ""
+    echo -e "${YELLOW}Please install Salesforce CLI:${NC}"
+    echo -e "${WHITE}  macOS:   ${CYAN}brew install sf${NC}"
+    echo -e "${WHITE}  Windows: ${CYAN}Download from https://developer.salesforce.com/tools/salesforcecli${NC}"
+    echo -e "${WHITE}  Linux:   ${CYAN}npm install -g @salesforce/cli${NC}"
+    echo ""
+    exit 1
+fi
 
 # Main menu loop
+FIRST_ITERATION=true
 while true; do
-    clear
+    # Only clear on subsequent iterations, not the first time
+    if [ "$FIRST_ITERATION" = "true" ]; then
+        FIRST_ITERATION=false
+        echo ""
+    else
+        clear
+    fi
     
     print_header "${ROCKET} MT VOICE ASSISTANT - DEPLOYMENT WIZARD ${ROCKET}"
     
@@ -477,7 +493,6 @@ while true; do
 
 # Check prerequisites
 print_header "${GEAR} CHECKING PREREQUISITES"
-print_success "Salesforce CLI detected"
 
 # Get org alias (if not already set from menu)
 if [ -z "$ORG_ALIAS" ]; then
