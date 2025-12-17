@@ -68,21 +68,9 @@ trap cleanup EXIT
 # MAIN SCRIPT
 ################################################################################
 
-clear
-
-print_header "${ROCKET} MT VOICE ASSISTANT - ONE-CLICK DEPLOYMENT ${ROCKET}"
-
-echo "This script will:"
-echo "  1. Download the latest code from GitHub"
-echo "  2. Deploy to your Salesforce org"
-echo "  3. Assign permissions automatically"
-echo ""
-
 ################################################################################
 # CHECK PREREQUISITES
 ################################################################################
-
-print_header "${GEAR} CHECKING PREREQUISITES"
 
 # Check Salesforce CLI
 if ! command -v sf &> /dev/null; then
@@ -342,14 +330,6 @@ echo -e "${CYAN}Latest version:${NC} ${LATEST_COMMIT}"
 ################################################################################
 # RUN DEPLOYMENT
 ################################################################################
-
-print_header "${ROCKET} STARTING DEPLOYMENT"
-
-echo "The deployment script will now:"
-echo "  • Connect to your Salesforce org (browser login)"
-echo "  • Deploy all components (~3-5 minutes)"
-echo "  • Assign permissions to admins"
-echo ""
 
 # Run the deployment script
 chmod +x "$TEMP_DIR/deploy.sh"
