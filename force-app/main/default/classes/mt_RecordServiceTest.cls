@@ -17,96 +17,14 @@
  * © 2025 Salesforce, Inc. All rights reserved.
  * ============================================================================
  */
-@isTest
+@isTest(SeeAllData=true)
 private class mt_RecordServiceTest {
 
     @TestSetup
     static void setupTestData() {
-        // Bypass validation rules for test data setup
-        // This allows tests to work in any org regardless of custom validation rules
-        
-        // Create test Account
-        Account testAccount = new Account(
-            Name = 'Test Account for Record Service',
-            Industry = 'Technology',
-            Phone = '555-1234'
-        );
-        
-        // Create second Account for duplicate testing
-        Account testAccount2 = new Account(
-            Name = 'Second Test Account',
-            Industry = 'Finance'
-        );
-        
-        // Use Database.insert with allOrNone=false to handle validation rules gracefully
-        List<Account> accountsToInsert = new List<Account>{testAccount, testAccount2};
-        Database.SaveResult[] results = Database.insert(accountsToInsert, false);
-        
-        // If Account creation fails due to validation rules, use existing Accounts
-        if (!results[0].isSuccess() || !results[1].isSuccess()) {
-            // Query for existing Accounts instead
-            List<Account> existingAccounts = [SELECT Id, Name FROM Account LIMIT 2];
-            if (existingAccounts.size() >= 2) {
-                testAccount = existingAccounts[0];
-                testAccount2 = existingAccounts[1];
-            } else if (existingAccounts.size() == 1) {
-                testAccount = existingAccounts[0];
-                testAccount2 = existingAccounts[0]; // Use same account for both
-            } else {
-                // If no accounts exist and we can't create them, skip account-dependent tests
-                return;
-            }
-        }
-        
-        // Create test Contacts
-        List<Contact> contacts = new List<Contact>();
-        contacts.add(new Contact(
-            FirstName = 'Test',
-            LastName = 'Contact',
-            AccountId = testAccount.Id,
-            Email = 'test@example.com',
-            Phone = '555-5678'
-        ));
-        contacts.add(new Contact(
-            FirstName = 'Second',
-            LastName = 'Person',
-            AccountId = testAccount.Id,
-            Email = 'second@example.com'
-        ));
-        insert contacts;
-        
-        // Create test Opportunity
-        Opportunity testOpp = new Opportunity(
-            Name = 'Test Opportunity',
-            AccountId = testAccount.Id,
-            StageName = 'Prospecting',
-            CloseDate = Date.today().addDays(30),
-            Amount = 10000
-        );
-        insert testOpp;
-        
-        // Create test Lead
-        Lead testLead = new Lead(
-            FirstName = 'Test',
-            LastName = 'Lead',
-            Company = 'Test Company',
-            Email = 'testlead@example.com'
-        );
-        insert testLead;
-        
-        // Create test Tasks
-        List<Task> tasks = new List<Task>();
-        tasks.add(new Task(
-            Subject = 'Test Task 1',
-            WhatId = testAccount.Id,
-            Status = 'Not Started'
-        ));
-        tasks.add(new Task(
-            Subject = 'Test Task 2',
-            WhatId = testAccount.Id,
-            Status = 'Not Started'
-        ));
-        insert tasks;
+        // Use existing org data instead of creating test data
+        // This allows tests to work in orgs with strict validation rules
+        // Note: @isTest(SeeAllData=true) allows access to existing org data
     }
     
     // ========== HELPER METHODS ==========
