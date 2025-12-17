@@ -154,12 +154,11 @@ export default class MtVoiceAssistantAdmin extends NavigationMixin(LightningElem
     
     // Setup Steps Completion State
     @track setupSteps = {
-        step0: false, // Enable Einstein AI
-        step1: false,
-        step2: false,
-        step3: false,
-        step4: false,
-        step5: false
+        step1: false, // Enable Agentforce/AI Features
+        step2: false, // App Setup
+        step3: false, // Credentials Configuration
+        step4: false, // Test Connection
+        step5: false  // Configuration Profiles
     };
     
     // Object Modal State
@@ -1650,7 +1649,7 @@ export default class MtVoiceAssistantAdmin extends NavigationMixin(LightningElem
      * @description Total number of setup steps
      */
     get totalStepsCount() {
-        return this.showNamedCredentialStep ? 6 : 5;
+        return 5;
     }
     
     /**
@@ -1658,10 +1657,9 @@ export default class MtVoiceAssistantAdmin extends NavigationMixin(LightningElem
      */
     get completedStepsCount() {
         let count = 0;
-        if (this.setupSteps.step0) count++;
         if (this.setupSteps.step1) count++;
         if (this.setupSteps.step2) count++;
-        if (this.showNamedCredentialStep && this.setupSteps.step3) count++;
+        if (this.setupSteps.step3) count++;
         if (this.setupSteps.step4) count++;
         if (this.setupSteps.step5) count++;
         return count;

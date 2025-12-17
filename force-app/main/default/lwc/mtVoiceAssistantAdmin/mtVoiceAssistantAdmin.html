@@ -150,53 +150,32 @@ outside of Salesforce without prior written approval from Michael Tietze
                                     </div>
                                 </lightning-accordion-section>
 
-                                <!-- Step 0: Enable Einstein AI -->
-                                <lightning-accordion-section name="step0" label="0. Enable Einstein AI (REQUIRED)">
+                                <!-- Step 1: Enable Agentforce/AI Features -->
+                                <lightning-accordion-section name="step1" label="1. Enable Agentforce/AI Features">
                                     <div class="step-header" slot="actions">
                                         <lightning-input 
                                             type="checkbox" 
                                             label="Complete"
-                                            checked={setupSteps.step0}
-                                            data-step="step0"
+                                            checked={setupSteps.step1}
+                                            data-step="step1"
                                             onchange={handleStepComplete}
                                             class="step-checkbox">
                                         </lightning-input>
                                     </div>
                                     <div class="step-content">
-                                        <div class="slds-box slds-box_x-small slds-theme_warning slds-m-bottom_medium">
+                                        <div class="slds-box slds-box_x-small slds-theme_info slds-m-bottom_medium">
                                             <div class="slds-grid slds-grid_vertical-align-center">
-                                                <lightning-icon icon-name="utility:warning" size="small" class="slds-m-right_small warning-icon"></lightning-icon>
+                                                <lightning-icon icon-name="utility:info" size="small" class="slds-m-right_small"></lightning-icon>
                                                 <div>
-                                                    <p class="slds-text-body_small"><strong>⚠️ CRITICAL STEP:</strong> The Voice Assistant <strong>will not work</strong> without Einstein AI enabled.</p>
-                                                    <p class="slds-text-body_small slds-m-top_xx-small">You'll get a <strong>404 error</strong> when trying to transcribe audio if this is not enabled.</p>
+                                                    <p class="slds-text-body_small">Agentforce/AI features have to be switched on to be able to use the transcription. You can do so by going to Setup - i.e. Agentforce for Sales - turn on Agentforce.</p>
                                                 </div>
                                             </div>
-                                        </div>
-                                        
-                                        <h4 class="slds-text-title_caps slds-m-bottom_x-small">Enable Einstein AI</h4>
-                                        <div class="checklist-steps slds-m-bottom_medium">
-                                            <div class="checklist-sub-item"><span class="step-bullet">1.</span> Go to <strong>Setup</strong> (gear icon ⚙️)</div>
-                                            <div class="checklist-sub-item"><span class="step-bullet">2.</span> In Quick Find, search for <strong>"Einstein"</strong></div>
-                                            <div class="checklist-sub-item"><span class="step-bullet">3.</span> Click <strong>Einstein Setup</strong> or <strong>Einstein AI</strong></div>
-                                            <div class="checklist-sub-item"><span class="step-bullet">4.</span> Click <strong>Turn On Einstein</strong> (if not already enabled)</div>
-                                            <div class="checklist-sub-item"><span class="step-bullet">5.</span> Accept the <strong>Terms and Conditions</strong></div>
-                                            <div class="checklist-sub-item highlight-important">
-                                                <lightning-icon icon-name="utility:success" size="xx-small" class="slds-m-right_xx-small success-icon"></lightning-icon>
-                                                <strong>Done!</strong> Einstein AI is now enabled for your org.
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="slds-box slds-box_x-small slds-theme_info">
-                                            <p class="slds-text-body_small">
-                                                <lightning-icon icon-name="utility:info" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
-                                                <strong>Note:</strong> This is a one-time setup. Once enabled, it stays enabled for your entire org.
-                                            </p>
                                         </div>
                                     </div>
                                 </lightning-accordion-section>
 
-                                <!-- Step 1: App Setup (Combined: Credentials + Client Flow + App Manager) -->
-                                <lightning-accordion-section name="step1" label="1. App Setup">
+                                <!-- Step 2: App Setup (Combined: Credentials + Client Flow + App Manager) -->
+                                <lightning-accordion-section name="step2" label="2. App Setup">
                                     <div class="step-header" slot="actions">
                                         <lightning-input 
                                             type="checkbox" 
@@ -251,14 +230,14 @@ outside of Salesforce without prior written approval from Michael Tietze
                                     </div>
                                 </lightning-accordion-section>
 
-                                <!-- Step 2: Credentials Configuration (Combined: Named Credential + External Credential) -->
-                                <lightning-accordion-section name="step2" label="2. Credentials Configuration">
+                                <!-- Step 3: Credentials Configuration (Combined: Named Credential + External Credential) -->
+                                <lightning-accordion-section name="step3" label="3. Credentials Configuration">
                                     <div class="step-header" slot="actions">
                                         <lightning-input 
                                             type="checkbox" 
                                             label="Complete"
-                                            checked={setupSteps.step2}
-                                            data-step="step2"
+                                            checked={setupSteps.step3}
+                                            data-step="step3"
                                             onchange={handleStepComplete}
                                             class="step-checkbox">
                                         </lightning-input>
@@ -383,14 +362,14 @@ outside of Salesforce without prior written approval from Michael Tietze
                                     </div>
                                 </lightning-accordion-section>
 
-                                <!-- Step 3: Test Connection -->
-                                <lightning-accordion-section name="step3" label="3. Test Connection">
+                                <!-- Step 4: Test Connection -->
+                                <lightning-accordion-section name="step4" label="4. Test Connection">
                                     <div class="step-header" slot="actions">
                                         <lightning-input 
                                             type="checkbox" 
                                             label="Complete"
-                                            checked={setupSteps.step3}
-                                            data-step="step3"
+                                            checked={setupSteps.step4}
+                                            data-step="step4"
                                             onchange={handleStepComplete}
                                             class="step-checkbox">
                                         </lightning-input>
@@ -487,7 +466,7 @@ outside of Salesforce without prior written approval from Michael Tietze
                                 </lightning-accordion-section>
 
                                 <!-- Configuration Profiles Section -->
-                                <lightning-accordion-section name="configprofiles" label="4. Configuration Profiles">
+                                <lightning-accordion-section name="configprofiles" label="5. Configuration Profiles">
                                     <div class="step-content">
                                         <p class="slds-text-body_small slds-m-bottom_small">
                                             Configuration profiles control how the Voice Assistant behaves for different use cases. Each profile defines:
