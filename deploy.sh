@@ -482,11 +482,53 @@ print_success "Salesforce CLI detected"
 # Get org alias (if not already set from menu)
 if [ -z "$ORG_ALIAS" ]; then
     echo ""
-    print_info "Enter your Salesforce org alias (or press Enter to create a new connection):"
-    if [ -t 0 ]; then
-        read -p "Org Alias: " ORG_ALIAS
+    
+    # Get list of existing orgs
+    EXISTING_ORGS=$(sf org list --json 2>/dev/null | grep -o '"alias":"[^"]*"' | cut -d'"' -f4 | grep -v "^$" | sort -u)
+    
+    if [ ! -z "$EXISTING_ORGS" ]; then
+        # Show existing orgs as options
+        print_info "Select an org or create a new connection:"
+        echo ""
+        
+        # Build array of orgs
+        ORG_ARRAY=()
+        ORG_INDEX=1
+        while IFS= read -r org; do
+            echo -e "${WHITE}$ORG_INDEX)${NC} $org"
+            ORG_ARRAY+=("$org")
+            ORG_INDEX=$((ORG_INDEX + 1))
+        done <<< "$EXISTING_ORGS"
+        
+        echo -e "${WHITE}$ORG_INDEX)${NC} ${CYAN}Create New Connection${NC}"
+        echo ""
+        
+        if [ -t 0 ]; then
+            read -p "Enter choice (1-$ORG_INDEX): " ORG_CHOICE
+        else
+            read -p "Enter choice (1-$ORG_INDEX): " ORG_CHOICE </dev/tty
+        fi
+        
+        # Validate choice
+        if [[ "$ORG_CHOICE" =~ ^[0-9]+$ ]] && [ "$ORG_CHOICE" -ge 1 ] && [ "$ORG_CHOICE" -lt "$ORG_INDEX" ]; then
+            # User selected an existing org
+            ORG_ALIAS="${ORG_ARRAY[$((ORG_CHOICE - 1))]}"
+            echo ""
+            print_success "Selected org: $ORG_ALIAS"
+            echo ""
+        elif [ "$ORG_CHOICE" = "$ORG_INDEX" ]; then
+            # User wants to create new connection
+            ORG_ALIAS=""
+        else
+            print_error "Invalid choice"
+            sleep 2
+            exit 1
+        fi
     else
-        read -p "Org Alias: " ORG_ALIAS </dev/tty
+        # No existing orgs, prompt for new connection
+        print_info "No existing org connections found. Let's create a new one."
+        echo ""
+        ORG_ALIAS=""
     fi
 fi
 
