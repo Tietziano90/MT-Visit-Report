@@ -149,11 +149,30 @@ if ! command -v sf &> /dev/null; then
                 echo ""
                 echo -e "${CYAN}This will:${NC}"
                 echo "  • Install Homebrew package manager"
-                echo "  • May ask for your password (sudo access)"
+                echo "  • Require your password (sudo access)"
                 echo "  • Take a few minutes"
                 echo ""
+                echo -e "${YELLOW}IMPORTANT:${NC}"
+                echo "  • You will be prompted for your macOS password"
+                echo "  • This is normal and required for Homebrew installation"
+                echo "  • Press Enter when ready..."
+                echo ""
                 
-                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                if [ -t 0 ]; then
+                    read -p ""
+                else
+                    read -p "" </dev/tty
+                fi
+                
+                echo ""
+                
+                # Run Homebrew installer with proper TTY
+                if [ -t 0 ]; then
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                else
+                    # Redirect to /dev/tty for password prompt
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" </dev/tty
+                fi
                 
                 # Add Homebrew to PATH for Apple Silicon Macs
                 if [[ $(uname -m) == 'arm64' ]]; then
@@ -253,7 +272,27 @@ if ! command -v sf &> /dev/null; then
             if [ "$INSTALL_BREW" = "yes" ] || [ "$INSTALL_BREW" = "y" ]; then
                 echo ""
                 print_step "Installing Homebrew..."
-                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                echo ""
+                echo -e "${YELLOW}IMPORTANT:${NC}"
+                echo "  • You will be prompted for your macOS password"
+                echo "  • This is normal and required"
+                echo "  • Press Enter when ready..."
+                echo ""
+                
+                if [ -t 0 ]; then
+                    read -p ""
+                else
+                    read -p "" </dev/tty
+                fi
+                
+                echo ""
+                
+                # Run Homebrew installer with proper TTY
+                if [ -t 0 ]; then
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                else
+                    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" </dev/tty
+                fi
                 
                 # Add Homebrew to PATH for Apple Silicon Macs
                 if [[ $(uname -m) == 'arm64' ]]; then
@@ -262,18 +301,23 @@ if ! command -v sf &> /dev/null; then
                 fi
                 
                 if command -v brew &> /dev/null; then
+                    echo ""
                     print_success "Homebrew installed!"
+                    echo ""
                     print_step "Installing Salesforce CLI..."
                     brew install sf
                     
                     if command -v sf &> /dev/null; then
                         print_success "Salesforce CLI installed successfully!"
+                        echo ""
                     else
                         print_error "Installation failed."
                         exit 1
                     fi
                 else
                     print_error "Homebrew installation failed."
+                    echo ""
+                    echo "Please install manually from: https://brew.sh"
                     exit 1
                 fi
             else
