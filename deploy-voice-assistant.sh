@@ -72,6 +72,8 @@ trap cleanup EXIT
 # CHECK PREREQUISITES
 ################################################################################
 
+print_header "${GEAR} CHECKING PREREQUISITES"
+
 # Check Salesforce CLI
 if ! command -v sf &> /dev/null; then
     print_error "Salesforce CLI not found!"
