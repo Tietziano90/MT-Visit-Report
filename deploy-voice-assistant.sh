@@ -131,11 +131,68 @@ if ! command -v sf &> /dev/null; then
                 exit 1
             fi
         else
-            echo -e "${YELLOW}Homebrew not found. Install Homebrew first:${NC}"
-            echo "  /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+            echo -e "${YELLOW}Homebrew not found.${NC}"
             echo ""
-            echo "Then run: brew install sf"
-            exit 1
+            echo "Homebrew is a package manager for macOS that makes installing tools easy."
+            echo ""
+            if [ -t 0 ]; then
+                read -p "Would you like to install Homebrew now? (yes/no): " INSTALL_BREW
+            else
+                read -p "Would you like to install Homebrew now? (yes/no): " INSTALL_BREW </dev/tty
+            fi
+            
+            INSTALL_BREW=$(echo "$INSTALL_BREW" | tr '[:upper:]' '[:lower:]' | xargs)
+            
+            if [ "$INSTALL_BREW" = "yes" ] || [ "$INSTALL_BREW" = "y" ]; then
+                echo ""
+                print_step "Installing Homebrew..."
+                echo ""
+                echo -e "${CYAN}This will:${NC}"
+                echo "  • Install Homebrew package manager"
+                echo "  • May ask for your password (sudo access)"
+                echo "  • Take a few minutes"
+                echo ""
+                
+                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                
+                # Add Homebrew to PATH for Apple Silicon Macs
+                if [[ $(uname -m) == 'arm64' ]]; then
+                    echo ""
+                    print_step "Adding Homebrew to PATH..."
+                    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+                    eval "$(/opt/homebrew/bin/brew shellenv)"
+                fi
+                
+                if command -v brew &> /dev/null; then
+                    echo ""
+                    print_success "Homebrew installed successfully!"
+                    echo ""
+                    
+                    # Now install Salesforce CLI
+                    print_step "Installing Salesforce CLI..."
+                    brew install sf
+                    
+                    if command -v sf &> /dev/null; then
+                        print_success "Salesforce CLI installed successfully!"
+                        echo ""
+                    else
+                        print_error "Salesforce CLI installation failed."
+                        exit 1
+                    fi
+                else
+                    print_error "Homebrew installation failed."
+                    echo ""
+                    echo "Please install manually from: https://brew.sh"
+                    exit 1
+                fi
+            else
+                echo ""
+                echo "Please install Homebrew manually:"
+                echo "  /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+                echo ""
+                echo "Then run: brew install sf"
+                exit 1
+            fi
         fi
     elif command -v npm &> /dev/null; then
         # Has npm (Linux/Windows)
@@ -176,9 +233,70 @@ if ! command -v sf &> /dev/null; then
             exit 1
         fi
     else
+        # No Homebrew or npm found
         echo ""
-        echo "Please install Salesforce CLI manually and run this script again."
-        exit 1
+        echo -e "${YELLOW}No package manager found (Homebrew or npm).${NC}"
+        echo ""
+        
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS without Homebrew
+            echo "For macOS, we recommend installing Homebrew first:"
+            echo ""
+            if [ -t 0 ]; then
+                read -p "Install Homebrew now? (yes/no): " INSTALL_BREW
+            else
+                read -p "Install Homebrew now? (yes/no): " INSTALL_BREW </dev/tty
+            fi
+            
+            INSTALL_BREW=$(echo "$INSTALL_BREW" | tr '[:upper:]' '[:lower:]' | xargs)
+            
+            if [ "$INSTALL_BREW" = "yes" ] || [ "$INSTALL_BREW" = "y" ]; then
+                echo ""
+                print_step "Installing Homebrew..."
+                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                
+                # Add Homebrew to PATH for Apple Silicon Macs
+                if [[ $(uname -m) == 'arm64' ]]; then
+                    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+                    eval "$(/opt/homebrew/bin/brew shellenv)"
+                fi
+                
+                if command -v brew &> /dev/null; then
+                    print_success "Homebrew installed!"
+                    print_step "Installing Salesforce CLI..."
+                    brew install sf
+                    
+                    if command -v sf &> /dev/null; then
+                        print_success "Salesforce CLI installed successfully!"
+                    else
+                        print_error "Installation failed."
+                        exit 1
+                    fi
+                else
+                    print_error "Homebrew installation failed."
+                    exit 1
+                fi
+            else
+                echo ""
+                echo "Please install manually from: https://developer.salesforce.com/tools/salesforcecli"
+                exit 1
+            fi
+        else
+            # Linux/Windows without npm
+            echo "Please install Node.js and npm first:"
+            echo ""
+            echo "Ubuntu/Debian:"
+            echo "  sudo apt-get update"
+            echo "  sudo apt-get install -y nodejs npm"
+            echo ""
+            echo "CentOS/RHEL:"
+            echo "  sudo yum install -y nodejs npm"
+            echo ""
+            echo "Or download from: https://nodejs.org"
+            echo ""
+            echo "Then run this script again."
+            exit 1
+        fi
     fi
 fi
 
