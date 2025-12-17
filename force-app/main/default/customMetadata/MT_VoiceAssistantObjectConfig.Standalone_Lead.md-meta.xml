@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+================================================================================
+MT RECORD SUGGESTION - Lightning Web Component
+================================================================================
+Author: Michael Tietze, Principal AI Architect
+Contact: mtietze@salesforce.com
+Created: December 2025
+Version: 1.5
+
+COPYRIGHT AND DISTRIBUTION
+Copyright © 2025 Salesforce, Inc. All rights reserved.
+
+INTERNAL USE ONLY - This code may not be shared externally or distributed
+outside of Salesforce without prior written approval from Michael Tietze
+(mtietze@salesforce.com).
+================================================================================
+-->
+
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Standalone - Lead</label>
+    <protected>false</protected>
+    <values>
+        <field>AllowCreate__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>AllowEdit__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>AllowedFields__c</field>
+        <value xsi:type="xsd:string">["FirstName","LastName","Email","Phone","Company","Title","Street","City","State","PostalCode","Country","Website","LeadSource","Industry","Description"]</value>
+    </values>
+    <values>
+        <field>ConfigProfile__c</field>
+        <value xsi:type="xsd:string">Standalone</value>
+    </values>
+    <values>
+        <field>MandatoryFields__c</field>
+        <value xsi:type="xsd:string">["LastName","Company"]</value>
+    </values>
+    <values>
+        <field>ObjectApiName__c</field>
+        <value xsi:type="xsd:string">Lead</value>
+    </values>
+</CustomMetadata>
+

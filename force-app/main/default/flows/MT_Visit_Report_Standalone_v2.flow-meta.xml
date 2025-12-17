@@ -341,7 +341,7 @@ outside of Salesforce without prior written approval from Michael Tietze
         <isInput>true</isInput>
         <isOutput>false</isOutput>
         <value>
-            <stringValue>Default</stringValue>
+            <stringValue>Standalone</stringValue>
         </value>
     </variables>
 </Flow>

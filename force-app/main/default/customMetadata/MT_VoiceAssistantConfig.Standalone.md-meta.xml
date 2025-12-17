@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+================================================================================
+MT RECORD SUGGESTION - Lightning Web Component
+================================================================================
+Author: Michael Tietze, Principal AI Architect
+Contact: mtietze@salesforce.com
+Created: December 2025
+Version: 1.5
+
+COPYRIGHT AND DISTRIBUTION
+Copyright © 2025 Salesforce, Inc. All rights reserved.
+
+INTERNAL USE ONLY - This code may not be shared externally or distributed
+outside of Salesforce without prior written approval from Michael Tietze
+(mtietze@salesforce.com).
+================================================================================
+-->
+
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Standalone</label>
+    <protected>false</protected>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Standalone configuration for creating Leads, Contacts, Tasks, and Events without Account context. Ideal for business card capture, lead generation, and quick note-taking.</value>
+    </values>
+    <values>
+        <field>EinsteinNamedCredential__c</field>
+        <value xsi:type="xsd:string">mt_EinsteinTranscribe</value>
+    </values>
+    <values>
+        <field>EnableImageInput__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>IsActive__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>PromptTemplateName__c</field>
+        <value xsi:type="xsd:string">MT_Voice_Standalone_MultiModal_v2</value>
+    </values>
+    <values>
+        <field>ShowProviderSelector__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>TranscriptionProvider__c</field>
+        <value xsi:type="xsd:string">Einstein</value>
+    </values>
+    <values>
+        <field>WhisperModel__c</field>
+        <value xsi:type="xsd:string">whisper-1</value>
+    </values>
+    <values>
+        <field>WhisperNamedCredential__c</field>
+        <value xsi:type="xsd:string">mt_OpenAI_Whisper</value>
+    </values>
+</CustomMetadata>
+
