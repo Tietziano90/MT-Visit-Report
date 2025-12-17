@@ -73,9 +73,7 @@ trap cleanup EXIT
 # CHECK PREREQUISITES
 ################################################################################
 
-print_header "${GEAR} CHECKING PREREQUISITES"
-
-# Check Salesforce CLI
+# Check Salesforce CLI (silent check, will show errors if needed)
 if ! command -v sf &> /dev/null; then
     print_error "Salesforce CLI not found!"
     echo ""
@@ -183,7 +181,6 @@ if ! command -v sf &> /dev/null; then
         exit 1
     fi
 fi
-print_success "Salesforce CLI detected"
 
 # Check Git
 if ! command -v git &> /dev/null; then
@@ -307,7 +304,6 @@ if ! command -v git &> /dev/null; then
         exit 1
     fi
 fi
-print_success "Git detected"
 
 ################################################################################
 # DOWNLOAD LATEST CODE
