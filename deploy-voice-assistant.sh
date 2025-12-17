@@ -116,13 +116,32 @@ if ! command -v sf &> /dev/null; then
             if [ "$INSTALL_CLI" = "yes" ] || [ "$INSTALL_CLI" = "y" ]; then
                 echo ""
                 print_step "Installing Salesforce CLI..."
-                brew install sf
                 
+                # Install or upgrade sf
+                brew install sf 2>&1 | tee /tmp/brew-sf-install.log
+                
+                # Check if it's installed but not linked
+                if grep -q "already installed" /tmp/brew-sf-install.log || grep -q "just not linked" /tmp/brew-sf-install.log; then
+                    echo ""
+                    print_step "Linking Salesforce CLI..."
+                    
+                    # Try to link, overwriting conflicts
+                    brew link --overwrite sf
+                    
+                    if [ $? -ne 0 ]; then
+                        # If link fails, try to remove old sfdx and link again
+                        print_step "Removing old sfdx symlink..."
+                        rm -f /usr/local/bin/sfdx 2>/dev/null
+                        brew link --overwrite sf
+                    fi
+                fi
+                
+                # Verify installation
                 if command -v sf &> /dev/null; then
                     print_success "Salesforce CLI installed successfully!"
                     echo ""
                 else
-                    print_error "Installation failed. Please install manually."
+                    print_error "Installation failed. Please run: brew link --overwrite sf"
                     exit 1
                 fi
             else
@@ -189,7 +208,13 @@ if ! command -v sf &> /dev/null; then
                     
                     # Now install Salesforce CLI
                     print_step "Installing Salesforce CLI..."
-                    brew install sf
+                    brew install sf 2>&1 | tee /tmp/brew-sf-install.log
+                    
+                    # Check if it's installed but not linked
+                    if grep -q "already installed" /tmp/brew-sf-install.log || grep -q "just not linked" /tmp/brew-sf-install.log; then
+                        print_step "Linking Salesforce CLI..."
+                        brew link --overwrite sf || (rm -f /usr/local/bin/sfdx && brew link --overwrite sf)
+                    fi
                     
                     if command -v sf &> /dev/null; then
                         print_success "Salesforce CLI installed successfully!"
@@ -305,7 +330,13 @@ if ! command -v sf &> /dev/null; then
                     print_success "Homebrew installed!"
                     echo ""
                     print_step "Installing Salesforce CLI..."
-                    brew install sf
+                    brew install sf 2>&1 | tee /tmp/brew-sf-install.log
+                    
+                    # Check if it's installed but not linked
+                    if grep -q "already installed" /tmp/brew-sf-install.log || grep -q "just not linked" /tmp/brew-sf-install.log; then
+                        print_step "Linking Salesforce CLI..."
+                        brew link --overwrite sf || (rm -f /usr/local/bin/sfdx && brew link --overwrite sf)
+                    fi
                     
                     if command -v sf &> /dev/null; then
                         print_success "Salesforce CLI installed successfully!"
