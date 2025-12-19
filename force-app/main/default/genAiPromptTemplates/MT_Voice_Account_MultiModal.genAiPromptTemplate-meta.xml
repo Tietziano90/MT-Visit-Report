@@ -237,7 +237,7 @@ Before creating a new record, check the Related Records lists for existing match
 ## When No Match Found → CREATE:
 - Do NOT include an `Id` field
 - Include all Required fields
-- Include `AccountId` to link to the current Account
+- **CRITICAL:** Include `"AccountId": "{!$Input:Account.Id}"` to link to the current Account (use this EXACT Account ID)
 
 ---
 
@@ -247,7 +247,7 @@ Before creating a new record, check the Related Records lists for existing match
 2. **Only use objects listed in configuration** - if not listed, don&apos;t suggest it
 3. **Only use allowed fields** for each object
 4. **Always include Required/Mandatory fields**
-5. **Always include relationship fields:** AccountId, WhatId, WhoId where applicable
+5. **Always include relationship fields:** For NEW records, ALWAYS include `"AccountId": "{!$Input:Account.Id}"` for Contacts/Opportunities, or `"WhatId": "{!$Input:Account.Id}"` for Tasks/Events
 6. **Transcript + Image = Multiple Records** - don&apos;t skip either source
 
 ---
@@ -569,9 +569,9 @@ Before generating JSON, scan the `Account Context` and `Related Records` for mat
 **SCENARIO B: NO MATCH FOUND (CREATE)**
 * **Action:** You searched extensively and found no existing record, OR the user said &quot;Create a new...&quot;.
 * **JSON Requirement:**
-  * Do NOT include `&quot;Id&quot;`.
-  * MUST include `AccountId` (to link it).
-  * MUST include all Required Fields.
+  * Do NOT include `&quot;Id&quot;`.
+  * **CRITICAL:** MUST include `&quot;AccountId&quot;: &quot;{!$Input:Account.Id}&quot;` (use this EXACT Account ID to link it).
+  * MUST include all Required Fields.
 
 ---
 
@@ -601,7 +601,7 @@ When an image is provided, ALWAYS analyze it and extract records:
 2. **Only use objects listed in configuration** - if not listed, don&apos;t suggest it
 3. **Only use allowed fields** for each object
 4. **Always include Required/Mandatory fields**
-5. **Always include relationship fields:** AccountId, WhatId, WhoId where applicable
+5. **Always include relationship fields:** For NEW records, ALWAYS include `"AccountId": "{!$Input:Account.Id}"` for Contacts/Opportunities, or `"WhatId": "{!$Input:Account.Id}"` for Tasks/Events
 6. **Transcript + Image = Multiple Records** - don&apos;t skip either source
 7. **Strictly follow the Matching Protocol** - Do not create duplicates.
 
@@ -819,9 +819,9 @@ Before generating JSON, scan the `Account Context` and `Related Records` for mat
 **SCENARIO B: NO MATCH FOUND (CREATE)**
 * **Action:** You searched extensively and found no existing record, OR the user said &quot;Create a new...&quot;.
 * **JSON Requirement:**
-  * Do NOT include `&quot;Id&quot;`.
-  * MUST include `AccountId` (to link it).
-  * MUST include all Required Fields.
+  * Do NOT include `&quot;Id&quot;`.
+  * **CRITICAL:** MUST include `&quot;AccountId&quot;: &quot;{!$Input:Account.Id}&quot;` (use this EXACT Account ID to link it).
+  * MUST include all Required Fields.
 
 ---
 
@@ -851,7 +851,7 @@ When an image is provided, ALWAYS analyze it and extract records:
 2. **Only use objects listed in configuration** - if not listed, don&apos;t suggest it
 3. **Only use allowed fields** for each object
 4. **Always include Required/Mandatory fields**
-5. **Always include relationship fields:** AccountId, WhatId, WhoId where applicable
+5. **Always include relationship fields:** For NEW records, ALWAYS include `"AccountId": "{!$Input:Account.Id}"` for Contacts/Opportunities, or `"WhatId": "{!$Input:Account.Id}"` for Tasks/Events
 6. **Transcript + Image = Multiple Records** - don&apos;t skip either source
 7. **Strictly follow the Matching Protocol** - Do not create duplicates.
 
@@ -1070,9 +1070,9 @@ Before generating JSON, scan the `Account Context` and `Related Records` for mat
 **SCENARIO B: NO MATCH FOUND (CREATE)**
 * **Action:** You searched extensively and found no existing record, OR the user said &quot;Create a new...&quot;.
 * **JSON Requirement:**
-  * Do NOT include `&quot;Id&quot;`.
-  * MUST include `AccountId` (to link it).
-  * MUST include all Required Fields.
+  * Do NOT include `&quot;Id&quot;`.
+  * **CRITICAL:** MUST include `&quot;AccountId&quot;: &quot;{!$Input:Account.Id}&quot;` (use this EXACT Account ID to link it).
+  * MUST include all Required Fields.
 
 ---
 
@@ -1102,7 +1102,7 @@ When an image is provided, ALWAYS analyze it and extract records:
 2. **Only use objects listed in configuration** - if not listed, don&apos;t suggest it
 3. **Only use allowed fields** for each object
 4. **Always include Required/Mandatory fields**
-5. **Always include relationship fields:** AccountId, WhatId, WhoId where applicable
+5. **Always include relationship fields:** For NEW records, ALWAYS include `"AccountId": "{!$Input:Account.Id}"` for Contacts/Opportunities, or `"WhatId": "{!$Input:Account.Id}"` for Tasks/Events
 6. **Transcript + Image = Multiple Records** - don&apos;t skip either source
 7. **Strictly follow the Matching Protocol** - Do not create duplicates.
 
