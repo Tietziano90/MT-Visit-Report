@@ -1,22 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-================================================================================
-MT RECORD SUGGESTION - Lightning Web Component
-================================================================================
-Author: Michael Tietze, Principal AI Architect
-Contact: mtietze@salesforce.com
-Created: December 2025
-Version: 1.5
-
-COPYRIGHT AND DISTRIBUTION
-Copyright © 2025 Salesforce, Inc. All rights reserved.
-
-INTERNAL USE ONLY - This code may not be shared externally or distributed
-outside of Salesforce without prior written approval from Michael Tietze
-(mtietze@salesforce.com).
-================================================================================
--->
-
 <GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
     <activeVersionIdentifier>L1jPqRvAA1ETr4SJ2z0kYIzVNzYKLcRo0d/xoFJfcnc=_3</activeVersionIdentifier>
     <description>Standalone multi-modal AI prompt v2 - Analyzes transcripts AND images together to extract ALL records from BOTH sources. Smart combined extraction.</description>
