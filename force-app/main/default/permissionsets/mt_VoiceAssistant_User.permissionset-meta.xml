@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 ================================================================================
-MT RECORD SUGGESTION - Lightning Web Component
+MT VOICE ASSISTANT - User Permission Set
 ================================================================================
 Author: Michael Tietze, Principal AI Architect
 Contact: mtietze@salesforce.com
@@ -22,11 +22,7 @@ outside of Salesforce without prior written approval from Michael Tietze
         <enabled>true</enabled>
         <name>mt_IsAIMeetingFollowUpUser</name>
     </customPermissions>
-    <classAccesses>
-        <apexClass>mt_VisitReportService</apexClass>
-        <enabled>true</enabled>
-    </classAccesses>
-    <description>Provides access to MT Voice Assistant features including Einstein Transcribe and Visit Report Drafts.</description>
+    <description>Provides access to MT Voice Assistant features including Einstein Transcribe.</description>
     <externalCredentialPrincipalAccesses>
         <enabled>true</enabled>
         <externalCredentialPrincipal>mt_EinsteinTranscribe-AutDetails</externalCredentialPrincipal>
@@ -37,74 +33,8 @@ outside of Salesforce without prior written approval from Michael Tietze
     </externalCredentialPrincipalAccesses>
     <hasActivationRequired>false</hasActivationRequired>
     <label>MT Voice Assistant User</label>
-    <objectPermissions>
-        <allowCreate>true</allowCreate>
-        <allowDelete>true</allowDelete>
-        <allowEdit>true</allowEdit>
-        <allowRead>true</allowRead>
-        <modifyAllRecords>false</modifyAllRecords>
-        <object>MT_Visit_Report_Draft__c</object>
-        <viewAllRecords>false</viewAllRecords>
-    </objectPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>MT_Visit_Report_Draft__c.Account__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>MT_Visit_Report_Draft__c.Configuration_Profile__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>MT_Visit_Report_Draft__c.Created_By_User__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>MT_Visit_Report_Draft__c.Error_Message__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>MT_Visit_Report_Draft__c.Processed_Date__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>MT_Visit_Report_Draft__c.Prompt_Response_JSON__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>MT_Visit_Report_Draft__c.Reasoning__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>MT_Visit_Report_Draft__c.Summary__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>MT_Visit_Report_Draft__c.Transcript__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
     <tabSettings>
         <tab>MT_Voice_Assistant_Settings</tab>
         <visibility>Visible</visibility>
     </tabSettings>
-    <tabSettings>
-        <tab>MT_Visit_Report_Draft__c</tab>
-        <visibility>Visible</visibility>
-    </tabSettings>
-    <tabSettings>
-        <tab>MT_Visit_Report_Manager_Home</tab>
-        <visibility>Visible</visibility>
-    </tabSettings>
-    <applicationVisibilities>
-        <application>mt_VisitReport_Manager</application>
-        <visible>true</visible>
-    </applicationVisibilities>
 </PermissionSet>
