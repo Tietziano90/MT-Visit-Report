@@ -1,12 +1,18 @@
-.slds-modal_large {
+.draft-card {
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.draft-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.draft-card.processed {
+    border-left: 4px solid #2e844a;
+}
+
+.slds-modal_large .slds-modal__container {
     max-width: 90%;
     width: 90%;
 }
-
-.slds-modal__content {
-    overflow-y: auto;
-    max-height: 70vh;
-}
-
-
-

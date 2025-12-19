@@ -3,9 +3,9 @@
  * MT Visit Report Queue - Lightning Web Component
  * ============================================================================
  * 
- * @description     Displays pending visit report drafts for an Account and
- *                  allows users to review and approve them using a modal
- *                  with the mtRecordSuggestion component.
+ * @description     Displays pending AND processed visit report drafts for an 
+ *                  Account in separate tabs. Allows users to review and approve
+ *                  them using a modal with the mtRecordSuggestion component.
  * 
  * @author          Michael Tietze, Principal AI Architect
  * @created         December 2025
@@ -18,10 +18,12 @@ import { refreshApex } from '@salesforce/apex';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getDrafts from '@salesforce/apex/mt_VisitReportService.getDraftsForAccount';
 import updateDraftStatus from '@salesforce/apex/mt_VisitReportService.updateDraftStatus';
+import updateDraftWithRecords from '@salesforce/apex/mt_VisitReportService.updateDraftWithRecords';
 
 export default class MtVisitReportQueue extends LightningElement {
     @api recordId; // Account ID from record page
-    @track drafts = [];
+    @track pendingDrafts = [];
+    @track processedDrafts = [];
     @track selectedDraft = null;
     @track showReviewModal = false;
     @track isLoading = false;
@@ -32,12 +34,15 @@ export default class MtVisitReportQueue extends LightningElement {
     wiredDrafts(result) {
         this.wiredDraftsResult = result;
         if (result.data) {
-            this.drafts = result.data.map(draft => ({
-                ...draft,
-                formattedDate: this.formatDate(draft.CreatedDate),
-                truncatedSummary: this.truncateSummary(draft.Summary__c),
-                accountName: draft.Account__r ? draft.Account__r.Name : 'Unknown Account'
-            }));
+            // Separate into pending and processed
+            this.pendingDrafts = result.data
+                .filter(draft => draft.Status__c === 'Ready')
+                .map(draft => this.enrichDraft(draft));
+            
+            this.processedDrafts = result.data
+                .filter(draft => draft.Status__c === 'Processed')
+                .map(draft => this.enrichDraft(draft));
+            
             this.isLoading = false;
         } else if (result.error) {
             this.showToast('Error', 'Error loading drafts: ' + result.error.body.message, 'error');
@@ -45,12 +50,46 @@ export default class MtVisitReportQueue extends LightningElement {
         }
     }
     
-    get hasDrafts() {
-        return this.drafts && this.drafts.length > 0;
+    enrichDraft(draft) {
+        return {
+            ...draft,
+            formattedDate: this.formatDate(draft.CreatedDate),
+            formattedProcessedDate: this.formatDate(draft.Processed_Date__c),
+            truncatedSummary: this.truncateSummary(draft.Summary__c),
+            accountName: draft.Account__r ? draft.Account__r.Name : 'Unknown Account'
+        };
     }
     
-    get noDrafts() {
-        return !this.hasDrafts;
+    get hasPendingDrafts() {
+        return this.pendingDrafts && this.pendingDrafts.length > 0;
+    }
+    
+    get noPendingDrafts() {
+        return !this.hasPendingDrafts;
+    }
+    
+    get hasProcessedDrafts() {
+        return this.processedDrafts && this.processedDrafts.length > 0;
+    }
+    
+    get noProcessedDrafts() {
+        return !this.hasProcessedDrafts;
+    }
+    
+    get pendingCount() {
+        return this.pendingDrafts ? this.pendingDrafts.length : 0;
+    }
+    
+    get processedCount() {
+        return this.processedDrafts ? this.processedDrafts.length : 0;
+    }
+    
+    get pendingTabLabel() {
+        return `Pending (${this.pendingCount})`;
+    }
+    
+    get processedTabLabel() {
+        return `Processed (${this.processedCount})`;
     }
     
     formatDate(dateString) {
@@ -96,16 +135,42 @@ export default class MtVisitReportQueue extends LightningElement {
     
     handleRecordsSaved(event) {
         // Records were saved by mtRecordSuggestion component
+        const recordSuggestionCmp = this.template.querySelector('c-mt-record-suggestion');
+        
+        if (!recordSuggestionCmp) {
+            this.showToast('Error', 'Could not find record suggestion component', 'error');
+            return;
+        }
+        
+        // Collect all saved record IDs by type
+        const savedRecordIds = {
+            contactIds: recordSuggestionCmp.savedContactIds || [],
+            opportunityIds: recordSuggestionCmp.savedOpportunityIds || [],
+            taskIds: recordSuggestionCmp.savedTaskIds || [],
+            eventIds: recordSuggestionCmp.savedEventIds || [],
+            leadIds: recordSuggestionCmp.savedLeadIds || []
+        };
+        
         this.isLoading = true;
         
-        updateDraftStatus({ 
+        // Update draft with saved record IDs and status
+        updateDraftWithRecords({ 
             draftId: this.selectedDraft.Id, 
-            status: 'Processed' 
+            contactIds: savedRecordIds.contactIds.join(','),
+            opportunityIds: savedRecordIds.opportunityIds.join(','),
+            taskIds: savedRecordIds.taskIds.join(','),
+            eventIds: savedRecordIds.eventIds.join(','),
+            leadIds: savedRecordIds.leadIds.join(',')
         })
         .then(() => {
-            this.showToast('Success', 'Visit report processed successfully', 'success');
-            this.handleModalClose();
+            this.showToast('Success', 'Visit report processed successfully! Moving to Processed tab...', 'success');
             return refreshApex(this.wiredDraftsResult);
+        })
+        .then(() => {
+            // Close modal after refresh completes
+            setTimeout(() => {
+                this.handleModalClose();
+            }, 1000);
         })
         .catch(error => {
             this.showToast('Error', 'Error updating draft: ' + error.body.message, 'error');
