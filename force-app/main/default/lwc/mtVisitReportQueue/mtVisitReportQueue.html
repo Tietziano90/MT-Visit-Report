@@ -147,17 +147,20 @@
                         onrecordsaved={handleRecordsSaved}>
                     </c-mt-record-suggestion>
                 </div>
-                <footer class="slds-modal__footer slds-modal__footer_directional">
-                    <lightning-button 
-                        label="Cancel" 
-                        onclick={handleModalClose}>
-                    </lightning-button>
-                    <lightning-button 
-                        variant="brand"
-                        label="Confirm & Complete" 
-                        icon-name="utility:check"
-                        onclick={handleMarkAsProcessed}>
-                    </lightning-button>
+                <footer class="slds-modal__footer">
+                    <div class="slds-float_right">
+                        <lightning-button 
+                            label="Cancel" 
+                            onclick={handleModalClose}>
+                        </lightning-button>
+                        <lightning-button 
+                            variant="brand"
+                            label="Confirm &amp; Complete" 
+                            icon-name="utility:check"
+                            onclick={handleMarkAsProcessed}
+                            class="slds-m-left_medium">
+                        </lightning-button>
+                    </div>
                 </footer>
             </div>
         </section>
