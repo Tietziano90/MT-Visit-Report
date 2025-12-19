@@ -244,6 +244,7 @@ export default class MtVisitReportManager extends LightningElement {
         this.isLoading = true;
         
         // Update draft with saved record IDs and status
+        console.log('Updating draft with records:', this.selectedDraft.Id);
         updateDraftWithRecords({ 
             draftId: this.selectedDraft.Id, 
             contactIds: savedRecordIds.contactIds.join(','),
@@ -253,7 +254,8 @@ export default class MtVisitReportManager extends LightningElement {
             leadIds: savedRecordIds.leadIds.join(',')
         })
         .then(() => {
-            this.showToast('Success', 'Visit report processed successfully! Moving to Processed tab...', 'success');
+            console.log('Draft updated successfully, refreshing lists...');
+            this.showToast('Success', 'Visit report processed successfully! Refreshing lists...', 'success');
             // Refresh both lists
             return Promise.all([
                 refreshApex(this.wiredPendingResult),
@@ -261,12 +263,16 @@ export default class MtVisitReportManager extends LightningElement {
             ]);
         })
         .then(() => {
+            console.log('Lists refreshed. Pending:', this.pendingDrafts.length, 'Processed:', this.processedDrafts.length);
             // Close modal after refresh completes
             setTimeout(() => {
                 this.handleModalClose();
-            }, 1000); // 1 second delay to show the refresh
+                // Switch to processed tab to show the result
+                this.activeTab = 'processed';
+            }, 2000); // 2 second delay to show the refresh
         })
         .catch(error => {
+            console.error('Error updating draft:', error);
             this.showToast('Error', 'Error updating draft: ' + error.body.message, 'error');
         })
         .finally(() => {
