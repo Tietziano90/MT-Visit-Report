@@ -114,9 +114,9 @@
             </value>
         </inputParameters>
         <inputParameters>
-            <name>targetId</name>
+            <name>targetPageRef</name>
             <value>
-                <elementReference>$Record.Id</elementReference>
+                <stringValue>{"type":"standard__navItemPage","attributes":{"apiName":"MT_Visit_Report_Manager_Home"}}</stringValue>
             </value>
         </inputParameters>
         <nameSegment>customNotificationAction</nameSegment>

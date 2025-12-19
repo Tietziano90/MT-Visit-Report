@@ -253,12 +253,18 @@ export default class MtVisitReportManager extends LightningElement {
             leadIds: savedRecordIds.leadIds.join(',')
         })
         .then(() => {
-            this.showToast('Success', 'Visit report processed successfully', 'success');
-            this.handleModalClose();
+            this.showToast('Success', 'Visit report processed successfully! Moving to Processed tab...', 'success');
+            // Refresh both lists
             return Promise.all([
                 refreshApex(this.wiredPendingResult),
                 refreshApex(this.wiredProcessedResult)
             ]);
+        })
+        .then(() => {
+            // Close modal after refresh completes
+            setTimeout(() => {
+                this.handleModalClose();
+            }, 1000); // 1 second delay to show the refresh
         })
         .catch(error => {
             this.showToast('Error', 'Error updating draft: ' + error.body.message, 'error');
