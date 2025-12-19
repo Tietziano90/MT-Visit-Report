@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Reasoning__c</fullName>
+    <description>AI reasoning for the suggested records</description>
+    <externalId>false</externalId>
+    <inlineHelpText>The AI's explanation for why it suggested these specific records</inlineHelpText>
+    <label>Reasoning</label>
+    <length>32768</length>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Html</type>
+    <visibleLines>10</visibleLines>
+</CustomField>
+
+

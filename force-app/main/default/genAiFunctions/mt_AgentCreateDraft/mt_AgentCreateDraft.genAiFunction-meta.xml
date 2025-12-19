@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Creates a new Visit Report Draft record from the agent conversation transcript</description>
+    <developerName>mt_AgentCreateDraft</developerName>
+    <invocationTarget>mt_AgentCreateDraft</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+    <localDeveloperName>mt_AgentCreateDraft</localDeveloperName>
+    <masterLabel>Create Visit Report Draft</masterLabel>
+    <progressIndicatorMessage>Creating your visit report draft...</progressIndicatorMessage>
+</GenAiFunction>

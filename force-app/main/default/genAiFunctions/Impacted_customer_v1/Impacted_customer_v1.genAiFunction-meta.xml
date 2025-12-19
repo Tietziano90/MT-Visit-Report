@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Returns T-800 issues detection data for visualization</description>
+    <developerName>Impacted_customer_v1</developerName>
+    <invocationTarget>T800IssuesController</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+    <localDeveloperName>Impacted_customer_v1</localDeveloperName>
+    <masterLabel>Impacted_customer_v1</masterLabel>
+    <progressIndicatorMessage>Collecting information</progressIndicatorMessage>
+</GenAiFunction>

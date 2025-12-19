@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bot xmlns="http://soap.sforce.com/2006/04/metadata">
+    <agentDSLEnabled>false</agentDSLEnabled>
+    <agentTemplate>SvcCopilotTmpl__EinsteinServiceAgent</agentTemplate>
+    <agentType>EinsteinServiceAgent</agentType>
+    <botMlDomain>
+        <label>MT Visit Report Agent</label>
+        <name>MT_Visit_Report_Agent</name>
+    </botMlDomain>
+    <botSource>None</botSource>
+    <contextVariables>
+        <dataType>Text</dataType>
+        <developerName>CompanyName</developerName>
+        <includeInPrompt>true</includeInPrompt>
+        <label>Company Name</label>
+    </contextVariables>
+    <contextVariables>
+        <dataType>Text</dataType>
+        <developerName>FoundAccountId</developerName>
+        <includeInPrompt>true</includeInPrompt>
+        <label>Found Account ID</label>
+    </contextVariables>
+    <contextVariables>
+        <dataType>Text</dataType>
+        <developerName>FoundAccountName</developerName>
+        <includeInPrompt>true</includeInPrompt>
+        <label>Found Account Name</label>
+    </contextVariables>
+    <contextVariables>
+        <dataType>Text</dataType>
+        <developerName>VisitTranscript</developerName>
+        <includeInPrompt>true</includeInPrompt>
+        <label>Visit Transcript</label>
+    </contextVariables>
+    <contextVariables>
+        <dataType>Text</dataType>
+        <developerName>CreatedDraftId</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Created Draft ID</label>
+    </contextVariables>
+    <description>Voice agent for creating visit report drafts via phone calls. Helps sales reps quickly log customer visit information.</description>
+    <label>MT Visit Report Agent</label>
+    <logPrivateConversationData>true</logPrivateConversationData>
+    <richContentEnabled>true</richContentEnabled>
+    <sessionTimeout>0</sessionTimeout>
+    <type>ExternalCopilot</type>
+</Bot>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Returns global T-800 detection issues with map visualization</description>
+    <developerName>Impacted_customer_v2</developerName>
+    <invocationTarget>CyberdyneIssuesController</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+    <localDeveloperName>Impacted_customer_v2</localDeveloperName>
+    <masterLabel>Impacted_customer_v2</masterLabel>
+    <progressIndicatorMessage>Collecting Information</progressIndicatorMessage>
+</GenAiFunction>

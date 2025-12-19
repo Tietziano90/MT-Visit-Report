@@ -1,0 +1,14 @@
+{
+  "required" : [ "region" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "region" : {
+      "title" : "Region Filter",
+      "description" : "Optional: Filter by region (USA, Europe, Asia, etc.)\nDefault: all",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

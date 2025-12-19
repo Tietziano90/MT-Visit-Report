@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <canEscalate>false</canEscalate>
+    <description>Handles the creation of visit report drafts by finding the account and collecting visit details from sales representatives.</description>
+    <developerName>Visit_Report_Creation</developerName>
+    <genAiFunctions>
+        <functionName>mt_AgentFindAccount</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>mt_AgentCreateDraft</functionName>
+    </genAiFunctions>
+    <genAiPluginInstructions>
+        <description>Keep all responses SHORT and NATURAL for voice conversations. Maximum 1-2 sentences per response.</description>
+        <developerName>instruction_keepshort0</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>Keep Responses Short</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>First, ask which company the visit report is for. Then use the Find Account action to search for the account.</description>
+        <developerName>instruction_findaccount1</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>Find Account First</masterLabel>
+        <sortOrder>1</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>After finding the account, confirm the account name with the user before proceeding.</description>
+        <developerName>instruction_confirmaccount2</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>Confirm Account</masterLabel>
+        <sortOrder>2</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>Once the account is confirmed, ask the user to describe their visit. Let them speak freely without interrupting.</description>
+        <developerName>instruction_collectvisit3</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>Collect Visit Details</masterLabel>
+        <sortOrder>3</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>After the user finishes describing their visit, ask if there is anything else to add. Keep this question brief.</description>
+        <developerName>instruction_askanythingelse4</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>Ask for Additional Details</masterLabel>
+        <sortOrder>4</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>When creating the draft, use the Create Visit Report Draft action with the found account ID and the full transcript of what the user said about their visit.</description>
+        <developerName>instruction_createdraft5</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>Create Draft with Full Transcript</masterLabel>
+        <sortOrder>5</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>After creating the draft, confirm that it has been created and will be processed automatically. Keep the confirmation brief and friendly.</description>
+        <developerName>instruction_confirmcreation6</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>Confirm Draft Creation</masterLabel>
+        <sortOrder>6</sortOrder>
+    </genAiPluginInstructions>
+    <language>en_US</language>
+    <localDeveloperName>Visit_Report_Creation</localDeveloperName>
+    <masterLabel>Visit Report Creation</masterLabel>
+    <pluginType>Topic</pluginType>
+    <scope>Your job is to help sales representatives create visit report drafts by finding the correct account and collecting information about their customer visits.</scope>
+</GenAiPlugin>

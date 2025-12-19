@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "properties": {
+    "accountId": {
+      "type": "string",
+      "description": "The Account ID for the visit report"
+    },
+    "transcript": {
+      "type": "string",
+      "description": "The full conversation transcript describing the visit"
+    },
+    "configProfile": {
+      "type": "string",
+      "description": "Optional configuration profile name (defaults to Default)"
+    }
+  },
+  "required": ["accountId", "transcript"]
+}
+

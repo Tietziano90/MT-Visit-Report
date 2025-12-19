@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiFunction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Searches for an Account by name and returns the Account ID and name if found</description>
+    <developerName>mt_AgentFindAccount</developerName>
+    <invocationTarget>mt_AgentFindAccount</invocationTarget>
+    <invocationTargetType>apex</invocationTargetType>
+    <isConfirmationRequired>false</isConfirmationRequired>
+    <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+    <localDeveloperName>mt_AgentFindAccount</localDeveloperName>
+    <masterLabel>Find Account for Visit Report</masterLabel>
+    <progressIndicatorMessage>Searching for account...</progressIndicatorMessage>
+</GenAiFunction>

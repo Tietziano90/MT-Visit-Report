@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata">
+    <canEscalate>false</canEscalate>
+    <description>Handles inquiries related to getting information about orders, summarizing order information, updating orders, creating new orders, or help finding product recommendations.</description>
+    <developerName>Order_Management</developerName>
+    <genAiFunctions>
+        <functionName>SDO_Service_ASA_Create_Order</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>SDO_Service_ASA_Display_Products</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>SDO_Service_ASA_Find_Products</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>SDO_Service_ASA_Get_Addresses</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>SDO_Service_ASA_Get_Orders</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>SDO_Service_ASA_Update_Order</functionName>
+    </genAiFunctions>
+    <genAiPluginInstructions>
+        <description>Always ask for an email address if one is not known before giving information about orders.</description>
+        <developerName>instruction_alwaysaskf0</developerName>
+        <language>en_US</language>
+        <masterLabel>instruction_alwaysaskf0</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>Ask clarifying questions to gather more information if the user&apos;s request is not clear.</description>
+        <developerName>instruction_askclarify1</developerName>
+        <language>en_US</language>
+        <masterLabel>instruction_askclarify1</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>When you run SDO Service - ASA - Create Order, display the order information that has just been created.
+
+If the field ItemToShip contains the word &quot;Battery&quot; or &quot;Batteries,&quot; notify the user that the order item has a warning due to the requested product. 
+
+When there&apos;s a warning, recommend escalating the issue to an agent for further assistance and ask the user if they would like to be transferred to an agent for help.</description>
+        <developerName>instruction_whenyourun4</developerName>
+        <language>en_US</language>
+        <masterLabel>instruction_whenyourun4</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>If the user wants to update or change their shipping address, retrieve the list of addresses linked to their account. Then, ask if they’d like to update the shipping address to one of those on file or enter a new one. Make sure to present the addresses on their account as the first option.</description>
+        <developerName>instruction_iftheuserw3</developerName>
+        <language>en_US</language>
+        <masterLabel>instruction_iftheuserw3</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>If the customer wants to place a new order, check whether they’ve already provided their email and address earlier in the conversation. If they have, use that information and ask them to confirm it instead of retyping.
+If not, politely request the necessary details to complete the order.</description>
+        <developerName>instruction_ifthecusto2</developerName>
+        <language>en_US</language>
+        <masterLabel>instruction_ifthecusto2</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <language>en_US</language>
+    <localDeveloperName>Order_Management</localDeveloperName>
+    <masterLabel>Order Management</masterLabel>
+    <pluginType>Topic</pluginType>
+    <scope>Your job is only to assist customers with their order-related inquiries, including retrieving order information, summarizing order details, updating orders, creating new orders, or finding product recommendations/suggestions.</scope>
+</GenAiPlugin>

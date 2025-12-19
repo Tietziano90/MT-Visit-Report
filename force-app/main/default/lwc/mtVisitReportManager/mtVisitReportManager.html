@@ -1,0 +1,271 @@
+<!--
+================================================================================
+MT VISIT REPORT MANAGER - Lightning Web Component Template
+================================================================================
+Author: Michael Tietze, Principal AI Architect
+Contact: mtietze@salesforce.com
+Created: December 2025
+Version: 1.0
+
+COPYRIGHT AND DISTRIBUTION
+Copyright © 2025 Salesforce, Inc. All rights reserved.
+
+INTERNAL USE ONLY - This code may not be shared externally or distributed
+outside of Salesforce without prior written approval from Michael Tietze
+(mtietze@salesforce.com).
+================================================================================
+-->
+
+<template>
+    <!-- Loading State -->
+    <template if:true={isLoading}>
+        <div class="slds-is-relative loading-container">
+            <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+        </div>
+    </template>
+
+    <!-- Main Interface -->
+    <template if:false={isLoading}>
+        <div class="slds-card">
+            <!-- Card Header -->
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="report-icon" title="Visit Report Manager">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <line x1="10" y1="9" x2="8" y2="9"></line>
+                            </svg>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title slds-text-heading_small">Visit Report Manager</h2>
+                        <p class="slds-text-body_small slds-text-color_weak">AI-Generated Customer Visit Reports</p>
+                    </div>
+                </header>
+                <div class="slds-no-flex">
+                    <lightning-badge label={pendingCount} variant="inverse" class="slds-m-right_x-small"></lightning-badge>
+                    <span class="slds-text-body_small slds-text-color_weak">Pending</span>
+                </div>
+            </div>
+
+            <div class="slds-card__body slds-card__body_inner">
+                <!-- How It Works Section -->
+                <div class="slds-box slds-m-bottom_medium overview-section">
+                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                        <lightning-icon icon-name="utility:info" size="small" class="slds-m-right_small info-icon"></lightning-icon>
+                        <h3 class="slds-text-heading_small">How It Works</h3>
+                    </div>
+                    <p class="slds-text-body_regular slds-m-bottom_small">
+                        Sales reps call the <strong>AI Agent</strong> to dictate visit reports. The system automatically processes transcripts, 
+                        extracts key information, and creates draft records for your review.
+                    </p>
+                    <div class="flow-diagram slds-p-around_small">
+                        <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+                            <div class="flow-step">
+                                <lightning-icon icon-name="utility:call" size="x-small"></lightning-icon>
+                                <span class="flow-text">Call AI Agent</span>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="flow-step">
+                                <lightning-icon icon-name="utility:record" size="x-small"></lightning-icon>
+                                <span class="flow-text">Dictate Visit</span>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="flow-step">
+                                <lightning-icon icon-name="utility:einstein" size="x-small"></lightning-icon>
+                                <span class="flow-text">AI Processing</span>
+                            </div>
+                            <div class="flow-arrow">→</div>
+                            <div class="flow-step">
+                                <lightning-icon icon-name="utility:notification" size="x-small"></lightning-icon>
+                                <span class="flow-text">Review & Approve</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div class="slds-m-top_medium">
+            <lightning-tabset active-tab-value={activeTab} onselect={handleTabChange}>
+                <!-- Pending Tab -->
+                <lightning-tab label="Pending" value="pending" icon-name="utility:notification">
+                    <template if:true={hasPendingDrafts}>
+                        <div class="slds-p-around_medium">
+                            <template for:each={pendingDrafts} for:item="draft">
+                                <article key={draft.Id} class="slds-card slds-m-bottom_medium">
+                                    <div class="slds-card__header slds-grid">
+                                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                            <div class="slds-media__figure">
+                                                <lightning-icon icon-name={draft.statusIcon} 
+                                                                variant={draft.statusVariant} 
+                                                                size="small">
+                                                </lightning-icon>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <h2 class="slds-card__header-title">
+                                                    <span class="slds-text-heading_small">{draft.Name}</span>
+                                                </h2>
+                                                <p class="slds-text-body_small slds-text-color_weak">
+                                                    <lightning-icon icon-name="standard:account" size="x-small"></lightning-icon>
+                                                    {draft.accountName} • {draft.formattedDate}
+                                                </p>
+                                            </div>
+                                        </header>
+                                        <div class="slds-no-flex">
+                                            <lightning-badge label={draft.Status__c} class={draft.statusVariant}></lightning-badge>
+                                        </div>
+                                    </div>
+                                    <div class="slds-card__body slds-card__body_inner">
+                                        <div class="slds-text-longform">
+                                            <p class="slds-text-body_regular">{draft.truncatedSummary}</p>
+                                        </div>
+                                    </div>
+                                    <footer class="slds-card__footer">
+                                        <lightning-button-group>
+                                            <lightning-button 
+                                                label="Review & Process" 
+                                                variant="brand"
+                                                icon-name="utility:preview"
+                                                data-id={draft.Id}
+                                                onclick={handleReview}
+                                                disabled={isLoading}>
+                                            </lightning-button>
+                                            <lightning-button 
+                                                label="Reject" 
+                                                variant="destructive-text"
+                                                icon-name="utility:close"
+                                                data-id={draft.Id}
+                                                onclick={handleReject}
+                                                disabled={isLoading}>
+                                            </lightning-button>
+                                        </lightning-button-group>
+                                    </footer>
+                                </article>
+                            </template>
+                        </div>
+                    </template>
+                    
+                    <!-- No Pending Drafts -->
+                    <template if:true={noPendingDrafts}>
+                        <div class="slds-text-align_center slds-p-around_xx-large">
+                            <lightning-icon icon-name="utility:check" size="large" variant="success" class="slds-m-bottom_medium"></lightning-icon>
+                            <h3 class="slds-text-heading_medium">All Caught Up!</h3>
+                            <p class="slds-text-body_regular slds-text-color_weak slds-m-top_small">
+                                You have no pending visit reports to review.
+                            </p>
+                        </div>
+                    </template>
+                </lightning-tab>
+                
+                <!-- Processed Tab -->
+                <lightning-tab label="Processed" value="processed" icon-name="utility:check">
+                    <template if:true={hasProcessedDrafts}>
+                        <div class="slds-p-around_medium">
+                            <template for:each={processedDrafts} for:item="draft">
+                                <article key={draft.Id} class="slds-card slds-m-bottom_medium">
+                                    <div class="slds-card__header slds-grid">
+                                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                            <div class="slds-media__figure">
+                                                <lightning-icon icon-name="utility:check" 
+                                                                variant="success" 
+                                                                size="small">
+                                                </lightning-icon>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <h2 class="slds-card__header-title">
+                                                    <span class="slds-text-heading_small">{draft.Name}</span>
+                                                </h2>
+                                                <p class="slds-text-body_small slds-text-color_weak">
+                                                    <lightning-icon icon-name="standard:account" size="x-small"></lightning-icon>
+                                                    {draft.accountName} • Processed: {draft.formattedProcessedDate}
+                                                </p>
+                                            </div>
+                                        </header>
+                                        <div class="slds-no-flex">
+                                            <lightning-badge label="Processed" variant="success"></lightning-badge>
+                                        </div>
+                                    </div>
+                                    <div class="slds-card__body slds-card__body_inner">
+                                        <div class="slds-text-longform">
+                                            <p class="slds-text-body_regular">{draft.truncatedSummary}</p>
+                                        </div>
+                                    </div>
+                                    <footer class="slds-card__footer">
+                                        <lightning-button 
+                                            label="View Details" 
+                                            variant="neutral"
+                                            icon-name="utility:preview"
+                                            data-id={draft.Id}
+                                            onclick={handleReview}>
+                                        </lightning-button>
+                                    </footer>
+                                </article>
+                            </template>
+                        </div>
+                    </template>
+                    
+                    <!-- No Processed Drafts -->
+                    <template if:true={noProcessedDrafts}>
+                        <div class="slds-text-align_center slds-p-around_xx-large">
+                            <lightning-icon icon-name="utility:info" size="large" class="slds-m-bottom_medium"></lightning-icon>
+                            <h3 class="slds-text-heading_medium">No Processed Reports Yet</h3>
+                            <p class="slds-text-body_regular slds-text-color_weak slds-m-top_small">
+                                Processed visit reports will appear here.
+                            </p>
+                        </div>
+                    </template>
+                </lightning-tab>
+            </lightning-tabset>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <!-- Review Modal -->
+    <template if:true={showReviewModal}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large">
+            <div class="slds-modal__container">
+                <!-- Modal Header -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" 
+                            title="Close" 
+                            onclick={handleModalClose}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 class="slds-modal__title slds-hyphenate">
+                        <lightning-icon icon-name="custom:custom85" size="small" class="slds-m-right_x-small"></lightning-icon>
+                        {selectedDraft.Name} - {selectedDraft.accountName}
+                    </h2>
+                    <p class="slds-m-top_x-small slds-text-body_small">
+                        Created: <lightning-formatted-date-time value={selectedDraft.CreatedDate}></lightning-formatted-date-time>
+                    </p>
+                </header>
+                
+                <!-- Modal Body -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content">
+                    <c-mt-record-suggestion
+                        payload={selectedDraft.Prompt_Response_JSON__c}
+                        account-id={selectedDraft.Account__c}
+                        config-name={selectedDraft.Configuration_Profile__c}
+                        onrecordssaved={handleRecordsSaved}>
+                    </c-mt-record-suggestion>
+                </div>
+                
+                <!-- Modal Footer -->
+                <footer class="slds-modal__footer">
+                    <lightning-button 
+                        label="Close" 
+                        onclick={handleModalClose}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>
+

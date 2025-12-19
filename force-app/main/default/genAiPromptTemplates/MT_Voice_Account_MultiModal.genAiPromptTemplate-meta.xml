@@ -116,7 +116,7 @@ Your output should include records from BOTH sources:
     }
   ],
   &quot;Reasoning&quot;: &quot;&lt;ul&gt;&lt;li&gt;Thomas Müller mentioned in transcript.&lt;/li&gt;&lt;li&gt;Olivia Wilson from business card image.&lt;/li&gt;&lt;/ul&gt;&quot;,
-  &quot;Summary&quot;: &quot;&lt;ul&gt;&lt;li&gt;Created contact &lt;b&gt;Thomas Müller&lt;/b&gt; (from transcript).&lt;/li&gt;&lt;li&gt;Created contact &lt;b&gt;Olivia Wilson&lt;/b&gt; (from image).&lt;/li&gt;&lt;/ul&gt;&quot;
+  &quot;Summary&quot;: &quot;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Meeting:&lt;/b&gt; Met with Thomas Müller, Customer Experience Lead, and Olivia Wilson, Real Estate Agent.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Discussion:&lt;/b&gt; Initial meeting to discuss potential collaboration opportunities.&lt;/li&gt;&lt;/ul&gt;&quot;
 }
 ```
 
@@ -169,7 +169,7 @@ Your output should include records from BOTH sources:
     }
   ],
   &quot;Reasoning&quot;: &quot;&lt;ul&gt;&lt;li&gt;Sarah and $50k CRM opportunity from transcript.&lt;/li&gt;&lt;li&gt;3 action items from notes image.&lt;/li&gt;&lt;/ul&gt;&quot;,
-  &quot;Summary&quot;: &quot;&lt;ul&gt;&lt;li&gt;Created contact &lt;b&gt;Sarah&lt;/b&gt; (from transcript).&lt;/li&gt;&lt;li&gt;Created opportunity &lt;b&gt;CRM Project&lt;/b&gt; $50,000 (from transcript).&lt;/li&gt;&lt;li&gt;Created 3 tasks from meeting notes (from image).&lt;/li&gt;&lt;/ul&gt;&quot;
+  &quot;Summary&quot;: &quot;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Meeting:&lt;/b&gt; Great meeting with Sarah about the new CRM deal.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Discussion:&lt;/b&gt; CRM Project valued at $50,000 with strong interest.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Next Steps:&lt;/b&gt; Send proposal by Monday, call vendor, schedule demo next week.&lt;/li&gt;&lt;/ul&gt;&quot;
 }
 ```
 
@@ -196,7 +196,7 @@ Your output should include records from BOTH sources:
     }
   ],
   &quot;Reasoning&quot;: &quot;&lt;ul&gt;&lt;li&gt;Matched Paul Partner to existing contact.&lt;/li&gt;&lt;li&gt;Combined: promotion to VP (transcript) + new email/phone (image).&lt;/li&gt;&lt;/ul&gt;&quot;,
-  &quot;Summary&quot;: &quot;&lt;ul&gt;&lt;li&gt;Updated &lt;b&gt;Paul Partner&lt;/b&gt; with promotion and new contact details (combined from transcript + image).&lt;/li&gt;&lt;/ul&gt;&quot;
+  &quot;Summary&quot;: &quot;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Meeting:&lt;/b&gt; Spoke with Paul Partner, who was recently promoted to VP Sales.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Discussion:&lt;/b&gt; Congratulated him on promotion and received his updated contact information.&lt;/li&gt;&lt;/ul&gt;&quot;
 }
 ```
 
@@ -254,19 +254,38 @@ Before creating a new record, check the Related Records lists for existing match
 
 # SUMMARY GENERATION GUIDELINES
 
-You must generate a **Detailed Executive Summary** that combines insights from BOTH the transcript and the image into a single, cohesive narrative.
+**CRITICAL: The Summary field is a MEETING SUMMARY, NOT an AI action log.**
 
-**Critical Rules for Summary Content:**
-1. **Unified View:** Do NOT separate &quot;Image Context&quot; from &quot;Transcript Context.&quot; Merge them into one story.
-2. **Detail Level:** You must include specific numbers, product names, roles, and project titles.
-3. **Structure:** Use a bulleted list (HTML `&lt;ul&gt;`) covering these specific dimensions:
-  * **Meeting Context &amp; People:** Who did we meet? What is their role? (Explicitly mention if they are a NEW contact).
-  * **Commercial Details:** Specific project names, revenue amounts, quantities (e.g., sqm, units), and specific products discussed.
-  * **Strategic Insight:** Why do they want this? (e.g., certifications like DGNB, pain points, competitive advantages).
-  * **Next Steps:** What specifically needs to happen next?
+You must generate a **Detailed Executive Summary** that describes **WHAT HAPPENED IN THE MEETING**, combining insights from BOTH the transcript and the image into a single, cohesive narrative.
 
-**Bad Summary:** &quot;Discussed a project and found contact info in the image.&quot;
-**Good Summary:** &quot;Met Markus Weber (New Lead PM) regarding the &apos;Gewerbepark Süd&apos; project (€550k). Discussed 2,500sqm of Schüco C2C facades to support their DGNB Gold goal. We have a competitive edge on certification.&quot;
+**What to Include (Meeting Focus):**
+1. **Meeting Context &amp; People:** Who did we meet? What is their role? (e.g., &quot;Met with John Smith, VP of Sales&quot;)
+2. **Discussion Topics:** What was discussed? (e.g., &quot;Discussed new CRM implementation project&quot;)
+3. **Commercial Details:** Specific project names, revenue amounts, quantities, products (e.g., &quot;$50,000 opportunity for 500 licenses&quot;)
+4. **Strategic Insight:** Why do they want this? Pain points? Goals? (e.g., &quot;They need better reporting for their board meetings&quot;)
+5. **Next Steps:** What needs to happen next? (e.g., &quot;Send proposal by Friday, schedule demo next week&quot;)
+
+**What NOT to Include:**
+- ❌ &quot;Created contact John Smith&quot;
+- ❌ &quot;Updated opportunity with $50k&quot;
+- ❌ &quot;Added 3 tasks from image&quot;
+- ❌ Any mention of what records the AI created/updated
+
+**Bad Summary (AI Action Log):**
+&quot;&lt;ul&gt;&lt;li&gt;Created contact &lt;b&gt;John Smith&lt;/b&gt; (from transcript).&lt;/li&gt;&lt;li&gt;Created opportunity &lt;b&gt;CRM Project&lt;/b&gt; $50,000 (from transcript).&lt;/li&gt;&lt;li&gt;Created 3 tasks from meeting notes (from image).&lt;/li&gt;&lt;/ul&gt;&quot;
+
+**Good Summary (Meeting Story):**
+&quot;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Meeting:&lt;/b&gt; Met with John Smith, VP of Sales at Acme Corp.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Discussion:&lt;/b&gt; Discussed CRM implementation project valued at $50,000 for 500 user licenses.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Key Points:&lt;/b&gt; They need better reporting capabilities for quarterly board meetings. Current system lacks real-time dashboards.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Next Steps:&lt;/b&gt; Send proposal by Friday, call vendor to confirm pricing, schedule demo for next week.&lt;/li&gt;&lt;/ul&gt;&quot;
+
+**Structure Template:**
+```html
+&lt;ul&gt;
+  &lt;li&gt;&lt;b&gt;Meeting:&lt;/b&gt; [Who we met, their role, company]&lt;/li&gt;
+  &lt;li&gt;&lt;b&gt;Discussion:&lt;/b&gt; [What was discussed, project name, value]&lt;/li&gt;
+  &lt;li&gt;&lt;b&gt;Key Points:&lt;/b&gt; [Pain points, goals, strategic insights]&lt;/li&gt;
+  &lt;li&gt;&lt;b&gt;Next Steps:&lt;/b&gt; [Action items with dates]&lt;/li&gt;
+&lt;/ul&gt;
+```
 
 ---
 
@@ -281,7 +300,7 @@ You must generate a **Detailed Executive Summary** that combines insights from B
     }
   ],
   &quot;Reasoning&quot;: &quot;&lt;ul&gt;&lt;li&gt;Source of each record (transcript/image)&lt;/li&gt;&lt;/ul&gt;&quot;,
-  &quot;Summary&quot;: &quot;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Context &amp; People:&lt;/b&gt; Met with [Name], the new [Role] at [Company].&lt;/li&gt;&lt;li&gt;&lt;b&gt;Opportunity &amp; Products:&lt;/b&gt; Discussed [Project Name] valued at [Amount]. Key focus on [Specific Product] due to [Reason].&lt;/li&gt;&lt;li&gt;&lt;b&gt;Strategy:&lt;/b&gt; Client is aiming for [Goal]; our advantage is [Reason].&lt;/li&gt;&lt;li&gt;&lt;b&gt;Action Items:&lt;/b&gt; Need to send [Document] by [Date].&lt;/li&gt;&lt;/ul&gt;&quot;
+  &quot;Summary&quot;: &quot;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Meeting:&lt;/b&gt; Met with [Name], [Role] at [Company].&lt;/li&gt;&lt;li&gt;&lt;b&gt;Discussion:&lt;/b&gt; Discussed [Project Name] valued at [Amount]. Focus on [Product/Service].&lt;/li&gt;&lt;li&gt;&lt;b&gt;Key Points:&lt;/b&gt; [Pain points, goals, strategic insights].&lt;/li&gt;&lt;li&gt;&lt;b&gt;Next Steps:&lt;/b&gt; [Action items with dates].&lt;/li&gt;&lt;/ul&gt;&quot;
 }
 ```
 
@@ -329,7 +348,7 @@ You must generate a **Detailed Executive Summary** that combines insights from B
     }
   ],
   &quot;Reasoning&quot;: &quot;&lt;ul&gt;&lt;li&gt;Follow up with John from transcript.&lt;/li&gt;&lt;li&gt;Three tasks extracted from whiteboard image.&lt;/li&gt;&lt;/ul&gt;&quot;,
-  &quot;Summary&quot;: &quot;&lt;ul&gt;&lt;li&gt;Created task: &lt;b&gt;Follow up with John&lt;/b&gt; (from transcript).&lt;/li&gt;&lt;li&gt;Created 3 tasks from whiteboard (from image).&lt;/li&gt;&lt;/ul&gt;&quot;
+  &quot;Summary&quot;: &quot;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Meeting:&lt;/b&gt; Great team meeting with key decisions made.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Next Steps:&lt;/b&gt; Follow up with John next week, call vendor by Friday, send proposal to client, schedule demo.&lt;/li&gt;&lt;/ul&gt;&quot;
 }
 ```
 
@@ -360,7 +379,7 @@ You must generate a **Detailed Executive Summary** that combines insights from B
     }
   ],
   &quot;Reasoning&quot;: &quot;&lt;ul&gt;&lt;li&gt;Paul Partner matched to existing contact - updated description.&lt;/li&gt;&lt;li&gt;Jane Smith extracted from business card (Paul&apos;s colleague).&lt;/li&gt;&lt;/ul&gt;&quot;,
-  &quot;Summary&quot;: &quot;&lt;ul&gt;&lt;li&gt;Updated &lt;b&gt;Paul Partner&lt;/b&gt; (from transcript).&lt;/li&gt;&lt;li&gt;Created contact &lt;b&gt;Jane Smith&lt;/b&gt;, CFO (from image).&lt;/li&gt;&lt;/ul&gt;&quot;
+  &quot;Summary&quot;: &quot;&lt;ul&gt;&lt;li&gt;&lt;b&gt;Meeting:&lt;/b&gt; Spoke with Paul Partner about the deal and met his colleague Jane Smith, CFO.&lt;/li&gt;&lt;li&gt;&lt;b&gt;Discussion:&lt;/b&gt; Discussed deal progress and next steps with decision makers.&lt;/li&gt;&lt;/ul&gt;&quot;
 }
 ```
 

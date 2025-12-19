@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlannerBundle xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <description>Voice agent for creating visit report drafts</description>
+    <localActionLinks>
+        <genAiFunctionName>AnswerQuestionsWithKnowledge_16jKj000000oQQp</genAiFunctionName>
+    </localActionLinks>
+    <localTopicLinks>
+        <genAiPluginName>Visit_Report_Creation_16jKj000000oQQp</genAiPluginName>
+    </localTopicLinks>
+    <localTopics>
+        <fullName>Visit_Report_Creation_16jKj000000oQQp</fullName>
+        <canEscalate>false</canEscalate>
+        <description>Handles requests from sales reps who want to create a visit report draft after meeting with a customer. User will mention company names and describe their customer visits.</description>
+        <developerName>Visit_Report_Creation_16jKj000000oQQp</developerName>
+        <genAiPluginInstructions>
+            <description>Keep all responses SHORT for voice conversations. Maximum 1-2 sentences per response.
+First, ask which company the visit report is for, then use the Find Account action to search for it.
+After finding the account, confirm the account name with the user before proceeding.
+Once confirmed, ask the user to describe their visit. Let them speak freely without interrupting.
+After they finish, ask if there&apos;s anything else to add. Keep this brief.
+When ready, use the Create Visit Report Draft action with the account ID and the full transcript of what the user said.
+After creating the draft, confirm it&apos;s done and will be processed automatically.</description>
+            <developerName>instruction_1</developerName>
+            <language xsi:nil="true"/>
+            <masterLabel>Instruction 1</masterLabel>
+            <sortOrder>1</sortOrder>
+        </genAiPluginInstructions>
+        <language>en_US</language>
+        <localDeveloperName>Visit_Report_Creation</localDeveloperName>
+        <masterLabel>Visit Report Creation</masterLabel>
+        <pluginType>Topic</pluginType>
+        <scope>Your job is to help sales representatives create visit report drafts by finding the correct account and collecting information about their customer visits.</scope>
+    </localTopics>
+    <masterLabel>MT Visit Report Agent</masterLabel>
+    <plannerActions>
+        <fullName>AnswerQuestionsWithKnowledge_16jKj000000oQQp</fullName>
+        <description>Answers questions about company policies and procedures, troubleshooting steps, or product information. For example: “What is your return policy?” “How do I fix an issue?” or “What features does a product have?”</description>
+        <developerName>AnswerQuestionsWithKnowledge_16jKj000000oQQp</developerName>
+        <invocationTarget>streamKnowledgeSearch</invocationTarget>
+        <invocationTargetType>standardInvocableAction</invocationTargetType>
+        <isConfirmationRequired>false</isConfirmationRequired>
+        <isIncludeInProgressIndicator>true</isIncludeInProgressIndicator>
+        <localDeveloperName>AnswerQuestionsWithKnowledge</localDeveloperName>
+        <masterLabel>Answer Questions with Knowledge</masterLabel>
+        <progressIndicatorMessage>Getting answers</progressIndicatorMessage>
+        <source>EmployeeCopilot__AnswerQuestionsWithKnowledge</source>
+    </plannerActions>
+    <plannerSurfaces>
+        <adaptiveResponseAllowed>true</adaptiveResponseAllowed>
+        <callRecordingAllowed>false</callRecordingAllowed>
+        <surface>SurfaceAction__CustomerWebClient</surface>
+        <surfaceType>CustomerWebClient</surfaceType>
+    </plannerSurfaces>
+    <plannerSurfaces>
+        <adaptiveResponseAllowed>true</adaptiveResponseAllowed>
+        <callRecordingAllowed>false</callRecordingAllowed>
+        <surface>SurfaceAction__Messaging</surface>
+        <surfaceType>Messaging</surfaceType>
+    </plannerSurfaces>
+    <plannerType>AiCopilot__ReAct</plannerType>
+    <ruleExpressions>
+        <conditions>
+            <leftOperand>isVerified</leftOperand>
+            <leftOperandType>Variable</leftOperandType>
+            <operator>equal</operator>
+            <rightOperandValue>true</rightOperandValue>
+        </conditions>
+        <expression>Verified_User</expression>
+        <expressionLabel>Verified User</expressionLabel>
+        <expressionName>Verified_User</expressionName>
+        <expressionType>sel</expressionType>
+    </ruleExpressions>
+</GenAiPlannerBundle>

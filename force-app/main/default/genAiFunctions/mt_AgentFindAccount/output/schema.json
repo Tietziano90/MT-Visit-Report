@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "Whether the search was successful"
+    },
+    "accountId": {
+      "type": "string",
+      "description": "The ID of the found account"
+    },
+    "accountName": {
+      "type": "string",
+      "description": "The name of the found account"
+    },
+    "message": {
+      "type": "string",
+      "description": "Message to relay to the user"
+    }
+  }
+}
+

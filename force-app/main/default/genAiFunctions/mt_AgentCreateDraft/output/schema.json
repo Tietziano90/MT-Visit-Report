@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "description": "Whether the draft was created successfully"
+    },
+    "draftId": {
+      "type": "string",
+      "description": "The ID of the created draft"
+    },
+    "message": {
+      "type": "string",
+      "description": "Message to relay to the user"
+    }
+  }
+}
+

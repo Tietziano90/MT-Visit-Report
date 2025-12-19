@@ -8,5 +8,6 @@
   "name": "Voice Assistant Visit Report",
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "65.0"
+  "sourceApiVersion": "65.0",
+  "oauthLocalPort": 1717
 }

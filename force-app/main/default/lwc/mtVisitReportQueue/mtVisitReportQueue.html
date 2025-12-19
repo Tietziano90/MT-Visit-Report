@@ -1,0 +1,128 @@
+<template>
+    <lightning-card title="Pending Visit Reports" icon-name="custom:custom85">
+        <!-- Loading Spinner -->
+        <template if:true={isLoading}>
+            <div class="slds-text-align_center slds-p-around_medium">
+                <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+        
+        <!-- Drafts Table -->
+        <template if:true={hasDrafts}>
+            <div class="slds-p-around_small">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Draft #">Draft #</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Account">Account</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Created">Created</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Summary">Summary</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Actions">Actions</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={drafts} for:item="draft">
+                            <tr key={draft.Id} class="slds-hint-parent">
+                                <td data-label="Draft #">
+                                    <div class="slds-truncate" title={draft.Name}>{draft.Name}</div>
+                                </td>
+                                <td data-label="Account">
+                                    <div class="slds-truncate" title={draft.accountName}>
+                                        <lightning-icon icon-name="standard:account" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                                        {draft.accountName}
+                                    </div>
+                                </td>
+                                <td data-label="Created">
+                                    <div class="slds-truncate" title={draft.formattedDate}>{draft.formattedDate}</div>
+                                </td>
+                                <td data-label="Summary">
+                                    <div class="slds-line-clamp" title={draft.Summary__c}>{draft.truncatedSummary}</div>
+                                </td>
+                                <td data-label="Actions">
+                                    <lightning-button-group>
+                                        <lightning-button 
+                                            label="Review" 
+                                            variant="brand"
+                                            data-id={draft.Id}
+                                            onclick={handleReview}
+                                            disabled={isLoading}>
+                                        </lightning-button>
+                                        <lightning-button 
+                                            label="Reject" 
+                                            variant="destructive-text"
+                                            data-id={draft.Id}
+                                            onclick={handleReject}
+                                            disabled={isLoading}>
+                                        </lightning-button>
+                                    </lightning-button-group>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </template>
+        
+        <!-- No Drafts Message -->
+        <template if:true={noDrafts}>
+            <div class="slds-text-align_center slds-p-around_large">
+                <lightning-icon icon-name="utility:check" size="large" class="slds-m-bottom_small"></lightning-icon>
+                <p class="slds-text-heading_small">No pending visit reports</p>
+                <p class="slds-text-color_weak slds-m-top_x-small">All visit reports for this account have been processed</p>
+            </div>
+        </template>
+    </lightning-card>
+    
+    <!-- Review Modal -->
+    <template if:true={showReviewModal}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large">
+            <div class="slds-modal__container">
+                <!-- Modal Header -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" 
+                            title="Close" 
+                            onclick={handleModalClose}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 class="slds-modal__title slds-hyphenate">Review Visit Report - {selectedDraft.Name}</h2>
+                    <p class="slds-m-top_x-small">
+                        <lightning-formatted-date-time value={selectedDraft.CreatedDate}></lightning-formatted-date-time>
+                    </p>
+                </header>
+                
+                <!-- Modal Body -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content">
+                    <c-mt-record-suggestion
+                        payload={selectedDraft.Prompt_Response_JSON__c}
+                        account-id={recordId}
+                        config-name={selectedDraft.Configuration_Profile__c}
+                        onrecordssaved={handleRecordsSaved}>
+                    </c-mt-record-suggestion>
+                </div>
+                
+                <!-- Modal Footer -->
+                <footer class="slds-modal__footer">
+                    <lightning-button 
+                        label="Close" 
+                        onclick={handleModalClose}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>
+
+
+

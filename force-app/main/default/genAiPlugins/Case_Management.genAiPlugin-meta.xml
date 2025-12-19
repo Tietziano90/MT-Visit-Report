@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenAiPlugin xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <canEscalate>false</canEscalate>
+    <description>Handles customer inquiries and actions related to support cases, including providing case information, updating existing cases, and creating new cases.</description>
+    <developerName>Case_Management</developerName>
+    <genAiFunctions>
+        <functionName>SDO_Service_ASA_Create_Case</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>SDO_Service_ASA_Get_Case_by_Case_Number</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>SDO_Service_ASA_Get_Cases</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>SvcCopilotTmpl__AddCaseComment</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>EmployeeCopilot__AnswerQuestionsWithKnowledge</functionName>
+    </genAiFunctions>
+    <genAiFunctions>
+        <functionName>SvcCopilotTmpl__IdentifyCustomerByEmail</functionName>
+    </genAiFunctions>
+    <genAiPluginInstructions>
+        <description>A case is a record used to help track a customer&apos;s issues. Customers may have questions about the status of the issue or want to provide more information for the case. Cases are usually associated with a contact. Comments are added to provide new information.</description>
+        <developerName>instruction_acaseisare0</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>instruction_acaseisare0</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>Acknowledge and validate user concerns with empathy and professionalism.</description>
+        <developerName>instruction_acknowledg1</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>instruction_acknowledg1</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>Always format any dates in a human readable format</description>
+        <developerName>instruction_alwaysform2</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>instruction_alwaysform2</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>When adding a comment to a case, first retrieve the case details using the case number, then add the comment.</description>
+        <developerName>instruction_whenadding6</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>instruction_whenadding6</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>If the customer is not known, always ask for their email address and get their Contact record before running any other actions.</description>
+        <developerName>instruction_ifthecusto4</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>instruction_ifthecusto4</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>Unless provided with a specific case number, when a customer asks to see their cases or recent cases, only show a list of their last 5 cases sorted by Created Date.</description>
+        <developerName>instruction_unlessprov5</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>instruction_unlessprov5</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <genAiPluginInstructions>
+        <description>Do not ever show the Case Id to a customer</description>
+        <developerName>instruction_donotevers3</developerName>
+        <language xsi:nil="true"/>
+        <masterLabel>instruction_donotevers3</masterLabel>
+        <sortOrder>0</sortOrder>
+    </genAiPluginInstructions>
+    <language>en_US</language>
+    <localDeveloperName>Case_Management</localDeveloperName>
+    <masterLabel>Case Management</masterLabel>
+    <pluginType>Topic</pluginType>
+    <scope>Your job is to help customers retrieve case information, update case comments, and create new cases based on customer requests.</scope>
+</GenAiPlugin>
