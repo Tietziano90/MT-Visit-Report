@@ -9,60 +9,57 @@
             <!-- Tabs for Pending and Processed -->
             <lightning-tabset>
                 <!-- Pending Tab -->
-                <lightning-tab label={pendingTabLabel} value="pending">
+                <lightning-tab label={pendingTabLabel} value="pending" icon-name="utility:notification">
                     <template if:true={hasPendingDrafts}>
-                        <div class="slds-grid slds-wrap slds-gutters_small">
+                        <div class="slds-p-around_medium">
                             <template for:each={pendingDrafts} for:item="draft">
-                                <div key={draft.Id} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-3">
-                                    <article class="slds-card slds-card_boundary draft-card">
-                                        <div class="slds-card__header slds-grid">
-                                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
-                                                <div class="slds-media__figure">
-                                                    <lightning-icon icon-name="standard:record" size="small"></lightning-icon>
-                                                </div>
-                                                <div class="slds-media__body">
-                                                    <h2 class="slds-card__header-title">
-                                                        <span class="slds-text-heading_small">{draft.Name}</span>
-                                                    </h2>
-                                                </div>
-                                            </header>
+                                <article key={draft.Id} class="slds-card slds-m-bottom_medium">
+                                    <div class="slds-card__header slds-grid">
+                                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                            <div class="slds-media__figure">
+                                                <lightning-icon icon-name="utility:record" 
+                                                                variant="warning" 
+                                                                size="small">
+                                                </lightning-icon>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <h2 class="slds-card__header-title">
+                                                    <span class="slds-text-heading_small">{draft.Name}</span>
+                                                </h2>
+                                                <p class="slds-text-body_small slds-text-color_weak">
+                                                    <lightning-icon icon-name="standard:account" size="x-small"></lightning-icon>
+                                                    {draft.accountName} • {draft.formattedDate}
+                                                </p>
+                                            </div>
+                                        </header>
+                                        <div class="slds-no-flex">
+                                            <lightning-badge label={draft.Status__c} variant="warning"></lightning-badge>
                                         </div>
-                                        <div class="slds-card__body slds-card__body_inner">
-                                            <div class="slds-text-body_small slds-m-bottom_x-small">
-                                                <strong>Created:</strong> {draft.formattedDate}
-                                            </div>
-                                            <div class="slds-text-body_small slds-m-bottom_small">
-                                                <strong>Account:</strong> {draft.accountName}
-                                            </div>
-                                            <template if:true={draft.Summary__c}>
-                                                <div class="slds-text-body_small slds-text-color_weak">
-                                                    <lightning-formatted-rich-text value={draft.Summary__c}></lightning-formatted-rich-text>
-                                                </div>
-                                            </template>
-                                            <template if:false={draft.Summary__c}>
-                                                <div class="slds-text-body_small slds-text-color_weak">
-                                                    No summary available
-                                                </div>
-                                            </template>
+                                    </div>
+                                    <div class="slds-card__body slds-card__body_inner">
+                                        <div class="slds-text-longform">
+                                            <p class="slds-text-body_regular">{draft.truncatedSummary}</p>
                                         </div>
-                                        <footer class="slds-card__footer">
-                                            <div class="slds-grid slds-grid_align-spread">
-                                                <lightning-button 
-                                                    label="Review & Process" 
-                                                    variant="brand" 
-                                                    data-id={draft.Id}
-                                                    onclick={handleReview}>
-                                                </lightning-button>
-                                                <lightning-button 
-                                                    label="Reject" 
-                                                    variant="destructive-text" 
-                                                    data-id={draft.Id}
-                                                    onclick={handleReject}>
-                                                </lightning-button>
-                                            </div>
-                                        </footer>
-                                    </article>
-                                </div>
+                                    </div>
+                                    <footer class="slds-card__footer">
+                                        <lightning-button-group>
+                                            <lightning-button 
+                                                label="Review &amp; Process" 
+                                                variant="brand"
+                                                icon-name="utility:preview"
+                                                data-id={draft.Id}
+                                                onclick={handleReview}>
+                                            </lightning-button>
+                                            <lightning-button 
+                                                label="Reject" 
+                                                variant="destructive-text"
+                                                icon-name="utility:close"
+                                                data-id={draft.Id}
+                                                onclick={handleReject}>
+                                            </lightning-button>
+                                        </lightning-button-group>
+                                    </footer>
+                                </article>
                             </template>
                         </div>
                     </template>
@@ -77,42 +74,48 @@
                 </lightning-tab>
 
                 <!-- Processed Tab -->
-                <lightning-tab label={processedTabLabel} value="processed">
+                <lightning-tab label={processedTabLabel} value="processed" icon-name="utility:check">
                     <template if:true={hasProcessedDrafts}>
-                        <div class="slds-grid slds-wrap slds-gutters_small">
+                        <div class="slds-p-around_medium">
                             <template for:each={processedDrafts} for:item="draft">
-                                <div key={draft.Id} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-3">
-                                    <article class="slds-card slds-card_boundary draft-card processed">
-                                        <div class="slds-card__header slds-grid">
-                                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
-                                                <div class="slds-media__figure">
-                                                    <lightning-icon icon-name="standard:record" size="small" variant="success"></lightning-icon>
-                                                </div>
-                                                <div class="slds-media__body">
-                                                    <h2 class="slds-card__header-title">
-                                                        <span class="slds-text-heading_small">{draft.Name}</span>
-                                                    </h2>
-                                                </div>
-                                            </header>
-                                        </div>
-                                        <div class="slds-card__body slds-card__body_inner">
-                                            <div class="slds-text-body_small slds-m-bottom_x-small">
-                                                <strong>Processed:</strong> {draft.formattedProcessedDate}
+                                <article key={draft.Id} class="slds-card slds-m-bottom_medium">
+                                    <div class="slds-card__header slds-grid">
+                                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                            <div class="slds-media__figure">
+                                                <lightning-icon icon-name="utility:check" 
+                                                                variant="success" 
+                                                                size="small">
+                                                </lightning-icon>
                                             </div>
-                                            <div class="slds-text-body_small slds-m-bottom_small">
-                                                <strong>Account:</strong> {draft.accountName}
+                                            <div class="slds-media__body">
+                                                <h2 class="slds-card__header-title">
+                                                    <span class="slds-text-heading_small">{draft.Name}</span>
+                                                </h2>
+                                                <p class="slds-text-body_small slds-text-color_weak">
+                                                    <lightning-icon icon-name="standard:account" size="x-small"></lightning-icon>
+                                                    {draft.accountName} • Processed: {draft.formattedProcessedDate}
+                                                </p>
                                             </div>
-                                            <template if:true={draft.Summary__c}>
-                                                <div class="slds-text-body_small slds-text-color_weak">
-                                                    <lightning-formatted-rich-text value={draft.Summary__c}></lightning-formatted-rich-text>
-                                                </div>
-                                            </template>
-                                        </div>
-                                        <footer class="slds-card__footer">
+                                        </header>
+                                        <div class="slds-no-flex">
                                             <lightning-badge label="Processed" variant="success"></lightning-badge>
-                                        </footer>
-                                    </article>
-                                </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-card__body slds-card__body_inner">
+                                        <div class="slds-text-longform">
+                                            <p class="slds-text-body_regular">{draft.truncatedSummary}</p>
+                                        </div>
+                                    </div>
+                                    <footer class="slds-card__footer">
+                                        <lightning-button 
+                                            label="View Details" 
+                                            variant="neutral"
+                                            icon-name="utility:preview"
+                                            data-id={draft.Id}
+                                            onclick={handleReview}>
+                                        </lightning-button>
+                                    </footer>
+                                </article>
                             </template>
                         </div>
                     </template>
@@ -143,8 +146,10 @@
                 </header>
                 <div class="slds-modal__content slds-p-around_medium">
                     <c-mt-record-suggestion 
-                        draft-id={selectedDraft.Id}
-                        onrecordsaved={handleRecordsSaved}>
+                        payload={selectedDraft.Prompt_Response_JSON__c}
+                        account-id={selectedDraft.Account__c}
+                        config-name={selectedDraft.Configuration_Profile__c}
+                        onrecordssaved={handleRecordsSaved}>
                     </c-mt-record-suggestion>
                 </div>
                 <footer class="slds-modal__footer">

@@ -107,8 +107,11 @@ export default class MtVisitReportQueue extends LightningElement {
     
     handleReview(event) {
         const draftId = event.target.dataset.id;
-        this.selectedDraft = this.drafts.find(d => d.Id === draftId);
-        this.showReviewModal = true;
+        // Find draft in either pending or processed list
+        this.selectedDraft = [...this.pendingDrafts, ...this.processedDrafts].find(d => d.Id === draftId);
+        if (this.selectedDraft) {
+            this.showReviewModal = true;
+        }
     }
     
     handleReject(event) {

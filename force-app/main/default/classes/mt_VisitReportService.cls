@@ -41,10 +41,11 @@ public with sharing class mt_VisitReportService {
             return [
                 SELECT Id, Name, CreatedDate, Status__c, Summary__c, 
                        Reasoning__c, Prompt_Response_JSON__c, Configuration_Profile__c,
-                       Account__c, Account__r.Name, Created_By_User__c, Created_By_User__r.Name
+                       Account__c, Account__r.Name, Created_By_User__c, Created_By_User__r.Name,
+                       Processed_Date__c
                 FROM MT_Visit_Report_Draft__c
                 WHERE Account__c = :accountId 
-                AND Status__c = 'Ready'
+                AND (Status__c = 'Ready' OR Status__c = 'Processed')
                 ORDER BY CreatedDate DESC
                 LIMIT 50
             ];
