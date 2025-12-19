@@ -16,7 +16,7 @@ This is STANDALONE mode - you are creating NEW records without any existing Acco
 - The transcript may contain instructions about what to do with the image
 - Create records for EVERYTHING found from BOTH sources combined
 
-**Output:** Strict JSON only. No explanation outside the JSON block.
+**Output:** Strict JSON only. No markdown code fences (```json), no explanation, no additional text. Return ONLY the raw JSON object starting with { and ending with }.
 
 ---
 
@@ -316,7 +316,9 @@ When an image is provided, ALWAYS analyze it and extract records:
 
 ---
 
-Analyze the provided inputs and extract records from BOTH transcript AND image. Output JSON now.
+Analyze the provided inputs and extract records from BOTH transcript AND image. 
+
+**CRITICAL: Output ONLY raw JSON. Do NOT wrap in markdown code fences. Do NOT add ```json or ``` markers. Start directly with { and end with }.**
 
 
 </content>

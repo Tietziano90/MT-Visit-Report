@@ -16,7 +16,7 @@ This mode has ACCOUNT CONTEXT - you can UPDATE existing records and CREATE new o
 - The transcript may contain instructions about what to do with the image
 - Create records for EVERYTHING found from BOTH sources combined
 
-**Output:** Strict JSON only. No explanation outside the JSON block.
+**Output:** Strict JSON only. No markdown code fences (```json), no explanation, no additional text. Return ONLY the raw JSON object starting with { and ending with }.
 
 ---
 
@@ -366,7 +366,9 @@ You must generate a **Detailed Executive Summary** that combines insights from B
 
 ---
 
-Analyze the provided inputs and extract records from BOTH transcript AND image. Output JSON now.
+Analyze the provided inputs and extract records from BOTH transcript AND image. 
+
+**CRITICAL: Output ONLY raw JSON. Do NOT wrap in markdown code fences. Do NOT add ```json or ``` markers. Start directly with { and end with }.**
 
 
 </content>
@@ -463,7 +465,7 @@ This mode has ACCOUNT CONTEXT - you can UPDATE existing records and CREATE new o
 - The transcript may contain instructions about what to do with the image
 - Create records for EVERYTHING found from BOTH sources combined
 
-**Output:** Strict JSON only. No explanation outside the JSON block.
+**Output:** Strict JSON only. No markdown code fences (```json), no explanation, no additional text. Return ONLY the raw JSON object starting with { and ending with }.
 
 ---
 
@@ -713,7 +715,7 @@ This mode has ACCOUNT CONTEXT - you can UPDATE existing records and CREATE new o
 - The transcript may contain instructions about what to do with the image
 - Create records for EVERYTHING found from BOTH sources combined
 
-**Output:** Strict JSON only. No explanation outside the JSON block.
+**Output:** Strict JSON only. No markdown code fences (```json), no explanation, no additional text. Return ONLY the raw JSON object starting with { and ending with }.
 
 ---
 
@@ -964,7 +966,7 @@ This mode has ACCOUNT CONTEXT - you can UPDATE existing records and CREATE new o
 - The transcript may contain instructions about what to do with the image
 - Create records for EVERYTHING found from BOTH sources combined
 
-**Output:** Strict JSON only. No explanation outside the JSON block.
+**Output:** Strict JSON only. No markdown code fences (```json), no explanation, no additional text. Return ONLY the raw JSON object starting with { and ending with }.
 
 ---
 
