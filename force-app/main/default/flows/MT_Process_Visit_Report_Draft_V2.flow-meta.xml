@@ -110,7 +110,7 @@
         <inputParameters>
             <name>recipientIds</name>
             <value>
-                <elementReference>Get_Admin_Users</elementReference>
+                <elementReference>AdminUserIDs</elementReference>
             </value>
         </inputParameters>
         <inputParameters>
@@ -128,7 +128,7 @@
     <formulas>
         <name>NotificationBody</name>
         <dataType>String</dataType>
-        <expression>"A new visit report for " &amp; {!Get_Account.Name} &amp; " is ready to review. Click to open the Visit Report Manager."</expression>
+        <expression>&quot;A new visit report for &quot; &amp; {!Get_Account.Name} &amp; &quot; is ready to review. Click to open the Visit Report Manager.&quot;</expression>
     </formulas>
     <interviewLabel>MT Process Visit Report_Draft {!$Flow.CurrentDateTime}</interviewLabel>
     <label>MT Process Visit Report_Draft_V2</label>
@@ -179,14 +179,14 @@
         <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Send_Notification_To_Admins</targetReference>
+            <targetReference>Loop_Through_Admins</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
-            <field>Profile.Name</field>
+            <field>ProfileId</field>
             <operator>EqualTo</operator>
             <value>
-                <stringValue>System Administrator</stringValue>
+                <stringValue>00eKj000002nstSIAQ</stringValue>
             </value>
         </filters>
         <filters>
@@ -198,8 +198,46 @@
         </filters>
         <getFirstRecordOnly>false</getFirstRecordOnly>
         <object>User</object>
+        <queriedFields>Id</queriedFields>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
+    <loops>
+        <name>Loop_Through_Admins</name>
+        <label>Loop Through Admins</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <collectionReference>Get_Admin_Users</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Add_Admin_ID_To_Collection</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Send_Notification_To_Admins</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <assignments>
+        <name>Add_Admin_ID_To_Collection</name>
+        <label>Add Admin ID To Collection</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>AdminUserIDs</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Loop_Through_Admins.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Through_Admins</targetReference>
+        </connector>
+    </assignments>
+    <variables>
+        <name>AdminUserIDs</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
     <recordUpdates>
         <name>Update_Draft_Processing</name>
         <label>Update Draft - Processing</label>
@@ -268,5 +306,5 @@
         <recordTriggerType>CreateAndUpdate</recordTriggerType>
         <triggerType>RecordAfterSave</triggerType>
     </start>
-    <status>Draft</status>
+    <status>InvalidDraft</status>
 </Flow>
