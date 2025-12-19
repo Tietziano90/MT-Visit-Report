@@ -10,5 +10,3 @@
     <errorDisplayField>Transcript__c</errorDisplayField>
     <errorMessage>Transcript is required when creating a visit report draft.</errorMessage>
 </ValidationRule>
-
-

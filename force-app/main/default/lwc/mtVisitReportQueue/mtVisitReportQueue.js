@@ -133,6 +133,35 @@ export default class MtVisitReportQueue extends LightningElement {
         this.selectedDraft = null;
     }
     
+    handleMarkAsProcessed() {
+        if (!this.selectedDraft) {
+            return;
+        }
+        
+        this.isLoading = true;
+        
+        // Update draft status to Processed
+        updateDraftStatus({ 
+            draftId: this.selectedDraft.Id, 
+            status: 'Processed' 
+        })
+        .then(() => {
+            this.showToast('Success', 'Visit report marked as processed!', 'success');
+            // Refresh the drafts list
+            return refreshApex(this.wiredDraftsResult);
+        })
+        .then(() => {
+            // Close modal
+            this.handleModalClose();
+        })
+        .catch(error => {
+            this.showToast('Error', 'Error marking draft as processed: ' + error.body.message, 'error');
+        })
+        .finally(() => {
+            this.isLoading = false;
+        });
+    }
+    
     handleRecordsSaved(event) {
         // Records were saved by mtRecordSuggestion component
         const recordSuggestionCmp = this.template.querySelector('c-mt-record-suggestion');

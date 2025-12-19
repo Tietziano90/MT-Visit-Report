@@ -222,6 +222,43 @@ export default class MtVisitReportManager extends LightningElement {
         this.selectedDraft = null;
     }
     
+    handleMarkAsProcessed() {
+        if (!this.selectedDraft) {
+            return;
+        }
+        
+        this.isLoading = true;
+        console.log('Marking draft as processed:', this.selectedDraft.Id);
+        
+        // Update draft status to Processed
+        updateDraftStatus({ 
+            draftId: this.selectedDraft.Id, 
+            status: 'Processed' 
+        })
+        .then(() => {
+            console.log('Draft marked as processed successfully');
+            this.showToast('Success', 'Visit report marked as processed! Moving to Processed tab...', 'success');
+            // Refresh both lists
+            return Promise.all([
+                refreshApex(this.wiredPendingResult),
+                refreshApex(this.wiredProcessedResult)
+            ]);
+        })
+        .then(() => {
+            console.log('Lists refreshed. Pending:', this.pendingDrafts.length, 'Processed:', this.processedDrafts.length);
+            // Close modal and switch to processed tab
+            this.handleModalClose();
+            this.activeTab = 'processed';
+        })
+        .catch(error => {
+            console.error('Error marking draft as processed:', error);
+            this.showToast('Error', 'Error marking draft as processed: ' + error.body.message, 'error');
+        })
+        .finally(() => {
+            this.isLoading = false;
+        });
+    }
+    
     handleRecordsSaved(event) {
         // Records were saved by mtRecordSuggestion component
         // Get the saved record IDs from the child component

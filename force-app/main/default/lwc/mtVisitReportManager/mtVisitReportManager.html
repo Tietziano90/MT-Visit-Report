@@ -257,10 +257,16 @@ outside of Salesforce without prior written approval from Michael Tietze
                 </div>
                 
                 <!-- Modal Footer -->
-                <footer class="slds-modal__footer">
+                <footer class="slds-modal__footer slds-modal__footer_directional">
                     <lightning-button 
-                        label="Close" 
+                        label="Cancel" 
                         onclick={handleModalClose}>
+                    </lightning-button>
+                    <lightning-button 
+                        variant="brand"
+                        label="Mark as Processed & Close" 
+                        icon-name="utility:check"
+                        onclick={handleMarkAsProcessed}>
                     </lightning-button>
                 </footer>
             </div>

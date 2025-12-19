@@ -7,5 +7,3 @@
     <errorDisplayField>Account__c</errorDisplayField>
     <errorMessage>Account is required. Please select the customer account for this visit report.</errorMessage>
 </ValidationRule>
-
-
