@@ -19,11 +19,16 @@ outside of Salesforce without prior written approval from Michael Tietze
 import { LightningElement, track, api, wire } from 'lwc';
 import { FlowNavigationNextEvent } from 'lightning/flowSupport';
 import FORM_FACTOR from '@salesforce/client/formFactor';
+import USER_LANGUAGE from '@salesforce/i18n/lang';
 import getAccessToken from '@salesforce/apex/mt_TranscribeController.getAccessToken';
 import getBaseUrl from '@salesforce/apex/mt_TranscribeController.getBaseUrl';
 import getRelatedAccount from '@salesforce/apex/mt_TranscribeController.getRelatedAccount';
 import getConfig from '@salesforce/apex/mt_TranscribeController.getConfig';
 import transcribeWithWhisper from '@salesforce/apex/mt_TranscribeController.transcribeWithWhisper';
+// Custom Labels for Language Support
+import LABEL_SPOKEN_LANGUAGE from '@salesforce/label/c.MT_Language_SpokenLanguage';
+import LABEL_TRANSCRIPTION_LANGUAGE from '@salesforce/label/c.MT_Language_TranscriptionLanguage';
+import LABEL_AUTO from '@salesforce/label/c.MT_Language_Auto';
 // New API feature imports (optional features) - Commented out until methods are implemented
 // import discoverVoices from '@salesforce/apex/mt_TranscribeController.discoverVoices';
 // import synthesizeSpeechV2 from '@salesforce/apex/mt_TranscribeController.synthesizeSpeechV2';
@@ -159,6 +164,133 @@ export default class MtEinsteinTranscribe extends LightningElement {
 		{ label: 'Einstein Transcribe', value: 'Einstein' },
 		{ label: 'OpenAI Whisper', value: 'Whisper' }
 	];
+	
+	// ==========================================================================
+	// LANGUAGE SUPPORT
+	// ==========================================================================
+	
+	/** @description Selected spoken language (input language) */
+	@track selectedSpokenLanguage = '';
+	
+	/** @description Selected transcription language (output language) */
+	@track selectedTranscriptionLanguage = '';
+	
+	/** @description Custom labels for language UI */
+	labels = {
+		spokenLanguage: LABEL_SPOKEN_LANGUAGE,
+		transcriptionLanguage: LABEL_TRANSCRIPTION_LANGUAGE,
+		auto: LABEL_AUTO
+	};
+
+	// ==========================================================================
+	// TESTING MODE (Hidden in UI, but available for debugging)
+	// ==========================================================================
+	
+	/** @description Enable testing mode to override configuration */
+	@track testingMode = false;
+	
+	/** @description Test endpoint selection */
+	@track testEndpoint = 'v1';
+	
+	/** @description Test engine selection */
+	@track testEngine = 'internal';
+	
+	/** @description Test diarization enabled */
+	@track testDiarization = false;
+	
+	/** @description Test model name */
+	@track testModel = '';
+	
+	/** @description Endpoint options for testing */
+	get endpointOptions() {
+		return [
+			{ label: 'v1 - Basic Transcription (Only Available Option)', value: 'v1' },
+			{ label: 'v2 - With Diarization (Not Yet Available)', value: 'v2', disabled: true },
+			{ label: 'streaming - Real-time WebSocket (Not Yet Available)', value: 'streaming', disabled: true }
+		];
+	}
+	
+	/** @description Engine options for testing */
+	get engineOptions() {
+		return [
+			{ label: 'internal - Einstein Native (Fast, Good)', value: 'internal' },
+			{ label: 'aws - Amazon Transcribe (Slower, Better)', value: 'aws' },
+			{ label: 'deepgram_remote - Deepgram API (Professional)', value: 'deepgram_remote' },
+			{ label: 'deepgram_falcon - Deepgram Falcon (Performance)', value: 'deepgram_falcon' },
+			{ label: 'deepgram_sagemaker - Deepgram SageMaker (Enterprise)', value: 'deepgram_sagemaker' }
+		];
+	}
+
+	// ==========================================================================
+	// TESTING MODE HANDLERS
+	// ==========================================================================
+
+	/**
+	 * @description Toggle testing mode on/off
+	 */
+	handleTestingModeToggle(event) {
+		this.testingMode = event.detail.checked;
+		console.log('[MtEinsteinTranscribe] Testing mode:', this.testingMode ? 'ENABLED' : 'DISABLED');
+		
+		// Initialize test values from current config when enabling
+		if (this.testingMode && this._config) {
+			this.testEndpoint = this._config.transcriptionEndpoint || 'v1';
+			this.testEngine = this._config.transcriptionEngine || 'internal';
+			this.testDiarization = this._config.enableDiarization || false;
+			this.testModel = this._config.transcriptionModel || '';
+		}
+	}
+
+	/**
+	 * @description Handle endpoint change in testing mode
+	 */
+	handleEndpointChange(event) {
+		this.testEndpoint = event.detail.value;
+		console.log('[MtEinsteinTranscribe] Test endpoint changed to:', this.testEndpoint);
+	}
+
+	/**
+	 * @description Handle engine change in testing mode
+	 */
+	handleEngineChange(event) {
+		this.testEngine = event.detail.value;
+		console.log('[MtEinsteinTranscribe] Test engine changed to:', this.testEngine);
+	}
+
+	/**
+	 * @description Handle diarization toggle in testing mode
+	 */
+	handleDiarizationChange(event) {
+		this.testDiarization = event.detail.checked;
+		console.log('[MtEinsteinTranscribe] Test diarization:', this.testDiarization);
+	}
+
+	/**
+	 * @description Handle model change in testing mode
+	 */
+	handleModelChange(event) {
+		this.testModel = event.detail.value;
+		console.log('[MtEinsteinTranscribe] Test model changed to:', this.testModel);
+	}
+	
+	/** @description Language options for dropdowns */
+	get languageOptions() {
+		return [
+			{ label: 'Auto-detect (from User Settings)', value: '' },
+			{ label: 'English', value: 'en' },
+			{ label: 'Deutsch (German)', value: 'de' },
+			{ label: 'Français (French)', value: 'fr' },
+			{ label: 'Español (Spanish)', value: 'es' },
+			{ label: 'Italiano (Italian)', value: 'it' },
+			{ label: 'Português (Portuguese)', value: 'pt' },
+			{ label: 'Nederlands (Dutch)', value: 'nl' },
+			{ label: '日本語 (Japanese)', value: 'ja' },
+			{ label: '中文 (Chinese)', value: 'zh' },
+			{ label: 'العربية (Arabic)', value: 'ar' },
+			{ label: 'Русский (Russian)', value: 'ru' },
+			{ label: '한국어 (Korean)', value: 'ko' }
+		];
+	}
 	
 	// ==========================================================================
 	// SINGLE IMAGE OUTPUT (for Flow)
@@ -554,8 +686,24 @@ export default class MtEinsteinTranscribe extends LightningElement {
 	            this._transcriptionProvider = result.provider || 'Einstein';
 	            this._enableImageInputFromConfig = result.enableImageInput === true;
 	            this._showProviderSelectorFromConfig = result.showProviderSelector === true;
+	            
+	            // Load language settings
+	            if (result.defaultSpokenLanguage) {
+	                this.selectedSpokenLanguage = result.defaultSpokenLanguage;
+	            } else if (!this.selectedSpokenLanguage) {
+	                this.selectedSpokenLanguage = this._getUserLanguageCode();
+	            }
+	            
+	            if (result.defaultTranscriptionLanguage) {
+	                this.selectedTranscriptionLanguage = result.defaultTranscriptionLanguage;
+	            } else if (!this.selectedTranscriptionLanguage) {
+	                this.selectedTranscriptionLanguage = this._getUserLanguageCode();
+	            }
+	            
+	            this.showLanguageSelector = result.allowLanguageOverride === true;
+	            
 	            this._configLoaded = true;
-	            console.log('Loaded config:', result.configName, '- Provider:', this._transcriptionProvider, '- Image Input:', this._enableImageInputFromConfig, '- Show Provider Selector:', this._showProviderSelectorFromConfig);
+	            console.log('Loaded config:', result.configName, '- Provider:', this._transcriptionProvider, '- Image Input:', this._enableImageInputFromConfig, '- Show Provider Selector:', this._showProviderSelectorFromConfig, '- Spoken Language:', this.selectedSpokenLanguage, '- Transcription Language:', this.selectedTranscriptionLanguage);
 	        } else {
 	            console.warn('Could not load config:', result.errorMessage);
 	            // Fall back to defaults
@@ -605,6 +753,86 @@ export default class MtEinsteinTranscribe extends LightningElement {
 	}
 	
 	/**
+	 * @description Handle spoken language change
+	 */
+	handleSpokenLanguageChange(event) {
+		this.selectedSpokenLanguage = event.detail.value;
+		console.log('[MtEinsteinTranscribe] Spoken language changed to:', this.selectedSpokenLanguage || 'Auto');
+	}
+	
+	/**
+	 * @description Handle transcription language change
+	 */
+	handleTranscriptionLanguageChange(event) {
+		this.selectedTranscriptionLanguage = event.detail.value;
+		console.log('[MtEinsteinTranscribe] Transcription language changed to:', this.selectedTranscriptionLanguage || 'Auto');
+	}
+
+	// ==========================================================================
+	// TESTING MODE HANDLERS
+	// ==========================================================================
+
+	/**
+	 * @description Toggle testing mode on/off
+	 */
+	handleTestingModeToggle(event) {
+		this.testingMode = event.detail.checked;
+		console.log('[MtEinsteinTranscribe] Testing mode:', this.testingMode ? 'ENABLED' : 'DISABLED');
+		
+		// Initialize test values from current config when enabling
+		if (this.testingMode && this._config) {
+			this.testEndpoint = this._config.transcriptionEndpoint || 'v1';
+			this.testEngine = this._config.transcriptionEngine || 'internal';
+			this.testDiarization = this._config.enableDiarization || false;
+			this.testModel = this._config.transcriptionModel || '';
+		}
+	}
+
+	/**
+	 * @description Handle endpoint change in testing mode
+	 */
+	handleEndpointChange(event) {
+		this.testEndpoint = event.detail.value;
+		console.log('[MtEinsteinTranscribe] Test endpoint changed to:', this.testEndpoint);
+	}
+
+	/**
+	 * @description Handle engine change in testing mode
+	 */
+	handleEngineChange(event) {
+		this.testEngine = event.detail.value;
+		console.log('[MtEinsteinTranscribe] Test engine changed to:', this.testEngine);
+	}
+
+	/**
+	 * @description Handle diarization toggle in testing mode
+	 */
+	handleDiarizationChange(event) {
+		this.testDiarization = event.detail.checked;
+		console.log('[MtEinsteinTranscribe] Test diarization:', this.testDiarization);
+	}
+
+	/**
+	 * @description Handle model change in testing mode
+	 */
+	handleModelChange(event) {
+		this.testModel = event.detail.value;
+		console.log('[MtEinsteinTranscribe] Test model changed to:', this.testModel);
+	}
+	
+	/**
+	 * @description Get user's language code from Salesforce
+	 * @returns {string} ISO 639-1 language code (e.g., 'en', 'de')
+	 */
+	_getUserLanguageCode() {
+		// USER_LANGUAGE returns format like "en-US", we need "en"
+		if (USER_LANGUAGE) {
+			return USER_LANGUAGE.split('-')[0];
+		}
+		return 'en'; // Default to English
+	}
+	
+	/**
 	 * @description Resolves the related Account from the provided recordId
 	 */
 	async _resolveRelatedAccount() {
@@ -642,6 +870,18 @@ export default class MtEinsteinTranscribe extends LightningElement {
 	 * @returns {string} Full endpoint URL
 	 */
 	getEndpoint(path) {
+		// Use testing mode endpoint if enabled, otherwise use config
+		const endpoint = this.testingMode ? this.testEndpoint : (this._config?.transcriptionEndpoint || 'v1');
+		
+		// Map path to correct endpoint based on configuration
+		// Note: v2 endpoint is not yet available in Einstein Platform API
+		// For now, all requests go to v1 endpoint
+		// TODO: Update when v2 endpoint is available
+		if (path === 'transcriptions' && endpoint === 'v2') {
+			console.warn('[MtEinsteinTranscribe] v2 endpoint not yet available, using v1');
+		}
+		
+		// Default to v1 endpoint (only one currently supported)
 		return `${this.BASE_API_URL}/${path}`;
 	}
 
@@ -673,7 +913,72 @@ export default class MtEinsteinTranscribe extends LightningElement {
 			const textBlob = new Blob([input], { type: 'text/plain' });
 			formData.append('input', textBlob, fileName);
 		}
-		formData.append('language', 'english');
+		
+		// Use testing mode values if enabled, otherwise use config
+		const engine = this.testingMode ? this.testEngine : (this._config?.transcriptionEngine || 'internal');
+		const endpoint = this.testingMode ? this.testEndpoint : (this._config?.transcriptionEndpoint || 'v1');
+		const diarizationEnabled = this.testingMode ? this.testDiarization : (this._config?.enableDiarization || false);
+		const model = this.testingMode ? this.testModel : (this._config?.transcriptionModel || '');
+		
+		// Add language parameter based on selected language and engine
+		const languageCode = this.selectedSpokenLanguage || this._getUserLanguageCode();
+		
+		// Different engines expect different language formats
+		let languageParam;
+		if (engine === 'internal') {
+			// Internal engine uses language names
+			const languageMap = {
+				'en': 'english',
+				'de': 'german',
+				'fr': 'french',
+				'es': 'spanish',
+				'it': 'italian',
+				'pt': 'portuguese',
+				'nl': 'dutch',
+				'ja': 'japanese',
+				'zh': 'chinese',
+				'ar': 'arabic',
+				'ru': 'russian',
+				'ko': 'korean'
+			};
+			languageParam = languageMap[languageCode] || 'english';
+		} else if (engine === 'aws' || engine.startsWith('deepgram')) {
+			// AWS and Deepgram use ISO codes with region
+			const isoMap = {
+				'en': 'en-US',
+				'de': 'de-DE',
+				'fr': 'fr-FR',
+				'es': 'es-ES',
+				'it': 'it-IT',
+				'pt': 'pt-BR',
+				'nl': 'nl-NL',
+				'ja': 'ja-JP',
+				'zh': 'zh-CN',
+				'ar': 'ar-SA',
+				'ru': 'ru-RU',
+				'ko': 'ko-KR'
+			};
+			languageParam = isoMap[languageCode] || 'en-US';
+		} else {
+			languageParam = languageCode || 'en';
+		}
+		
+		console.log('[MtEinsteinTranscribe] Language param:', languageParam, 'for engine:', engine);
+		formData.append('language', languageParam);
+		
+		// Add engine parameter
+		formData.append('engine', engine);
+		
+		// Add diarization parameter if enabled (for v2 endpoint)
+		if (diarizationEnabled && endpoint === 'v2') {
+			formData.append('diarizationEnabled', 'true');
+		}
+		
+		// Add model parameter if specified (for Deepgram engines)
+		if (model && engine.startsWith('deepgram')) {
+			formData.append('model', model);
+		}
+		
 		if (type === 'text') {
 			formData.append('voiceId', this.selectedLanguageTTS);
 		}
@@ -688,6 +993,14 @@ export default class MtEinsteinTranscribe extends LightningElement {
 	 */
 	async callApi(endpoint, formData) {
 		try {
+			// Log what we're sending for debugging
+			console.log('[MtEinsteinTranscribe] API Call:', endpoint);
+			for (let [key, value] of formData.entries()) {
+				if (key !== 'input') { // Don't log the audio blob
+					console.log(`  ${key}:`, value);
+				}
+			}
+			
 			const accessToken = await getAccessToken();
 			const fetchOptions = {
 				method: 'POST',
@@ -809,10 +1122,11 @@ export default class MtEinsteinTranscribe extends LightningElement {
 		
 		const audioBase64 = await base64Promise;
 		
-		// Call Apex method to transcribe via Whisper
+		// Call Apex method to transcribe via Whisper with language support
 		const result = await transcribeWithWhisper({ 
 			audioBase64: audioBase64, 
-			configName: this.configName || 'Default' 
+			configName: this.configName || 'Default',
+			spokenLanguage: this.selectedSpokenLanguage || null
 		});
 		
 		if (result.success) {

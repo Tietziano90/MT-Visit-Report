@@ -57,22 +57,20 @@ outside of Salesforce without prior written approval from Michael Tietze
 				</h2>
 			</div>
 			
-			<!-- Provider Selection (shown when showProviderSelector is true) -->
-			<template lwc:if={showProviderSelector}>
-				<div class="provider-selector">
-					<lightning-combobox
-						name="provider"
-						label="Transcription Provider"
-						value={_transcriptionProvider}
-						options={providerOptions}
-						onchange={handleProviderChange}
-						variant="label-hidden"
-						class="provider-dropdown">
-					</lightning-combobox>
-				</div>
-			</template>
+		<!-- Language Selection (always shown) -->
+		<div class="language-selector-container slds-m-top_small slds-m-bottom_small">
+			<lightning-combobox
+				name="spokenLanguage"
+				label="Spoken Language"
+				value={selectedSpokenLanguage}
+				options={languageOptions}
+				onchange={handleSpokenLanguageChange}
+				field-level-help="Select the language being spoken. Auto-detect uses your Salesforce user language setting."
+				class="language-dropdown">
+			</lightning-combobox>
+		</div>
 
-			<!-- Tabbed Mode (Both STT and TTS) -->
+		<!-- Tabbed Mode (Both STT and TTS) -->
 			<template lwc:if={showTabs}>
 				<lightning-tabset active-tab-value={activeTab} onchange={handleTabChange}>
 					

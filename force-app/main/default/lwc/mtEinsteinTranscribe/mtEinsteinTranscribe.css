@@ -829,3 +829,54 @@ outside of Salesforce without prior written approval from Michael Tietze
     0%, 100% { opacity: 1; }
     50% { opacity: 0.3; }
 }
+
+/* ============================================================================
+   TESTING MODE STYLES
+   ============================================================================ */
+
+/* Testing mode toggle */
+.testing-mode-toggle {
+    margin: 0.5rem 0;
+}
+
+/* Testing configuration container */
+.testing-config-container {
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    border: 2px dashed var(--slds-g-color-border-base-4, #c9c9c9);
+    border-radius: var(--lds2-radius-md, 0.5rem);
+    padding: 1rem;
+    margin-top: 0.5rem;
+}
+
+.testing-config-container h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--slds-g-color-neutral-base-10, #181818);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.testing-config-container lightning-icon {
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+/* Current settings display */
+.testing-config-container .slds-theme_info {
+    background: var(--slds-g-color-info-base-95, #d8edff);
+    border-left: 3px solid var(--slds-g-color-info-base-50, #0176d3);
+}
+
+.testing-config-container .slds-text-body_small {
+    color: var(--slds-g-color-neutral-base-10, #181818);
+    line-height: 1.5;
+}
+
+/* Language selector container */
+.language-selector-container {
+    padding: 0.5rem 0;
+}
+
+.language-dropdown {
+    width: 100%;
+}

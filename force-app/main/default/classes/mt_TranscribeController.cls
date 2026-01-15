@@ -358,6 +358,13 @@ public with sharing class mt_TranscribeController {
                 result.description = config.Description__c;
                 result.enableImageInput = config.EnableImageInput__c == true;
                 result.showProviderSelector = config.ShowProviderSelector__c == true;
+                result.defaultSpokenLanguage = config.DefaultSpokenLanguage__c;
+                result.defaultTranscriptionLanguage = config.DefaultTranscriptionLanguage__c;
+                result.allowLanguageOverride = config.AllowLanguageOverride__c == true;
+                result.transcriptionEndpoint = config.TranscriptionEndpoint__c;
+                result.transcriptionEngine = config.TranscriptionEngine__c;
+                result.enableDiarization = config.EnableDiarization__c == true;
+                result.transcriptionModel = config.TranscriptionModel__c;
             } else {
                 result.success = false;
                 result.errorMessage = 'No configuration found. Please create a Default configuration.';
@@ -410,10 +417,11 @@ public with sharing class mt_TranscribeController {
      * @description Transcribe audio using OpenAI Whisper API
      * @param audioBase64 Base64-encoded audio data
      * @param configName Configuration profile name to use
+     * @param spokenLanguage ISO 639-1 language code for spoken language (optional, e.g., 'en', 'de')
      * @return TranscriptionResult with transcribed text or error
      */
     @AuraEnabled
-    public static TranscriptionResult transcribeWithWhisper(String audioBase64, String configName) {
+    public static TranscriptionResult transcribeWithWhisper(String audioBase64, String configName, String spokenLanguage) {
         TranscriptionResult result = new TranscriptionResult();
         
         try {
@@ -443,9 +451,9 @@ public with sharing class mt_TranscribeController {
             String boundary = '----WebKitFormBoundary' + String.valueOf(DateTime.now().getTime());
             req.setHeader('Content-Type', 'multipart/form-data; boundary=' + boundary);
             
-            // Build multipart body
+            // Build multipart body with language support
             Blob audioBlob = EncodingUtil.base64Decode(audioBase64);
-            String body = buildMultipartBody(boundary, audioBlob, model);
+            String body = buildMultipartBody(boundary, audioBlob, model, spokenLanguage);
             req.setBodyAsBlob(Blob.valueOf(body));
             
             // Note: Authorization header is set by Named Credential
@@ -487,9 +495,10 @@ public with sharing class mt_TranscribeController {
      * @param boundary The boundary string
      * @param audioBlob The audio data
      * @param model The Whisper model to use
+     * @param language ISO 639-1 language code (optional)
      * @return String multipart form body
      */
-    private static String buildMultipartBody(String boundary, Blob audioBlob, String model) {
+    private static String buildMultipartBody(String boundary, Blob audioBlob, String model, String language) {
         String body = '';
         
         // File field
@@ -502,6 +511,13 @@ public with sharing class mt_TranscribeController {
         body += '--' + boundary + '\r\n';
         body += 'Content-Disposition: form-data; name="model"\r\n\r\n';
         body += model + '\r\n';
+        
+        // Language field (if provided)
+        if (String.isNotBlank(language)) {
+            body += '--' + boundary + '\r\n';
+            body += 'Content-Disposition: form-data; name="language"\r\n\r\n';
+            body += language + '\r\n';
+        }
         
         // Response format
         body += '--' + boundary + '\r\n';
@@ -1465,6 +1481,13 @@ public with sharing class mt_TranscribeController {
         @AuraEnabled public String description;
         @AuraEnabled public Boolean enableImageInput = false;
         @AuraEnabled public Boolean showProviderSelector = false;
+        @AuraEnabled public String defaultSpokenLanguage;
+        @AuraEnabled public String defaultTranscriptionLanguage;
+        @AuraEnabled public Boolean allowLanguageOverride = true;
+        @AuraEnabled public String transcriptionEndpoint; // v1, v2, or streaming
+        @AuraEnabled public String transcriptionEngine; // internal, aws, deepgram_remote, deepgram_falcon, deepgram_sagemaker
+        @AuraEnabled public Boolean enableDiarization = false; // Speaker identification
+        @AuraEnabled public String transcriptionModel; // Model name (e.g., nova-2-phonecall, nova-3)
         @AuraEnabled public String errorMessage;
     }
     
