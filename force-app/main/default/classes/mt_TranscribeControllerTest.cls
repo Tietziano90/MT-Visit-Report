@@ -480,7 +480,7 @@ private class mt_TranscribeControllerTest {
         
         System.Test.startTest();
         mt_TranscribeController.TranscriptionResult result = 
-            mt_TranscribeController.transcribeWithWhisper('base64audiodata', 'Default');
+            mt_TranscribeController.transcribeWithWhisper('base64audiodata', 'Default', 'en');
         System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
@@ -493,7 +493,7 @@ private class mt_TranscribeControllerTest {
         
         System.Test.startTest();
         mt_TranscribeController.TranscriptionResult result = 
-            mt_TranscribeController.transcribeWithWhisper('base64audiodata', 'Default');
+            mt_TranscribeController.transcribeWithWhisper('base64audiodata', 'Default', 'en');
         System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');
@@ -503,7 +503,7 @@ private class mt_TranscribeControllerTest {
     static void testTranscribeWithWhisper_NullAudio() {
         System.Test.startTest();
         mt_TranscribeController.TranscriptionResult result = 
-            mt_TranscribeController.transcribeWithWhisper(null, 'Default');
+            mt_TranscribeController.transcribeWithWhisper(null, 'Default', null);
         System.Test.stopTest();
         
         Assert.isNotNull(result, 'Result should not be null');

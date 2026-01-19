@@ -32,5 +32,31 @@
         <members>*</members>
         <name>StaticResource</name>
     </types>
+    <types>
+        <members>*</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>CustomMetadata</name>
+    </types>
+    <types>
+        <members>MT_VoiceAssistantConfig__mdt.DefaultSpokenLanguage__c</members>
+        <members>MT_VoiceAssistantConfig__mdt.DefaultTranscriptionLanguage__c</members>
+        <members>MT_VoiceAssistantConfig__mdt.AllowLanguageOverride__c</members>
+        <members>MT_VoiceAssistantConfig__mdt.TranscriptionEndpoint__c</members>
+        <members>MT_VoiceAssistantConfig__mdt.TranscriptionEngine__c</members>
+        <members>MT_VoiceAssistantConfig__mdt.EnableDiarization__c</members>
+        <members>MT_VoiceAssistantConfig__mdt.TranscriptionModel__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>GenAiPromptTemplate</name>
+    </types>
     <version>65.0</version>
 </Package>
