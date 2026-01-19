@@ -56,4 +56,32 @@ outside of Salesforce without prior written approval from Michael Tietze
         <field>WhisperNamedCredential__c</field>
         <value xsi:type="xsd:string">mt_OpenAI_Whisper</value>
     </values>
+    <values>
+        <field>DefaultSpokenLanguage__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>DefaultTranscriptionLanguage__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>AllowLanguageOverride__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>TranscriptionEndpoint__c</field>
+        <value xsi:type="xsd:string">v1</value>
+    </values>
+    <values>
+        <field>TranscriptionEngine__c</field>
+        <value xsi:type="xsd:string">internal</value>
+    </values>
+    <values>
+        <field>EnableDiarization__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>TranscriptionModel__c</field>
+        <value xsi:nil="true"/>
+    </values>
 </CustomMetadata>
