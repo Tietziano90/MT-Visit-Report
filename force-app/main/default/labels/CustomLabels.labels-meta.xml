@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!-- Button Labels -->
+    <labels>
+        <fullName>MT_Button_Save</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Save button</shortDescription>
+        <value>Save</value>
+    </labels>
+    <labels>
+        <fullName>MT_Button_Save</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Save button</shortDescription>
+        <value>Speichern</value>
+    </labels>
+    
+    <labels>
+        <fullName>MT_Button_Saving</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Saving button</shortDescription>
+        <value>Saving...</value>
+    </labels>
+    <labels>
+        <fullName>MT_Button_Saving</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Saving button</shortDescription>
+        <value>Wird gespeichert...</value>
+    </labels>
+    
+    <labels>
+        <fullName>MT_Button_Saved</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Saved button</shortDescription>
+        <value>Saved</value>
+    </labels>
+    <labels>
+        <fullName>MT_Button_Saved</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Saved button</shortDescription>
+        <value>Gespeichert</value>
+    </labels>
+    
+    <labels>
+        <fullName>MT_Button_Edit</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Edit button</shortDescription>
+        <value>Edit</value>
+    </labels>
+    <labels>
+        <fullName>MT_Button_Edit</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Edit button</shortDescription>
+        <value>Bearbeiten</value>
+    </labels>
+    
+    <labels>
+        <fullName>MT_Button_Cancel</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Cancel button</shortDescription>
+        <value>Cancel</value>
+    </labels>
+    <labels>
+        <fullName>MT_Button_Cancel</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Cancel button</shortDescription>
+        <value>Abbrechen</value>
+    </labels>
+    
+    <labels>
+        <fullName>MT_Button_CancelEdit</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Cancel Edit button</shortDescription>
+        <value>Cancel Edit</value>
+    </labels>
+    <labels>
+        <fullName>MT_Button_CancelEdit</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Cancel Edit button</shortDescription>
+        <value>Bearbeitung abbrechen</value>
+    </labels>
+    
+    <labels>
+        <fullName>MT_Button_Refresh</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Refresh button</shortDescription>
+        <value>Refresh</value>
+    </labels>
+    <labels>
+        <fullName>MT_Button_Refresh</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Refresh button</shortDescription>
+        <value>Aktualisieren</value>
+    </labels>
+    
+    <labels>
+        <fullName>MT_Button_Link</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Link button</shortDescription>
+        <value>Link</value>
+    </labels>
+    <labels>
+        <fullName>MT_Button_Link</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Link button</shortDescription>
+        <value>Verknüpfen</value>
+    </labels>
+    
+    <labels>
+        <fullName>MT_Button_AddField</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Add Field button</shortDescription>
+        <value>Add Field</value>
+    </labels>
+    <labels>
+        <fullName>MT_Button_AddField</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Add Field button</shortDescription>
+        <value>Feld hinzufügen</value>
+    </labels>
+    
+    <labels>
+        <fullName>MT_Button_Done</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Done button</shortDescription>
+        <value>Done</value>
+    </labels>
+    <labels>
+        <fullName>MT_Button_Done</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Done button</shortDescription>
+        <value>Fertig</value>
+    </labels>
+    
+    <labels>
+        <fullName>MT_Button_ViewMatches</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>View Matches button</shortDescription>
+        <value>View Matches</value>
+    </labels>
+    <labels>
+        <fullName>MT_Button_ViewMatches</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>View Matches button</shortDescription>
+        <value>Übereinstimmungen anzeigen</value>
+    </labels>
+    
+    <!-- Badge Labels -->
+    <labels>
+        <fullName>MT_Badge_New</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>New badge</shortDescription>
+        <value>New</value>
+    </labels>
+    <labels>
+        <fullName>MT_Badge_New</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>New badge</shortDescription>
+        <value>Neu</value>
+    </labels>
+    
+    <labels>
+        <fullName>MT_Badge_Update</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Update badge</shortDescription>
+        <value>Update</value>
+    </labels>
+    <labels>
+        <fullName>MT_Badge_Update</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Update badge</shortDescription>
+        <value>Aktualisierung</value>
+    </labels>
+    
+    <!-- Layout Toggle Labels -->
+    <labels>
+        <fullName>MT_Layout_ShowAll</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Show All Fields</shortDescription>
+        <value>Show All Fields</value>
+    </labels>
+    <labels>
+        <fullName>MT_Layout_ShowAll</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Show All Fields</shortDescription>
+        <value>Alle Felder anzeigen</value>
+    </labels>
+    
+    <labels>
+        <fullName>MT_Layout_ShowFewer</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Show Fewer Fields</shortDescription>
+        <value>Show Fewer Fields</value>
+    </labels>
+    <labels>
+        <fullName>MT_Layout_ShowFewer</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Show Fewer Fields</shortDescription>
+        <value>Weniger Felder anzeigen</value>
+    </labels>
+    
+    <!-- Menu Item Labels -->
+    <labels>
+        <fullName>MT_Menu_LinkDifferent</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Link to different record</shortDescription>
+        <value>Link to different record</value>
+    </labels>
+    <labels>
+        <fullName>MT_Menu_LinkDifferent</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Link to different record</shortDescription>
+        <value>Mit anderem Datensatz verknüpfen</value>
+    </labels>
+    
+    <!-- Language Labels -->
+    <labels>
+        <fullName>MT_Language_SpokenLanguage</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Spoken Language</shortDescription>
+        <value>Spoken Language</value>
+    </labels>
+    <labels>
+        <fullName>MT_Language_SpokenLanguage</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Spoken Language</shortDescription>
+        <value>Gesprochene Sprache</value>
+    </labels>
+    
+    <labels>
+        <fullName>MT_Language_TranscriptionLanguage</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Transcription Language</shortDescription>
+        <value>Transcription Language</value>
+    </labels>
+    <labels>
+        <fullName>MT_Language_TranscriptionLanguage</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Transcription Language</shortDescription>
+        <value>Transkriptionssprache</value>
+    </labels>
+    
+    <labels>
+        <fullName>MT_Language_Auto</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Auto-detect</shortDescription>
+        <value>Auto-detect (User Language)</value>
+    </labels>
+    <labels>
+        <fullName>MT_Language_Auto</fullName>
+        <language>de</language>
+        <protected>false</protected>
+        <shortDescription>Auto-detect</shortDescription>
+        <value>Automatisch erkennen (Benutzersprache)</value>
+    </labels>
+</CustomLabels>
