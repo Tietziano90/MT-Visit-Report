@@ -104,50 +104,15 @@ public with sharing class mt_GetObjectConfigForPrompt {
             
             objectSection.add('### ' + config.ObjectApiName__c + ' (' + permissions + ')');
             
-            // Get field metadata for this object
-            Map<String, Schema.SObjectField> fieldMap = Schema.getGlobalDescribe().get(config.ObjectApiName__c)?.getDescribe()?.fields?.getMap();
-            
-            // Allowed fields with detailed metadata
-            if (String.isNotBlank(config.AllowedFields__c) && fieldMap != null) {
+            // Allowed fields
+            if (String.isNotBlank(config.AllowedFields__c)) {
                 try {
                     List<Object> fields = (List<Object>) JSON.deserializeUntyped(config.AllowedFields__c);
-                    List<String> fieldDetails = new List<String>();
-                    
-                    objectSection.add('\n**Allowed Fields:**');
+                    List<String> fieldStrings = new List<String>();
                     for (Object f : fields) {
-                        String fieldApiName = String.valueOf(f);
-                        Schema.SObjectField field = fieldMap.get(fieldApiName.toLowerCase());
-                        
-                        if (field != null) {
-                            Schema.DescribeFieldResult fieldDescribe = field.getDescribe();
-                            String fieldDetail = '- **' + fieldApiName + '** (' + fieldDescribe.getLabel() + ')';
-                            fieldDetail += ' - Type: ' + fieldDescribe.getType();
-                            
-                            // Add picklist values if applicable
-                            if (fieldDescribe.getType() == Schema.DisplayType.PICKLIST || 
-                                fieldDescribe.getType() == Schema.DisplayType.COMBOBOX) {
-                                List<String> picklistLabels = new List<String>();
-                                for (Schema.PicklistEntry entry : fieldDescribe.getPicklistValues()) {
-                                    if (entry.isActive()) {
-                                        picklistLabels.add(entry.getLabel());
-                                    }
-                                }
-                                if (!picklistLabels.isEmpty()) {
-                                    fieldDetail += ' - Options: ' + String.join(picklistLabels, ', ');
-                                }
-                            }
-                            
-                            // Mark required fields
-                            if (!fieldDescribe.isNillable() && fieldDescribe.isCreateable()) {
-                                fieldDetail += ' - **REQUIRED**';
-                            }
-                            
-                            fieldDetails.add(fieldDetail);
-                        } else {
-                            fieldDetails.add('- **' + fieldApiName + '**');
-                        }
+                        fieldStrings.add(String.valueOf(f));
                     }
-                    objectSection.add(String.join(fieldDetails, '\n'));
+                    objectSection.add('**Allowed Fields:** ' + String.join(fieldStrings, ', '));
                 } catch (Exception e) {
                     objectSection.add('**Allowed Fields:** ' + config.AllowedFields__c);
                 }
@@ -161,9 +126,9 @@ public with sharing class mt_GetObjectConfigForPrompt {
                     for (Object f : fields) {
                         fieldStrings.add(String.valueOf(f));
                     }
-                    objectSection.add('\n**Required Fields (always include):** ' + String.join(fieldStrings, ', '));
+                    objectSection.add('**Required Fields (always include):** ' + String.join(fieldStrings, ', '));
                 } catch (Exception e) {
-                    objectSection.add('\n**Required Fields:** ' + config.MandatoryFields__c);
+                    objectSection.add('**Required Fields:** ' + config.MandatoryFields__c);
                 }
             }
             
@@ -173,11 +138,6 @@ public with sharing class mt_GetObjectConfigForPrompt {
         String header = '## ALLOWED OBJECTS & FIELDS CONFIGURATION\n\n';
         header += 'You may ONLY suggest records for the following objects with the specified fields.\n';
         header += 'Always include the Required Fields even if not explicitly mentioned in the transcript.\n\n';
-        header += '**IMPORTANT INSTRUCTIONS FOR PICKLIST FIELDS:**\n';
-        header += '- For picklist fields, you MUST use the exact picklist VALUE (not the label) in your JSON output\n';
-        header += '- The picklist options listed show the LABELS that users see, but you must map them to their API values\n';
-        header += '- Example: If you see "Options: Open, In Progress, Closed" for Status field, and the transcript says "in progress", use the exact API value like "In Progress" or "InProgress" depending on the picklist configuration\n';
-        header += '- When in doubt, use the label as shown in the options list\n\n';
         
         return header + String.join(sections, '\n\n');
     }
