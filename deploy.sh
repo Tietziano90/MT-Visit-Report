@@ -216,49 +216,51 @@ manual_component_deployment() {
     echo -e "${WHITE} 1)${NC}  Custom Metadata Types & Objects"
     echo -e "${WHITE} 2)${NC}  Custom Permissions"
     echo -e "${WHITE} 3)${NC}  Apex Classes"
-    echo -e "${WHITE} 4)${NC}  Lightning Web Components (All)"
-    echo -e "${WHITE} 5)${NC}  mtDateInput (LWC)"
-    echo -e "${WHITE} 6)${NC}  mtRecordSuggestion (LWC)"
-    echo -e "${WHITE} 7)${NC}  mtEinsteinTranscribe (LWC)"
-    echo -e "${WHITE} 8)${NC}  mtVoiceAssistantAdmin (LWC)"
-    echo -e "${WHITE} 9)${NC}  Page Layouts"
-    echo -e "${WHITE}10)${NC}  Custom Metadata Records"
-    echo -e "${WHITE}11)${NC}  External Credentials"
-    echo -e "${WHITE}12)${NC}  Named Credentials"
-    echo -e "${WHITE}13)${NC}  CSP Trusted Sites"
-    echo -e "${WHITE}14)${NC}  Connected App"
-    echo -e "${WHITE}15)${NC}  GenAI Prompt Templates"
-    echo -e "${WHITE}16)${NC}  Custom Tab"
-    echo -e "${WHITE}17)${NC}  Flows"
-    echo -e "${WHITE}18)${NC}  Permission Sets"
+    echo -e "${WHITE} 4)${NC}  Custom Labels"
+    echo -e "${WHITE} 5)${NC}  Lightning Web Components (All)"
+    echo -e "${WHITE} 6)${NC}  mtDateInput (LWC)"
+    echo -e "${WHITE} 7)${NC}  mtRecordSuggestion (LWC)"
+    echo -e "${WHITE} 8)${NC}  mtEinsteinTranscribe (LWC)"
+    echo -e "${WHITE} 9)${NC}  mtVoiceAssistantAdmin (LWC)"
+    echo -e "${WHITE}10)${NC}  Page Layouts"
+    echo -e "${WHITE}11)${NC}  Custom Metadata Records"
+    echo -e "${WHITE}12)${NC}  External Credentials"
+    echo -e "${WHITE}13)${NC}  Named Credentials"
+    echo -e "${WHITE}14)${NC}  CSP Trusted Sites"
+    echo -e "${WHITE}15)${NC}  Connected App"
+    echo -e "${WHITE}16)${NC}  GenAI Prompt Templates"
+    echo -e "${WHITE}17)${NC}  Custom Tab"
+    echo -e "${WHITE}18)${NC}  Flows"
+    echo -e "${WHITE}19)${NC}  Permission Sets"
     echo -e "${WHITE} 0)${NC}  Back to main menu"
     echo ""
     
     if [ -t 0 ]; then
-        read -p "Enter choice (0-18): " COMPONENT_CHOICE
+        read -p "Enter choice (0-19): " COMPONENT_CHOICE
     else
-        read -p "Enter choice (0-18): " COMPONENT_CHOICE </dev/tty
+        read -p "Enter choice (0-19): " COMPONENT_CHOICE </dev/tty
     fi
     
     case $COMPONENT_CHOICE in
         1) deploy_component "Custom Metadata Types & Objects" "force-app/main/default/objects" ;;
         2) deploy_component "Custom Permissions" "force-app/main/default/customPermissions" ;;
         3) deploy_component "Apex Classes" "force-app/main/default/classes" ;;
-        4) deploy_component "All Lightning Web Components" "force-app/main/default/lwc" ;;
-        5) deploy_component "mtDateInput" "force-app/main/default/lwc/mtDateInput" ;;
-        6) deploy_component "mtRecordSuggestion" "force-app/main/default/lwc/mtRecordSuggestion" ;;
-        7) deploy_component "mtEinsteinTranscribe" "force-app/main/default/lwc/mtEinsteinTranscribe" ;;
-        8) deploy_component "mtVoiceAssistantAdmin" "force-app/main/default/lwc/mtVoiceAssistantAdmin" ;;
-        9) deploy_component "Page Layouts" "force-app/main/default/layouts" ;;
-        10) deploy_component "Custom Metadata Records" "force-app/main/default/customMetadata" ;;
-        11) deploy_component "External Credentials" "force-app/main/default/externalCredentials" ;;
-        12) deploy_component "Named Credentials" "force-app/main/default/namedCredentials" ;;
-        13) deploy_component "CSP Trusted Sites" "force-app/main/default/cspTrustedSites" ;;
-        14) deploy_component "Connected App" "force-app/main/default/connectedApps" ;;
-        15) deploy_component "GenAI Prompt Templates" "force-app/main/default/genAiPromptTemplates" ;;
-        16) deploy_component "Custom Tab" "force-app/main/default/tabs" ;;
-        17) deploy_component "Flows" "force-app/main/default/flows" ;;
-        18) deploy_component "Permission Sets" "force-app/main/default/permissionsets" ;;
+        4) deploy_component "Custom Labels" "force-app/main/default/labels" ;;
+        5) deploy_component "All Lightning Web Components" "force-app/main/default/lwc" ;;
+        6) deploy_component "mtDateInput" "force-app/main/default/lwc/mtDateInput" ;;
+        7) deploy_component "mtRecordSuggestion" "force-app/main/default/lwc/mtRecordSuggestion" ;;
+        8) deploy_component "mtEinsteinTranscribe" "force-app/main/default/lwc/mtEinsteinTranscribe" ;;
+        9) deploy_component "mtVoiceAssistantAdmin" "force-app/main/default/lwc/mtVoiceAssistantAdmin" ;;
+        10) deploy_component "Page Layouts" "force-app/main/default/layouts" ;;
+        11) deploy_component "Custom Metadata Records" "force-app/main/default/customMetadata" ;;
+        12) deploy_component "External Credentials" "force-app/main/default/externalCredentials" ;;
+        13) deploy_component "Named Credentials" "force-app/main/default/namedCredentials" ;;
+        14) deploy_component "CSP Trusted Sites" "force-app/main/default/cspTrustedSites" ;;
+        15) deploy_component "Connected App" "force-app/main/default/connectedApps" ;;
+        16) deploy_component "GenAI Prompt Templates" "force-app/main/default/genAiPromptTemplates" ;;
+        17) deploy_component "Custom Tab" "force-app/main/default/tabs" ;;
+        18) deploy_component "Flows" "force-app/main/default/flows" ;;
+        19) deploy_component "Permission Sets" "force-app/main/default/permissionsets" ;;
         0) return ;;
         *) print_error "Invalid choice" ;;
     esac
@@ -648,7 +650,7 @@ DEPLOYMENT_START=$(date +%s)
 FAILED_COMPONENTS=()
 
 # Step 1: Deploy Custom Metadata Types and Objects
-print_header "STEP 1/12: Custom Metadata Types & Objects"
+print_header "STEP 1/14: Custom Metadata Types & Objects"
 if deploy_component "Custom Metadata Types & Objects" "force-app/main/default/objects"; then
     sleep 2
 else
@@ -656,7 +658,7 @@ else
 fi
 
 # Step 2: Deploy Custom Permissions
-print_header "STEP 2/12: Custom Permissions"
+print_header "STEP 2/14: Custom Permissions"
 if deploy_component "Custom Permissions" "force-app/main/default/customPermissions"; then
     sleep 2
 else
@@ -664,15 +666,23 @@ else
 fi
 
 # Step 3: Deploy Apex Classes
-print_header "STEP 3/12: Apex Classes"
+print_header "STEP 3/14: Apex Classes"
 if deploy_component "Apex Classes" "force-app/main/default/classes"; then
     sleep 2
 else
     FAILED_COMPONENTS+=("Apex Classes")
 fi
 
-# Step 4: Deploy Lightning Web Components (Core) - IN DEPENDENCY ORDER!
-print_header "STEP 4/14: Lightning Web Components"
+# Step 4: Deploy Custom Labels (BEFORE LWCs - LWCs depend on them!)
+print_header "STEP 4/14: Custom Labels"
+if deploy_component "Custom Labels" "force-app/main/default/labels"; then
+    sleep 2
+else
+    FAILED_COMPONENTS+=("Custom Labels")
+fi
+
+# Step 5: Deploy Lightning Web Components (Core) - IN DEPENDENCY ORDER!
+print_header "STEP 5/14: Lightning Web Components"
 
 # Deploy mtDateInput FIRST (no dependencies)
 print_step "Deploying mtDateInput..."
@@ -706,32 +716,32 @@ else
     FAILED_COMPONENTS+=("mtVoiceAssistantAdmin")
 fi
 
-# Step 5: Deploy Page Layouts
-print_header "STEP 5/12: Page Layouts"
+# Step 6: Deploy Page Layouts
+print_header "STEP 6/14: Page Layouts"
 if deploy_component "Page Layouts" "force-app/main/default/layouts"; then
     sleep 2
 else
     FAILED_COMPONENTS+=("Page Layouts")
 fi
 
-# Step 6: Deploy Custom Metadata Records
-print_header "STEP 6/12: Custom Metadata Records"
+# Step 7: Deploy Custom Metadata Records
+print_header "STEP 7/14: Custom Metadata Records"
 if deploy_component "Custom Metadata Records" "force-app/main/default/customMetadata"; then
     sleep 2
 else
     FAILED_COMPONENTS+=("Custom Metadata Records")
 fi
 
-# Step 7: Deploy External Credentials
-print_header "STEP 7/12: External Credentials"
+# Step 8: Deploy External Credentials
+print_header "STEP 8/14: External Credentials"
 if deploy_component "External Credentials" "force-app/main/default/externalCredentials"; then
     sleep 2
 else
     FAILED_COMPONENTS+=("External Credentials")
 fi
 
-# Step 8: Deploy Named Credentials
-print_header "STEP 8/14: Named Credentials"
+# Step 9: Deploy Named Credentials
+print_header "STEP 9/14: Named Credentials"
 print_info "Named Credentials will need URL configuration after deployment"
 if deploy_component "Named Credentials" "force-app/main/default/namedCredentials"; then
     sleep 2
@@ -739,16 +749,16 @@ else
     FAILED_COMPONENTS+=("Named Credentials")
 fi
 
-# Step 9: Deploy CSP Trusted Sites
-print_header "STEP 9/12: CSP Trusted Sites"
+# Step 10: Deploy CSP Trusted Sites
+print_header "STEP 10/14: CSP Trusted Sites"
 if deploy_component "CSP Trusted Sites" "force-app/main/default/cspTrustedSites"; then
     sleep 2
 else
     FAILED_COMPONENTS+=("CSP Trusted Sites")
 fi
 
-# Step 10: Deploy Connected App
-print_header "STEP 10/12: Connected App"
+# Step 11: Deploy Connected App
+print_header "STEP 11/14: Connected App"
 print_warning "Connected App may require manual configuration"
 if deploy_component "Connected App" "force-app/main/default/connectedApps"; then
     sleep 2
@@ -756,8 +766,8 @@ else
     print_warning "Connected App may need manual setup - this is normal"
 fi
 
-# Step 11: Deploy GenAI Prompt Templates (BEFORE Flows - Flows depend on them!)
-print_header "STEP 11/14: GenAI Prompt Templates"
+# Step 12: Deploy GenAI Prompt Templates (BEFORE Flows - Flows depend on them!)
+print_header "STEP 12/14: GenAI Prompt Templates"
 print_warning "Prompt Templates require Einstein AI to be enabled"
 if deploy_component "GenAI Prompt Templates" "force-app/main/default/genAiPromptTemplates"; then
     sleep 2
@@ -765,8 +775,8 @@ else
     print_warning "Prompt Templates failed - ensure Einstein AI is enabled"
 fi
 
-# Step 12: Deploy Custom Tab (BEFORE Flows and Permission Sets - they reference it!)
-print_header "STEP 12/14: Custom Tab"
+# Step 13: Deploy Custom Tab (BEFORE Flows and Permission Sets - they reference it!)
+print_header "STEP 13/14: Custom Tab"
 if deploy_component "Custom Tab" "force-app/main/default/tabs"; then
     sleep 2
 else
