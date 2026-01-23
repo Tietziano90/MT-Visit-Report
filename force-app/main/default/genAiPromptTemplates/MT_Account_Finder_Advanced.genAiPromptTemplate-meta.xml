@@ -2,8 +2,8 @@
 <GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
     <activeVersionIdentifier>NIzhDlDJmArVdEFaxtcMljmoS/0FS/fojfUKYhn08Rc=_1</activeVersionIdentifier>
     <description>Extracts account/company name from transcript for Account matching.</description>
-    <developerName>MT_Account_Finder_Post</developerName>
-    <masterLabel>MT Account Finder (Post)</masterLabel>
+    <developerName>MT_Account_Finder_Advanced</developerName>
+    <masterLabel>MT Account Finder (Advanced)</masterLabel>
     <templateVersions>
         <content># ROLE
 

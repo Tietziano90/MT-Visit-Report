@@ -23,7 +23,7 @@ outside of Salesforce without prior written approval from Michael Tietze
         <label>Call Prompt (No Image)</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <actionName>MT_Voice_Account_MultiModal_Post_Specific</actionName>
+        <actionName>MT_Voice_Account_MultiModal_Advanced</actionName>
         <actionType>generatePromptResponse</actionType>
         <connector>
             <targetReference>Voice_Suggestion</targetReference>
@@ -53,7 +53,7 @@ outside of Salesforce without prior written approval from Michael Tietze
                 <elementReference>MT_Einstein_Transcribe.currentDateTime</elementReference>
             </value>
         </inputParameters>
-        <nameSegment>MT_Voice_Account_MultiModal_Post_Specific</nameSegment>
+        <nameSegment>MT_Voice_Account_MultiModal_Advanced</nameSegment>
         <offset>0</offset>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
@@ -62,7 +62,7 @@ outside of Salesforce without prior written approval from Michael Tietze
         <label>Call Prompt (With Image)</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <actionName>MT_Voice_Account_MultiModal_Post_Specific</actionName>
+        <actionName>MT_Voice_Account_MultiModal_Advanced</actionName>
         <actionType>generatePromptResponse</actionType>
         <connector>
             <targetReference>Voice_Suggestion</targetReference>
@@ -98,7 +98,7 @@ outside of Salesforce without prior written approval from Michael Tietze
                 <elementReference>Create_Image_Document.contentDocument</elementReference>
             </value>
         </inputParameters>
-        <nameSegment>MT_Voice_Account_MultiModal_Post_Specific</nameSegment>
+        <nameSegment>MT_Voice_Account_MultiModal_Advanced</nameSegment>
         <offset>0</offset>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
@@ -182,7 +182,7 @@ outside of Salesforce without prior written approval from Michael Tietze
         <label>Find Account via Data Cloud</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <actionName>MT_Account_Finder_Post</actionName>
+        <actionName>MT_Account_Finder_Advanced</actionName>
         <actionType>generatePromptResponse</actionType>
         <connector>
             <targetReference>Parse_Account_Response</targetReference>
@@ -194,7 +194,7 @@ outside of Salesforce without prior written approval from Michael Tietze
                 <elementReference>MT_Einstein_Transcribe.outputText</elementReference>
             </value>
         </inputParameters>
-        <nameSegment>MT_Account_Finder_Post</nameSegment>
+        <nameSegment>MT_Account_Finder_Advanced</nameSegment>
         <offset>0</offset>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
@@ -386,7 +386,7 @@ outside of Salesforce without prior written approval from Michael Tietze
         <object>Account</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
-    <description>Account-Based Voice Assistant (Post Specific) - Create or update records from transcripts and/or images with Account context. Supports business cards, handwritten notes, whiteboards. Use on Account record pages or related records (Contact, Opportunity, etc.).</description>
+    <description>Account-Based Voice Assistant (Advanced) - Create or update records from transcripts and/or images with Account context. Supports business cards, handwritten notes, whiteboards. Use on Account record pages or related records (Contact, Opportunity, etc.).</description>
     <environments>Default</environments>
     <formulas>
         <name>PromptResponseFormula</name>
@@ -410,8 +410,8 @@ outside of Salesforce without prior written approval from Michael Tietze
   )
 )</expression>
     </formulas>
-    <interviewLabel>MT Voice Assistant (Account - Post Specific) {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>MT Voice Assistant (Account-Based Post Specific)</label>
+    <interviewLabel>MT Voice Assistant (Account - Advanced) {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>MT Voice Assistant (Account-Based Advanced)</label>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
