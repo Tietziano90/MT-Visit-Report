@@ -275,6 +275,9 @@ deploy_component "Custom Permissions" "force-app/main/default/customPermissions"
 deploy_component "Apex Classes" "force-app/main/default/classes" $STEP $TOTAL
 ((STEP++))
 
+deploy_component "Custom Labels" "force-app/main/default/labels" $STEP $TOTAL
+((STEP++))
+
 print_header "STEP $STEP/$TOTAL: Lightning Web Components"
 echo ""
 print_step "Deploying mtDateInput..."
@@ -320,13 +323,13 @@ print_warning "Prompt Templates require Einstein AI to be enabled"
 deploy_component "GenAI Prompt Templates" "force-app/main/default/genAiPromptTemplates" $STEP $TOTAL
 ((STEP++))
 
+deploy_component "Custom Tab" "force-app/main/default/tabs" $STEP $TOTAL
+((STEP++))
+
 deploy_component "Flows" "force-app/main/default/flows" $STEP $TOTAL
 ((STEP++))
 
 deploy_component "Permission Sets" "force-app/main/default/permissionsets" $STEP $TOTAL
-((STEP++))
-
-deploy_component "Custom Tab" "force-app/main/default/tabs" $STEP $TOTAL
 
 ################################################################################
 # STEP 5: ASSIGN PERMISSION SETS
