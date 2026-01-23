@@ -222,7 +222,7 @@ outside of Salesforce without prior written approval from Michael Tietze
     <formulas>
         <name>PromptResponseFormula</name>
         <dataType>String</dataType>
-        <expression>IF(ISBLANK({!Call_Prompt_With_Image.output}), {!Call_Prompt_No_Image.output}, {!Call_Prompt_With_Image.output})</expression>
+        <expression>IF(ISBLANK({!Call_Prompt_With_Image.promptResponse}), {!Call_Prompt_No_Image.promptResponse}, {!Call_Prompt_With_Image.promptResponse})</expression>
     </formulas>
     <interviewLabel>MT Voice Assistant (Standalone) {!$Flow.CurrentDateTime}</interviewLabel>
     <label>MT Voice Assistant (Standalone)</label>

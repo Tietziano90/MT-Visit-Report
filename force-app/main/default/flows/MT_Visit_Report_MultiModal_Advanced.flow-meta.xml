@@ -212,7 +212,7 @@ outside of Salesforce without prior written approval from Michael Tietze
         <inputParameters>
             <name>jsonResponse</name>
             <value>
-                <elementReference>Find_Account_via_DataCloud.output</elementReference>
+                <elementReference>Find_Account_via_DataCloud.promptResponse</elementReference>
             </value>
         </inputParameters>
         <nameSegment>mt_AccountFinderParser</nameSegment>
@@ -391,19 +391,19 @@ outside of Salesforce without prior written approval from Michael Tietze
     <formulas>
         <name>PromptResponseFormula</name>
         <dataType>String</dataType>
-        <expression>IF(ISBLANK({!Call_Prompt_With_Image.output}), {!Call_Prompt_No_Image.output}, {!Call_Prompt_With_Image.output})</expression>
+        <expression>IF(ISBLANK({!Call_Prompt_With_Image.promptResponse}), {!Call_Prompt_No_Image.promptResponse}, {!Call_Prompt_With_Image.promptResponse})</expression>
     </formulas>
     <formulas>
         <name>FoundAccountId</name>
         <dataType>String</dataType>
         <expression>IF(
-  ISBLANK({!Find_Account_via_DataCloud.output}),
+  ISBLANK({!Find_Account_via_DataCloud.promptResponse}),
   {!MT_Einstein_Transcribe.account.Id},
   IF(
-    CONTAINS({!Find_Account_via_DataCloud.output}, &quot;accountId&quot;),
+    CONTAINS({!Find_Account_via_DataCloud.promptResponse}, &quot;accountId&quot;),
     MID(
-      {!Find_Account_via_DataCloud.output},
-      FIND(&quot;accountId&quot;, {!Find_Account_via_DataCloud.output}) + 13,
+      {!Find_Account_via_DataCloud.promptResponse},
+      FIND(&quot;accountId&quot;, {!Find_Account_via_DataCloud.promptResponse}) + 13,
       18
     ),
     {!MT_Einstein_Transcribe.account.Id}
