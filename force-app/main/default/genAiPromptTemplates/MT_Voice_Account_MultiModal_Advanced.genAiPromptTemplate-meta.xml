@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <activeVersionIdentifier>NIzhDlDJmArVdEFaxtcMljmoS/0FS/fojfUKYhn08Rc=_5</activeVersionIdentifier>
     <description>Account-focused multi-modal AI prompt (Advanced) - Analyzes transcripts AND images together to extract ALL records from BOTH sources. Smart combined extraction.</description>
     <developerName>MT_Voice_Account_MultiModal_Advanced</developerName>
     <masterLabel>MT Voice Account MultiModal (Advanced)</masterLabel>
