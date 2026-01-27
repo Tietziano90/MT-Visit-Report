@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GenAiPromptTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <activeVersionIdentifier>NIzhDlDJmArVdEFaxtcMljmoS/0FS/fojfUKYhn08Rc=_4</activeVersionIdentifier>
     <description>Account-focused multi-modal AI prompt (Advanced) - Analyzes transcripts AND images together to extract ALL records from BOTH sources. Smart combined extraction.</description>
     <developerName>MT_Voice_Account_MultiModal_Advanced</developerName>
     <masterLabel>MT Voice Account MultiModal (Advanced)</masterLabel>
@@ -236,7 +237,7 @@ Before creating a new record, check the Related Records lists for existing match
 ## When No Match Found → CREATE:
 - Do NOT include an `Id` field
 - Include all Required fields
-- **CRITICAL:** Include `"AccountId": "{!$Input:Account.Id}"` to link to the current Account (use this EXACT Account ID)
+- **CRITICAL:** Include `&quot;AccountId&quot;: &quot;{!$Input:Account.Id}&quot;` to link to the current Account (use this EXACT Account ID)
 
 ---
 
@@ -246,7 +247,7 @@ Before creating a new record, check the Related Records lists for existing match
 2. **Only use objects listed in configuration** - if not listed, don&apos;t suggest it
 3. **Only use allowed fields** for each object
 4. **Always include Required/Mandatory fields**
-5. **Always include relationship fields:** For NEW records, ALWAYS include `"AccountId": "{!$Input:Account.Id}"` for Contacts/Opportunities, or `"WhatId": "{!$Input:Account.Id}"` for Tasks/Events
+5. **Always include relationship fields:** For NEW records, ALWAYS include `&quot;AccountId&quot;: &quot;{!$Input:Account.Id}&quot;` for Contacts/Opportunities, or `&quot;WhatId&quot;: &quot;{!$Input:Account.Id}&quot;` for Tasks/Events
 6. **Transcript + Image = Multiple Records** - don&apos;t skip either source
 
 ---
@@ -600,7 +601,7 @@ When an image is provided, ALWAYS analyze it and extract records:
 2. **Only use objects listed in configuration** - if not listed, don&apos;t suggest it
 3. **Only use allowed fields** for each object
 4. **Always include Required/Mandatory fields**
-5. **Always include relationship fields:** For NEW records, ALWAYS include `"AccountId": "{!$Input:Account.Id}"` for Contacts/Opportunities, or `"WhatId": "{!$Input:Account.Id}"` for Tasks/Events
+5. **Always include relationship fields:** For NEW records, ALWAYS include `&quot;AccountId&quot;: &quot;{!$Input:Account.Id}&quot;` for Contacts/Opportunities, or `&quot;WhatId&quot;: &quot;{!$Input:Account.Id}&quot;` for Tasks/Events
 6. **Transcript + Image = Multiple Records** - don&apos;t skip either source
 7. **Strictly follow the Matching Protocol** - Do not create duplicates.
 
@@ -850,7 +851,7 @@ When an image is provided, ALWAYS analyze it and extract records:
 2. **Only use objects listed in configuration** - if not listed, don&apos;t suggest it
 3. **Only use allowed fields** for each object
 4. **Always include Required/Mandatory fields**
-5. **Always include relationship fields:** For NEW records, ALWAYS include `"AccountId": "{!$Input:Account.Id}"` for Contacts/Opportunities, or `"WhatId": "{!$Input:Account.Id}"` for Tasks/Events
+5. **Always include relationship fields:** For NEW records, ALWAYS include `&quot;AccountId&quot;: &quot;{!$Input:Account.Id}&quot;` for Contacts/Opportunities, or `&quot;WhatId&quot;: &quot;{!$Input:Account.Id}&quot;` for Tasks/Events
 6. **Transcript + Image = Multiple Records** - don&apos;t skip either source
 7. **Strictly follow the Matching Protocol** - Do not create duplicates.
 
@@ -1101,7 +1102,7 @@ When an image is provided, ALWAYS analyze it and extract records:
 2. **Only use objects listed in configuration** - if not listed, don&apos;t suggest it
 3. **Only use allowed fields** for each object
 4. **Always include Required/Mandatory fields**
-5. **Always include relationship fields:** For NEW records, ALWAYS include `"AccountId": "{!$Input:Account.Id}"` for Contacts/Opportunities, or `"WhatId": "{!$Input:Account.Id}"` for Tasks/Events
+5. **Always include relationship fields:** For NEW records, ALWAYS include `&quot;AccountId&quot;: &quot;{!$Input:Account.Id}&quot;` for Contacts/Opportunities, or `&quot;WhatId&quot;: &quot;{!$Input:Account.Id}&quot;` for Tasks/Events
 6. **Transcript + Image = Multiple Records** - don&apos;t skip either source
 7. **Strictly follow the Matching Protocol** - Do not create duplicates.
 
